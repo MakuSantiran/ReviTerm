@@ -1,0 +1,56 @@
+<html>
+<head>
+	<title>MakuSan QuizHelper_v2.22</title>
+	<link rel="stylesheet" type="text/css" href="files\css\lestyle.css">
+</head>
+	<body>
+
+
+	<div class="bg-image"></div>
+	<div class="focus_efx" id="focus_efx_id"> </div>
+
+	<div class="isplaying" id="isplaying_id">
+		<div class="title_no" id="title_id" unselectable="on">
+			health
+		</div>
+
+
+		<div class="choice1" id="c1_id" onclick="chckanswer(choice1Id, 0)" unselectable="on">JavaScript</div>
+		<div class="choice2" id="c2_id" onclick="chckanswer(choice2Id, 1)" unselectable="on">isn't working</div>	
+		<div class="choice3" id="c3_id" onclick="chckanswer(choice3Id, 2)" unselectable="on">properly</div>	
+		<input class="remix3input" id="userinput_Id" type="text" value="" placeholder="Type your answer here"><br><br>
+		<div class="choice4" id="c4_id" onclick="chckanswer(choice4Id, 3)" unselectable="on">  </div>	
+		<div class="question" unselectable="on">
+			<div style='font-family: "Arial";' id="q_id"> :(</div>
+			<br />
+			<img class="questionimg_class" id="questionimg_id" src="" onclick="image()"/>
+		</div>			
+
+	</div>
+
+	
+	<img class="character_class" id="character_id" src="files/img/Maku.gif" />
+		
+	<div class="questionimg_blur" id="questionimg_blur_id" onclick="image()"> </div>
+	<div class="lowHealth_class" id="lowHealth_id"></div>
+	<div class="gameOver_class" id="gameOverScreen_id" > 
+		<center>
+			<div class="gameOver_class_textF" id = "gameOver_class_textF_id"> F a i l e d . . </div>
+		</center>
+		<div class="gameOver_class_textPR" id="gameOver_class_textPR_id" onclick="gameOverRestart(0)"> Practice Mode </div> 
+		<div class="gameOver_class_textP" id="gameOver_class_textP_id"  onclick="gameOverRestart(1)"> Retry Panic Mode </div>
+		
+	</div>
+
+	<div class="loading_class" id="loading_class_id"> 
+		<div class="loading_classText" id="loading_classText_id">
+		</div>
+	</div>
+	
+	<script src="files\ajax_xlxs_0.16.19.js"></script>
+	<script src="files\conf.js"></script>
+	<script src="files\questions.js"></script>
+	<script src="files\Pizzicato.js"></script>
+	<script src="files\javascript.js" type="module"></script>
+	</body>
+</html>
