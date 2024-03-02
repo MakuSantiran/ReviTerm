@@ -1,5 +1,5 @@
 <h1> ReviTerm </h1>
-A reviewer app in a form of quiz creator that specifically helps to <b>Re</b>view <b>Term</b>inologies(ReviTerm) for people who finds reviewing boring or have trouble remembering terminologies and hopefully help them to get higher scores in the actual quizzes
+A reviewer app in a form of quiz creator that specifically helps to <b><u>Re</u></b>view <b><u>Term</u></b>inologies(ReviTerm) for people who finds reviewing boring or have trouble remembering terminologies and hopefully help them to get higher scores in the actual quizzes
 
 <h3> Features </h3>
 <ul>
