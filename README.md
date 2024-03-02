@@ -8,6 +8,6 @@ A gamified quiz creator that specifically helps to review terminologies(ReviTerm
   <li> Choices are automatically shuffled based on the groupings </li>
   <li> Remix mode! (ex: multiple choice becomes true or false, or question becomes shuffled modes)</li>
   <li> Ability to share your quizzes to other people </li>
-  <li> Implementation of unique algorithm that prioritizes the items that you forget the most </li>
+  <li> Implementation of unique algorithm that prioritizes the items that you forget the most (Mayonnaise Algorithm) </li>
   <li> Good accessibility options while maintaining gamified aspects </li>
 </ul>
