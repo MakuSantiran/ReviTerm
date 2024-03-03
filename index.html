@@ -4,92 +4,31 @@
 	<title>Editor</title>
 </head>
 <body>
+
+	<b> Create new Quiz </b>
 	<form>
 		<table>
 			<tr>
-				<td><label>Group</label></td>
-				<td><input type="text" class="itemGroup" ></td>
-			</tr>
-			<tr>
-				<td><label>Question</label></td>
-				<td><input type="text" class="itemQuestion"></td>
-			</tr>
-			<tr>
-				<td><label>Answer</label></td>
-				<td><input type="text" class="itemAnswer"></td>
-			</tr>
-			<tr>
-				<td><label>Image</label></td>
-				<td><input type="file" class="itemImage"></td>
+				<td><label>Name</label></td>
+				<td><input type="text" class="nameQuiz" ></td>
 			</tr>
 		</table>
-		<input type="button" value="Add" class="addItem">
+		<input type="button" value="Add" class="addQuiz">
 		
 	</form> 
 
-	<br/>
-	<b>Review Terms??</b><a href="./game.html"> ReviTerm! </a>
 
 	<br/><br/>
-	Database
-	<div class="listOfItems">
+	<b>Created quizzes:</b>
+	<div class="listOfQuiz">
 		
 	</div>
+
 </body>
 
 <!-- Uncomment this when exporting as an apk
 	<script src="cordova.js"></script>
 -->
+<script type="module" src="./files/reviMenu.js"></script>
 
-<script type="module" src="./files/quizEditor.js"></script>
-
-<style type="text/css">
-
-	body {
-		font-family: 'arial', sans-serif;
-		height: 100vh;
-		/*display: flex;*/
-		align-items: center;
-		justify-content: center;
-	}
-
-	form {
-		max-width: 400px;
-		background: #b7b7b7;
-		padding: 20px;
-		border-radius: 10px;
-	}
-
-	input[type="text"],
-	input[type="file"] {
-		width: 100%;
-		padding: 5px;
-		margin-bottom: 5px;
-		box-sizing: border-box;
-		border: 1px solid black;
-		border-radius: 5px;
-	}
-
-	input[type="file"] {
-		border: none;
-	}
-
-	input[type="submit"] {
-		background-color: #0fd412;
-		color: black;
-		padding: 10px;
-		border: 1px solid black;
-		border-radius: 3px;
-		cursor: pointer;
-		display: flex;
-		margin-left: auto;
-		margin-right: auto;
-	}
-
-	input[type="submit"]:hover {
-		background-color: #7ffa81;
-		border: none;
-	}
-
-</style>
 </html>

@@ -898,14 +898,25 @@ bg_music0 = new Pizzicato.Sound({
 });
 
 
+
+
+
+
 // starts the game
+var quizDatabaseName = "selectedQuiz"
+
+localforage.getItem("selectedQuiz", function (err, value) {
+	quizDatabaseName = value
+	console.log(value)
+})
+
 function gameStart(checker){
 
 	if (checker == 5){
 		//
 		//document.getElementById('fileInput').addEventListener('change', getExcel);
 
-		localforage.getItem("quizContent", function (err, value) {
+		localforage.getItem(quizDatabaseName, function (err, value) {
 
 			for (var i=0; i<value.length; i++){
 				question = [value[i]["Question"]]

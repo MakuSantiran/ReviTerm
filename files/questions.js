@@ -8,7 +8,7 @@ var identificationMode = false;
 var drainBy = -0.005;
 var wrongDamage = 17;
 var examMode = false; // no practice mode 
-var PanicMode = false; // with health and timer
+var PanicMode = true; // with health and timer
 var RemixModeRarity = 4; // the lower the value, the more remixes occuring | if 0 then all will be remix mode
 
 /* level management */

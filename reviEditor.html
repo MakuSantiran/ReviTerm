@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Editor</title>
+</head>
+<body>
+	
+	<!--
+		<button onclick="gotoSelectQuiz()"> Go Back </button>
+	-->
+	
+	<div class="topScreen">
+		<div class="reviewerNameHeader">
+			<a href="./index.html" class="goBackLink"> < </a> <div class="reviewerName"></div>
+		</div>
+	
+		<div class="reviewerDetails">
+			Total Items: #
+		</div>
+	</div>
+
+	<div style="margin-bottom: 22vw;"></div>
+
+
+
+
+	<div class="addItemWithoutGroup" onclick="showEditor(-1,'')">
+		Add Item
+	</div>
+
+	<!--
+		<b>Review Terms??</b><a href="./game.html"> ReviTerm! </a>
+	-->
+	
+
+	<div class="listOfItems">
+	</div>
+
+	<div class="overlay" id="overlay">
+	</div>
+
+	<div class="editorBox" id="editorId">
+
+		<!--
+		Enumaration Mode? (YES/NO)<br/>
+		<br/>
+		-->
+		Question(Max 255)<br/>
+		<textarea  class="itemQuestion" name="w3review" rows="4" cols="50"></textarea>
+		
+		<div class="flexContainer">
+			<div class="flexItem">
+				<br/>
+				Group<br/>
+				<input type="text" class="itemGroup" >
+		
+				<br/><br/>
+				Answer<br/>
+				
+				<input type="text" class="itemAnswer" >
+		
+				<br/><br/>
+				Disabled <input type="checkbox" class="itemDisabled">
+			</div>
+
+			<div class="flexItem">
+				<br/>
+				Picture<br/>
+
+				<div class="itemImage">
+					Coming Soon!
+				</div>
+
+			</div>
+		</div>
+
+
+		<br/><br/>
+
+		<div class="flexContainer">
+			<div class="flexItem">
+				<center>
+					<input type="button" value="Cancel" class="hideEditorFunc">
+				</center>
+			</div>
+			<div class="flexItem">
+				<center>
+					<input type="button" value="Delete" class="removeItemFunc">
+				</center>
+			</div>
+			<div class="flexItem">
+				<center>
+					<input type="button" value="Add" class="addItemFunc">
+				</center>
+			</div>
+		</div>
+	</div> 
+
+	<br/>
+	<br/>
+</body>
+
+<!-- Uncomment this when exporting as an apk
+	<script src="cordova.js"></script>
+-->
+
+<script type="module" src="./files/reviEditor.js"></script>
+
+<link rel="stylesheet" href="./files/css/revEditor.css">
+</style>
+</html>
