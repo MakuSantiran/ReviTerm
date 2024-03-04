@@ -1,11 +1,11 @@
 import localforage from "./localForage/localforage.js"
 
 
-var quizDatabaseName = "quizContent"
-var quizaddOn = "quizContent_"
+var reviewerDatabaseName = "reviewerContent"
+var revieweraddOn = "reviewerContent_"
 //  ^-- This might change especially for the structure of file
 
-// temporary/local values to be updated in the quizContent_NAME_Details database
+// temporary/local values to be updated in the reviewerContent_NAME_Details database
 var local_idCounter = 0
 var local_amountOfItems = 0
 var local_groupList = []
@@ -37,7 +37,7 @@ function findItemIndexById(array, id) {
 
 function displayItems(){
     // then add
-    localforage.getItem(quizDatabaseName, function (err, value) {
+    localforage.getItem(reviewerDatabaseName, function (err, value) {
 
         if (value != null) {
             //console.log("length of value THing", value.length)
@@ -49,6 +49,16 @@ function displayItems(){
             var totalGroups = [...new Set(local_groupList)]; //without the duplicates
             
             console.log(totalGroups)
+
+            // display empty message if empty
+            if (totalGroups.length == 0){
+                html_listOfItems.innerHTML += `
+                    <div class="emptyItemMessage">
+                        Woaaah soo empty! (   ŏ⁠﹏⁠ŏ⁠) <br/>
+                        Press the [ Add Item ] to add new Items!
+                    </div>
+                `               
+            }
 
             // this is unoptimized but gets the job done
             for (var i in totalGroups){
@@ -66,7 +76,10 @@ function displayItems(){
 
                         html_listOfItems.innerHTML += `
                             <div class="itemBox" onclick="showEditor(`+value[j].id+`,'`+value[j].group+`')">
-                                `+value[j].question+` <br/>
+                                <div class="textInItemBox"> 
+                                    <pre>`+value[j].question+`</pre>
+                                </div>
+                                
                                 <div class="itemAnswerText">Answer [`+value[j].answer+`]</div>
                             </div>                            
                         `
@@ -81,6 +94,15 @@ function displayItems(){
                     </div>
                 `
             }
+        } else {
+            // display empty message if empty
+            var html_listOfItems = document.querySelector(".listOfItems")
+            html_listOfItems.innerHTML += `
+                <div class="emptyItemMessage">
+                    Woaaah soo empty! (   ŏ⁠﹏⁠ŏ⁠) <br/>
+                    Press the [ Add Item ] to add new Items!
+                </div>
+            `               
         }
     });
 }
@@ -89,15 +111,18 @@ function displayItems(){
 // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD 
 // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD 
 
-function updateQuizDetails(updId, updAOI, updGL){
-    localforage.getItem(quizDatabaseName+"_Details", function (err, value) {
+function updateReviewerDetails(updId, updAOI, updGL){
+    localforage.getItem(reviewerDatabaseName+"_Details", function (err, value) {
+
+        var html_totalItems = document.querySelector(".totalItems")
+        html_totalItems.innerHTML = updAOI
 
         value.idCounter = updId
         value.amountOfItems = updAOI
         value.groupList = updGL
 
-        localforage.setItem(quizDatabaseName+"_Details", value)
-        console.log(quizDatabaseName+"_Details is updated!")
+        localforage.setItem(reviewerDatabaseName+"_Details", value)
+        console.log(reviewerDatabaseName+"_Details is updated!")
     
     })
 }
@@ -137,7 +162,7 @@ function addItem(){
         console.log(item)
 
         // add new item
-        localforage.getItem(quizDatabaseName, function (err, value) {
+        localforage.getItem(reviewerDatabaseName, function (err, value) {
 
             // check first if the database is empty
             if (value == null){
@@ -147,15 +172,15 @@ function addItem(){
             var newValue = value
             newValue.push(item)
 
-            localforage.setItem(quizDatabaseName, newValue)
+            localforage.setItem(reviewerDatabaseName, newValue)
             console.log(newValue)
 
 
-            // update quizDetails
+            // update reviewerDetails
             local_idCounter += 1
             local_amountOfItems += 1
             local_groupList.push(group)
-            updateQuizDetails(local_idCounter, local_amountOfItems, local_groupList)
+            updateReviewerDetails(local_idCounter, local_amountOfItems, local_groupList)
 
             //document.querySelector(".userValue").value = ""
             hideEditor()
@@ -197,7 +222,7 @@ function addItem(){
         }
 
         // add new item
-        localforage.getItem(quizDatabaseName, function (err, value) {
+        localforage.getItem(reviewerDatabaseName, function (err, value) {
 
             var selectedITBU_Index = findItemIndexById(value, id) // selected Item To Be Updated
 
@@ -214,35 +239,13 @@ function addItem(){
                     local_groupList.splice(indexToRemove, 1);
                 }
 
-                updateQuizDetails(local_idCounter, local_amountOfItems, local_groupList)
+                updateReviewerDetails(local_idCounter, local_amountOfItems, local_groupList)
             }
 
-            localforage.setItem(quizDatabaseName, newValue)
+            localforage.setItem(reviewerDatabaseName, newValue)
 
             hideEditor()
             setTimeout(displayItems, 25);
-
-            //var newValue = value
-            //newValue.push(item)
-
-            /*
-            // check first if the database is empty
-            if (value == null){
-                value = []
-            }
-
-
-
-            localforage.setItem(quizDatabaseName, newValue)
-            console.log(newValue)
-
-
-            // update quizDetails
-            local_groupList.push(group)
-            updateQuizDetails(local_idCounter, local_amountOfItems, local_groupList)
-
-            //document.querySelector(".userValue").value = ""
-            */
         }); 
     }
 
@@ -251,44 +254,63 @@ function addItem(){
 }
 document.querySelector(".addItemFunc").addEventListener("click", addItem);
 
-// kunin muna yung "selectedQuiz"
+// kunin muna yung "selectedReviewer"
 function initialization(){
 
-    localforage.getItem("selectedQuiz", function (err, value) {
-        quizDatabaseName = quizaddOn+value
-        console.log(quizDatabaseName)
+    localforage.getItem("selectedReviewer", function (err, value) {
+        reviewerDatabaseName = revieweraddOn+value
+        console.log(reviewerDatabaseName)
         setTimeout(displayItems, 25);
 
-        localforage.getItem(quizDatabaseName, function (err, value) {
-            console.log("Content of "+quizDatabaseName+" are "+value)
+        localforage.getItem(reviewerDatabaseName, function (err, value) {
 
-            document.querySelector(".reviewerName").innerHTML += quizDatabaseName
+            // if empty 
+            if (value == null){
+
+            }
+
+            value = []
+
+            console.log("Content of "+reviewerDatabaseName+" are "+value)
+
+            var reviewerHeaderName = reviewerDatabaseName.replace(revieweraddOn, "");
+
+            document.querySelector(".reviewerName").innerHTML += reviewerHeaderName
+            document.querySelector(".totalItems").innerHTML = value["amountOfItems"]
         })
         
+        //localforage.removeItem(reviewerDatabaseName+"_Details")
+        // to set up the details of the reviewer
+        localforage.getItem(reviewerDatabaseName+"_Details", function (err, value) {
 
-        //localforage.removeItem(quizDatabaseName+"_Details")
 
-        // to set up the details of the quiz
-        localforage.getItem(quizDatabaseName+"_Details", function (err, value) {
             // if its empty, then create a new "save file"
             if (value == null){
 
-                var quizDetails = {
+                var reviewerDetails = {
                     idCounter: 0,
                     amountOfItems: 0,
                     groupList: []
                 }
 
-                localforage.setItem(quizDatabaseName+"_Details", quizDetails)
-                console.log(quizDatabaseName+"_Details is created!")
+                localforage.setItem(reviewerDatabaseName+"_Details", reviewerDetails)
+                console.log(reviewerDatabaseName+"_Details is created!")
+
+                var html_totalItems = document.querySelector(".totalItems")
+                html_totalItems.innerHTML = 0
+
+            // if not then just load
             } else {
 
-                console.log(quizDatabaseName+"_Details contains", value)
+                console.log(reviewerDatabaseName+"_Details contains", value)
 
                 // save to local values
                 local_idCounter = value["idCounter"]
                 local_amountOfItems = value["amountOfItems"]
                 local_groupList = value["groupList"]
+
+                var html_totalItems = document.querySelector(".totalItems")
+                html_totalItems.innerHTML = value["amountOfItems"]
 
                 //console.log(local_idCounter)
             }
@@ -301,21 +323,29 @@ function initialization(){
 // BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS
 // BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS
 
-function removeItem(index){
+function removeItem(){
+
+    if (local_selectedItem.id == -1){
+        console.log("Nothing to be deleted")
+    }
+
     // remove item
-    localforage.getItem(quizDatabaseName, function (err, value) {
+    localforage.getItem(reviewerDatabaseName, function (err, value) {
 
-        // get the group first
-        var groupToBeRemoved = value[index]["group"]
+        // get the item to be removed
+        var selectedITBR_Index = findItemIndexById(value, local_selectedItem.id) // selected Item To Be Removed
         
-        // then remove
-        var newValue = value
-        newValue.splice(index, 1);
+        // get the group first
+        var groupToBeRemoved = value[selectedITBR_Index]["group"]
 
-        localforage.setItem(quizDatabaseName, newValue)
+        // with the deleted
+        var newValue = value
+        newValue.splice(selectedITBR_Index, 1);
+
+        localforage.setItem(reviewerDatabaseName, newValue)
         console.log(newValue)
 
-        // update quizDetails
+        // update reviewerDetails
         local_amountOfItems -= 1
         
         // this could've been simplier aarghhh (update group list)
@@ -324,10 +354,18 @@ function removeItem(index){
             local_groupList.splice(indexToRemove, 1);
         }
 
-        updateQuizDetails(local_idCounter, local_amountOfItems, local_groupList)
-
+        updateReviewerDetails(local_idCounter, local_amountOfItems, local_groupList)
+        hideEditor()
         setTimeout(displayItems, 25);
+
+
+        
+        // then remove
+
+
+
         /**/
+
     }); 
 }
 //document.querySelector(".remove").addEventListener("click", removeValue);
@@ -339,10 +377,11 @@ function showEditor(index = -1, selectedGroup){
     var html_answer = document.querySelector(".itemAnswer")
     var html_image = document.querySelector(".itemImage")
     var html_addButton = document.querySelector(".addItemFunc")
+    var html_difficulty = document.querySelector(".itemDifficulty")
 
     // if selected an existing item
     if (index != -1){
-        localforage.getItem(quizDatabaseName, function (err, item) {
+        localforage.getItem(reviewerDatabaseName, function (err, item) {
             
             local_selectedItem = getItemById(item, index)
 
@@ -351,6 +390,7 @@ function showEditor(index = -1, selectedGroup){
             html_question.value = local_selectedItem.question
             html_answer.value = local_selectedItem.answer
             html_image.value = local_selectedItem.image
+            html_difficulty.innerHTML = local_selectedItem.difficulty
 
             console.log(local_selectedItem)
 
@@ -377,6 +417,7 @@ function showEditor(index = -1, selectedGroup){
         html_answer.value = local_selectedItem.answer
         html_image.value = local_selectedItem.image
         html_addButton.value = "Add"
+        html_difficulty.innerHTML = 0
 
         console.log(local_selectedItem)
 
@@ -407,7 +448,7 @@ document.querySelector(".hideEditorFunc").addEventListener("click", hideEditor);
 // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK 
 // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK 
 
-function gotoSelectQuiz(){
+function gotoSelectReviewer(){
     window.location.replace("index.html");
 }
 
@@ -415,5 +456,5 @@ function gotoSelectQuiz(){
 initialization()
 
 window.removeItem = removeItem
-window.gotoSelectQuiz = gotoSelectQuiz
+window.gotoSelectReviewer = gotoSelectReviewer
 window.showEditor = showEditor

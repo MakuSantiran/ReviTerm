@@ -1,0 +1,23 @@
+body {
+    font-family: 'arial', sans-serif;
+    /*display: flex;*/
+    align-items: center;
+    justify-content: center;
+}
+
+
+.divThing {
+    text-align: center;
+
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    width: 100%;
+}
+
+hr {
+    margin-top: 5vw;
+    width: 100%;
+}

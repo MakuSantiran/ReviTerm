@@ -12,11 +12,18 @@
 	<div class="topScreen">
 		<div class="reviewerNameHeader">
 			<a href="./index.html" class="goBackLink"> < </a> <div class="reviewerName"></div>
-		</div>
-	
+		</div>	
+		
 		<div class="reviewerDetails">
-			Total Items: #
+			Total Items: <div class="totalItems"></div>
 		</div>
+
+		<a href="./reviGame.html">
+			<div class="playButton">
+				ReviTerm!
+			</div>
+		</a>
+
 	</div>
 
 	<div style="margin-bottom: 22vw;"></div>
@@ -73,6 +80,9 @@
 
 			</div>
 		</div>
+		
+		<br/>
+		Difficulty level: <div class="itemDifficulty">#</div>
 
 
 		<br/><br/>
@@ -85,7 +95,7 @@
 			</div>
 			<div class="flexItem">
 				<center>
-					<input type="button" value="Delete" class="removeItemFunc">
+					<input type="button" value="Delete" class="removeItemFunc" onclick="removeItem()">
 				</center>
 			</div>
 			<div class="flexItem">

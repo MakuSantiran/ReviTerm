@@ -1,73 +1,73 @@
 import localforage from "./localForage/localforage.js" 
 
 /*
-    "quizNames" = contains the names of the user created quizzes
-    "selectedQuiz" = contains the name of the quiz that is going to be edited
+    "reviewerNames" = contains the names of the user created reviewerzes
+    "selectedReviewer" = contains the name of the reviewer that is going to be edited
     spaceRepetition = contains the datas of the user performance
 */
 
-var quizId = 0
+var reviewerId = 0
 
 
 // initialization (create the database once opened)
 function initialize(){
-    localforage.getItem("quizNames", function (err, value) {
+    localforage.getItem("reviewerNames", function (err, value) {
 
         // if its empty, then create a new "save file"
         if (value == null){
-            localforage.setItem("quizNames", [])
-            console.log("quizNames is created!")
+            localforage.setItem("reviewerNames", [])
+            console.log("reviewerNames is created!")
         } else {
-            console.log("quizNames contains", value)
-            updateQuizList()
+            console.log("reviewerNames contains", value)
+            updateReviewerList()
         }
 
         
     })
 
-    localforage.getItem("quizNamesId", function (err, value) {
+    localforage.getItem("reviewerNamesId", function (err, value) {
         // if its empty, then create a new "save file"
         if (value == null){
-            localforage.setItem("quizNamesId", 0)
-            console.log("quizNamesId is created!")
+            localforage.setItem("reviewerNamesId", 0)
+            console.log("reviewerNamesId is created!")
         } else {
-            console.log("quizNamesId contains", value)
-            quizId = value
+            console.log("reviewerNamesId contains", value)
+            reviewerId = value
         }
     })
 }
 
-function addQuiz(){
-    var QuizName = document.querySelector(".nameQuiz").value
+function addReviewer(){
+    var ReviewerName = document.querySelector(".nameReviewer").value
     var Terms = 0
-    var Id = quizId
-    var Revi = {Id, QuizName, Terms}
+    var Id = reviewerId
+    var Revi = {Id, ReviewerName, Terms}
 
-    if (QuizName == ""){
+    if (ReviewerName == ""){
         alert("please put somethingg!")
         return
     }
 
-    localforage.getItem("quizNames", function (err, value) {
+    localforage.getItem("reviewerNames", function (err, value) {
         var newValue = value
         newValue.push(Revi)
 
-        localforage.setItem("quizNames", newValue)
+        localforage.setItem("reviewerNames", newValue)
         console.log(newValue)
 
         //document.querySelector(".userValue").value = ""
-        setTimeout(updateQuizList, 100);
+        setTimeout(updateReviewerList, 100);
 
-        quizId += 1;
-        localforage.setItem("quizNamesId", quizId)
+        reviewerId += 1;
+        localforage.setItem("reviewerNamesId", reviewerId)
     }); 
 }
-document.querySelector(".addQuiz").addEventListener("click", addQuiz);
+document.querySelector(".addReviewer").addEventListener("click", addReviewer);
 
 
-function getAmountOfTerms(quizName, index){
+function getAmountOfTerms(reviewerName, index){
 
-    var noQuoteName = quizName.replace(/['"]+/g, '')
+    var noQuoteName = reviewerName.replace(/['"]+/g, '')
     // ^-- temporary fix
 
     localforage.getItem(noQuoteName, function (err, value) {
@@ -77,57 +77,71 @@ function getAmountOfTerms(quizName, index){
 }
 
 
-function updateQuizList(){
+function updateReviewerList(){
     // then add
-    localforage.getItem("quizNames", function (err, value) {
+    localforage.getItem("reviewerNames", function (err, value) {
 
         // clear first
-        document.querySelector(".listOfQuiz").innerHTML = ""    
+        document.querySelector(".listOfReviewer").innerHTML = ""    
 
         for (var i=0; i<value.length; i++){
 
-            var theTitle = JSON.stringify(value[i]["QuizName"])
+            var theTitle = JSON.stringify(value[i]["ReviewerName"])
             var theTerms = JSON.stringify(value[i]["Terms"])
 
-            document.querySelector(".listOfQuiz").innerHTML += 
+            document.querySelector(".listOfReviewer").innerHTML += 
             `Title: `+theTitle+`__Terms: `+theTerms+`___
             <button onclick='gotoPlay(`+theTitle+`)'>Play</button> 
             <button onclick='gotoEditor(`+theTitle+`)'>Edit</button>
-            <button onclick="removeQuiz(`+i+`)">Remove</button>
+            <br/>
+            <button onclick="removeReviewer(`+i+`)">Remove</button>
             <br/><br/>`
         }
     });
 }
 
-function removeQuiz(index){
+function removeReviewer(index){
     // remove item
-    localforage.getItem("quizNames", function (err, value) {
+    localforage.getItem("reviewerNames", function (err, value) {
+
+        var reviewerName = value[index].ReviewerName
+        var reviewerContent = "reviewerContent_"+reviewerName
+        var reviewerDetails = "reviewerContent_"+reviewerName+"_Details"
+
         var newValue = value
         newValue.splice(index, 1);
 
-        localforage.setItem("quizNames", newValue)
+        localforage.removeItem(reviewerContent)
+        localforage.removeItem(reviewerDetails)
+        console.log(reviewerName,reviewerContent, reviewerDetails)
+
+
+
+        localforage.setItem("reviewerNames", newValue)
         console.log(newValue)
-        setTimeout(updateQuizList, 100);
+        setTimeout(updateReviewerList, 100);
     }); 
 }
 
 
 function gotoEditor(name){
-    localforage.setItem("selectedQuiz", name)
+    localforage.setItem("selectedReviewer", name)
     window.location.replace("reviEditor.html");
     //console.log(name)
 }
 
 function gotoPlay(name){
-    localforage.setItem("selectedQuiz", name)
+    localforage.setItem("selectedReviewer", name)
     window.location.replace("reviGame.html");  
 }
 
-//localforage.removeItem("quizNamesId")
-//console.log("quizName succesfully removed!")
+//localforage.clear()
 
-//localforage.setItem("quizName", [])
-//console.log("quizName is created!")
+//localforage.removeItem("reviewerNamesId")
+//console.log("reviewerName succesfully removed!")
+
+//localforage.setItem("reviewerName", [])
+//console.log("reviewerName is created!")
 
 
 
@@ -135,6 +149,6 @@ initialize()
 
 
 // exports
-window.removeQuiz = removeQuiz
+window.removeReviewer = removeReviewer
 window.gotoEditor = gotoEditor
 window.gotoPlay = gotoPlay

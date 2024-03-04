@@ -65,43 +65,18 @@ body {
 
 /* ITEMS *//* ITEMS *//* ITEMS *//* ITEMS *//* ITEMS *//* ITEMS *//* ITEMS *//* ITEMS *//* ITEMS *//* ITEMS *//* ITEMS */
 
-.topScreen{
+.emptyItemMessage{
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-}
-
-.reviewerName{
-    display:  inline-block;
-}
-
-.reviewerNameHeader{
-    background: #762f6f;
-    color: white;
-    padding: 1%;
-    width: 100%;
-
-    font-size: 6vw;
-}
-
-.goBackLink {
-    color: #ffffff; /* Change the color to black */
-    text-decoration: none; /* Optional: Remove underline */
-
-    font-weight: 900;
-}
-
-.reviewerDetails{
-    position: fixed;
-    background-color: #5b2455;
-    color: white;
-    font-size: 1.5vw;
-    padding: 1%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center; /* Optional: Center text horizontally */
 
     width: 100%;
 
-    font-size: 4vw;
+    font-size: 3.5vw;
+
+    user-select: none;
 }
 
 .groupHeader{
@@ -111,6 +86,8 @@ body {
 
     /* font-size: 3vw; For Phone */
     font-size: 6vw;
+
+    
 }
 
 .itemBox {
@@ -119,15 +96,31 @@ body {
     border-style: solid;
     border-width: 1.2px;
     border-top:#ffffff;
-    padding: 2vw;
 
+    padding-left: 2vw;
+
+    padding-top: 4vw;
+    padding-bottom: 4vw;
+
+}
+
+.textInItemBox {
     /* font-size: 3vw; For Phone */
     font-size: 4vw;
+
+}
+
+/* to prevent overflowing */
+pre {
+    white-space: pre-line;
+    margin-top: 1vw;
+    margin-bottom: 1vw;
 }
 
 
 .itemAnswerText{
-    color: #6e6e6e;
+    color: #8d8d8d;
+    font-size: 4vw;
 }
 
 .addItem {
@@ -160,3 +153,69 @@ body {
 
     font-size: 4vw;
 }
+
+.itemDifficulty{
+    display:  inline-block;
+}
+
+/* TOP SCREEN */ /* TOP SCREEN */ /* TOP SCREEN */ /* TOP SCREEN *//* TOP SCREEN *//* TOP SCREEN *//* TOP SCREEN */
+
+.topScreen{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+.reviewerName{
+    display:  inline-block;
+}
+
+.totalItems{
+    display: inline-block;
+}
+
+.reviewerNameHeader{
+    background: #762f6f;
+    color: white;
+    padding: 1%;
+    width: 100%;
+
+    font-size: 6vw;
+}
+
+.goBackLink {
+    color: #ffffff; /* Change the color to black */
+    text-decoration: none; /* Optional: Remove underline */
+
+    font-weight: 900;
+}
+
+.reviewerDetails{
+    position: fixed;
+    background-color: #5b2455;
+    color: white;
+    font-size: 1.5vw;
+    padding: 1%;
+
+    width: 100%;
+
+    font-size: 4vw;
+}
+
+.playButton {
+    background-color: #83f070;
+    color: #000000;
+    right: 0;
+    top: 0;
+    position: absolute;
+    width: 30%;
+    height: 100%;
+
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+
+    user-select: none;
+}
+
