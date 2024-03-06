@@ -328,8 +328,6 @@ function initialization(){
         //localforage.removeItem(reviewerDatabaseName+"_Details")
         // to set up the details of the reviewer
         localforage.getItem(reviewerDatabaseName+"_Details", function (err, value) {
-
-
             // if its empty, then create a new "save file"
             if (value == null){
 
@@ -338,12 +336,17 @@ function initialization(){
                     amountOfItems: 0,
                     groupList: []
                 }
+                
 
                 localforage.setItem(reviewerDatabaseName+"_Details", reviewerDetails)
                 console.log(reviewerDatabaseName+"_Details is created!")
 
                 var html_totalItems = document.querySelector(".totalItems")
                 html_totalItems.innerHTML = 0
+
+
+                // although check if the reviewer was imported
+
 
             // if not then just load
             } else {

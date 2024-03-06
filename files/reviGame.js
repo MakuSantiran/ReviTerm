@@ -215,20 +215,17 @@ function proceedToNextItem(){
 
         // if there was an exclusion, before saving to database, put back the exclusion
         if (local_temporarySaveForExcluded.length > 1){
-
             console.log(reviewItems)
-
             reviewItems = [...reviewItems, ...local_temporarySaveForExcluded]
-
             console.log("BackOriginal", reviewItems)
-
-            localforage.getItem(reviewerDatabase, function (err, value) {
-                console.log(value)
-                localforage.setItem(reviewerDatabase, reviewItems)
-                setTimeout(startReviTerm, 3000) 
-            })   
         }
         
+        localforage.getItem(reviewerDatabase, function (err, value) {
+            console.log(value)
+            localforage.setItem(reviewerDatabase, reviewItems)
+            setTimeout(startReviTerm, 3000) 
+        })   
+
         /*/
       
         /**/

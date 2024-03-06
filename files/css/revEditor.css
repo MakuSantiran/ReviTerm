@@ -156,20 +156,21 @@ pre {
 .addItemWithoutGroup {
     background: #762f6f;
     color: white;
-    padding: 1%;
+    padding: 2vw;
     text-align: center;
     user-select: none;
 
-    width: 30vw;
+    width: 40vw;
 
     position: fixed;
-    bottom: 3vw;
+    bottom: 3vh;
     left: 50%;
     transform: translateX(-50%);
 
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 
-    font-size: 4vw;
+    font-size: 5vw;
+
 }
 
 .itemDifficulty{

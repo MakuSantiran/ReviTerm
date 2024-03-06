@@ -16,12 +16,17 @@
 		<input type="button" value="Add" class="addReviewer">
 	</form> 
 
+	<h4>Import A Reviewer</h4>
+	<input type="file" id="importReviewer" name="files" accept=".rtr">
+
+
+
 	<br/><br/>
 	<b>Created Reviwers:</b>
 	<div class="listOfReviewer">
 		
 	</div>
-	
+
 	<div class="overlay" id="overlay"></div>
 
 	<div class="deleteContainer" id="deleteContainerId">
@@ -85,9 +90,10 @@
 
 <!-- u forgetful piece of sh-
 	git add .
-	git commit -m "my changes" 
+	git commit -m "Maku v0.51" 
 	git push -u
 -->
+<script src="./files/SheetJS/xlsx.full.min.js"></script>
 <script type="module" src="./files/reviMenu.js"></script>
 <link rel="stylesheet" href="./files/css/revMenu.css">
 </html>
