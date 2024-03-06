@@ -422,6 +422,7 @@ function importReviewer() {
 
         document.querySelector(".importReviewerValue").value  = '';
         alert("Imported "+ReviewerName+" Successfully!")
+        navigator.clipboard.writeText("");
     }); 
     /**/
 
