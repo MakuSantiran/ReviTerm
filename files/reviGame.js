@@ -17,10 +17,18 @@ var Game = {
 var reviewItems_Groups = []     // the outline of this is {group: #, difficulty: #}
 var reviewItems_Choices = {}
 
+var local_selectedGroupExclusion = []
+var local_temporarySaveForExcluded = []
+
 // Define sample quiz questions
 var reviewItems = [];
 var reviewerDatabase = ""
 
+var difficultyRange = 5
+
+// Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms 
+// Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms 
+// Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms 
 
 // addToGroupList first if it doesn't exists {}
 function generateGroupList(){
@@ -114,8 +122,6 @@ function mayonnaiseAlgorithm(){
 
         // empty the SFS
         temporarySFS = [];
-
-
     }
 
     // clear the review Items then copy it to Temporary FO
@@ -123,11 +129,54 @@ function mayonnaiseAlgorithm(){
     reviewItems = temporaryFO
 }
 
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+function extractExclusionGroup(){
+    var tempReviewItems = [...reviewItems]
+
+    for (var i in local_selectedGroupExclusion){
+        var extracted = reviewItems.filter(item => item.group == local_selectedGroupExclusion[i]);
+        var tempReviewItems = tempReviewItems.filter(item => item.group != local_selectedGroupExclusion[i]);
+
+        local_temporarySaveForExcluded.push(extracted)
+
+        // why do u have to make this complicated javascript??
+        local_temporarySaveForExcluded = [].concat(...local_temporarySaveForExcluded);
+    }
+
+    // clear then replace
+    reviewItems = []
+    reviewItems = tempReviewItems
+
+    console.log("Extracted: ",local_temporarySaveForExcluded)
+    console.log("reviewItems", reviewItems)
+}
+
+
+// Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function 
+// Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function 
+// Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function 
+
 function showChoices(Group){
+    
     html_Choice.innerHTML = "<br/>Choices: <br/>"
 
+    var theChoices = []
+
     for (var i in reviewItems_Choices[Group]) {
-        html_Choice.innerHTML += reviewItems_Choices[Group][i]+"<br/>"
+        theChoices.push(reviewItems_Choices[Group][i])
+    }
+
+    var randomizedChoices = shuffleArray(theChoices)
+
+    for (var i in reviewItems_Choices[Group]) {
+        html_Choice.innerHTML += randomizedChoices[i]+"<br/>"
     }
 }
 
@@ -148,10 +197,10 @@ function reAllowToSubmit(){
 
 function proceedToNextItem(){
 
-
     // if not finished
     if (reviewItems.length > Game.atNumber){
         html_Answer.value = ""
+        html_GroupTitle.innerHTML =  reviewItems[Game.atNumber].group
         html_Question.innerHTML = reviewItems[Game.atNumber].question
         html_difficultyMeter.innerHTML = "DifficultyMeter: "+reviewItems[Game.atNumber].difficulty
         showChoices(reviewItems[Game.atNumber].group)   
@@ -162,12 +211,28 @@ function proceedToNextItem(){
     } else {
         html_Question.innerHTML = "You completed the review session!, Restarting!"
         html_Choice.innerHTML = ""
+        html_Answer.value = ""
 
-        localforage.getItem(reviewerDatabase, function (err, value) {
-            console.log(value)
-            localforage.setItem(reviewerDatabase, reviewItems)
-            setTimeout(startReviTerm, 3000) 
-        })
+        // if there was an exclusion, before saving to database, put back the exclusion
+        if (local_temporarySaveForExcluded.length > 1){
+
+            console.log(reviewItems)
+
+            reviewItems = [...reviewItems, ...local_temporarySaveForExcluded]
+
+            console.log("BackOriginal", reviewItems)
+
+            localforage.getItem(reviewerDatabase, function (err, value) {
+                console.log(value)
+                localforage.setItem(reviewerDatabase, reviewItems)
+                setTimeout(startReviTerm, 3000) 
+            })   
+        }
+        
+        /*/
+      
+        /**/
+
     }
 
 
@@ -175,10 +240,14 @@ function proceedToNextItem(){
 
 function checkAnswer(){
     var userAnswer = html_Answer.value.trimRight()
+    userAnswer = userAnswer.toLowerCase()
+
+    var toCheck = reviewItems[Game.atNumber].answer.toLowerCase()
+    
 
     if (!Game.isGoingToNext){
         // if correct
-        if (reviewItems[Game.atNumber].answer == userAnswer){
+        if (toCheck == userAnswer){
 
             Game.isGoingToNext = true
 
@@ -186,7 +255,7 @@ function checkAnswer(){
 
             if (Game.gotWrong == false){
 
-                if (reviewItems[Game.atNumber].difficulty > -10){
+                if (reviewItems[Game.atNumber].difficulty > -difficultyRange){
                     reviewItems[Game.atNumber].difficulty -= 1
                 }
             
@@ -207,7 +276,7 @@ function checkAnswer(){
             Game.gotWrong = true
 
             // add difficulty number
-            if (reviewItems[Game.atNumber].difficulty < +10){
+            if (reviewItems[Game.atNumber].difficulty < difficultyRange){
                 reviewItems[Game.atNumber].difficulty += 1
             }
 
@@ -220,7 +289,6 @@ function checkAnswer(){
 }
 
 function getReviewerContent(){
-
     // first get the title
     localforage.getItem("selectedReviewer", function (err, title) {
         reviewerDatabase = "reviewerContent_"+title
@@ -229,10 +297,22 @@ function getReviewerContent(){
         localforage.getItem(reviewerDatabase, function (err, items) {
             reviewItems = items
 
-            // then start the reviTerm!
-            startReviTerm()
+            // and get the excluded groups
+            localforage.getItem("selectedGroupExclusion", function (err, exGroup) {
+                local_selectedGroupExclusion = exGroup
+                console.log(exGroup)
+
+                // then start the reviTerm!
+                startReviTerm()
+
+            });
         });
     });
+}
+
+
+function includeGroups(){
+
 }
 
 
@@ -242,6 +322,12 @@ function startReviTerm(){
     Game.atNumber = 0
     reviewItems_Groups = []
     reviewItems_Choices = {}
+
+    // check for exclusions
+    extractExclusionGroup()
+
+    // shuffle first
+    reviewItems = shuffleArray(reviewItems)
 
     // start the functions
     generateGroupList()

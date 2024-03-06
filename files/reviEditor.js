@@ -3,6 +3,9 @@ import localforage from "./localForage/localforage.js"
 
 var reviewerDatabaseName = "reviewerContent"
 var revieweraddOn = "reviewerContent_"
+
+// selectedGroupExclusion --> includes the group that would not be taken in the reviterm
+
 //  ^-- This might change especially for the structure of file
 
 // temporary/local values to be updated in the reviewerContent_NAME_Details database
@@ -10,6 +13,7 @@ var local_idCounter = 0
 var local_amountOfItems = 0
 var local_groupList = []
 var local_selectedItem = []
+var local_selectedGroupExclusion = []
 
 // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS 
 // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS 
@@ -39,7 +43,12 @@ function displayItems(){
     // then add
     localforage.getItem(reviewerDatabaseName, function (err, value) {
 
+        localforage.setItem("selectedGroupExclusion", []);
+
         if (value != null) {
+
+            value = value.sort((a, b) => a.id - b.id);
+            console.log(value)
             //console.log("length of value THing", value.length)
 
             // clear first
@@ -254,6 +263,43 @@ function addItem(){
 }
 document.querySelector(".addItemFunc").addEventListener("click", addItem);
 
+function removeItem(){
+
+    if (local_selectedItem.id == -1){
+        console.log("Nothing to be deleted")
+    }
+
+    // remove item
+    localforage.getItem(reviewerDatabaseName, function (err, value) {
+
+        // get the item to be removed
+        var selectedITBR_Index = findItemIndexById(value, local_selectedItem.id) // selected Item To Be Removed
+        
+        // get the group first
+        var groupToBeRemoved = value[selectedITBR_Index]["group"]
+
+        // with the deleted
+        var newValue = value
+        newValue.splice(selectedITBR_Index, 1);
+
+        localforage.setItem(reviewerDatabaseName, newValue)
+        console.log(newValue)
+
+        // update reviewerDetails
+        local_amountOfItems -= 1
+        
+        // this could've been simplier aarghhh (update group list)
+        var indexToRemove = local_groupList.indexOf(groupToBeRemoved);
+        if (indexToRemove !== -1) {
+            local_groupList.splice(indexToRemove, 1);
+        }
+
+        updateReviewerDetails(local_idCounter, local_amountOfItems, local_groupList)
+        hideEditor()
+        setTimeout(displayItems, 25);
+    }); 
+}
+
 // kunin muna yung "selectedReviewer"
 function initialization(){
 
@@ -319,56 +365,27 @@ function initialization(){
     })
 }
 
-// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS
-// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS
-// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS
+function excludeGroup(groupName){
+    // works like checkbox thing
 
-function removeItem(){
-
-    if (local_selectedItem.id == -1){
-        console.log("Nothing to be deleted")
+    // if it exists in excluded group (remove)
+    if (local_selectedGroupExclusion.includes(groupName)) {
+        // remove the string from the exclusion (gosh i wish this worked like python tho)
+        local_selectedGroupExclusion = local_selectedGroupExclusion.filter(item => item !== groupName);
+    } else {
+        local_selectedGroupExclusion.push(groupName)
     }
 
-    // remove item
-    localforage.getItem(reviewerDatabaseName, function (err, value) {
+    // update to database
+    localforage.setItem("selectedGroupExclusion", local_selectedGroupExclusion)
 
-        // get the item to be removed
-        var selectedITBR_Index = findItemIndexById(value, local_selectedItem.id) // selected Item To Be Removed
-        
-        // get the group first
-        var groupToBeRemoved = value[selectedITBR_Index]["group"]
+    console.log("Exclusion List: ", local_selectedGroupExclusion)
 
-        // with the deleted
-        var newValue = value
-        newValue.splice(selectedITBR_Index, 1);
-
-        localforage.setItem(reviewerDatabaseName, newValue)
-        console.log(newValue)
-
-        // update reviewerDetails
-        local_amountOfItems -= 1
-        
-        // this could've been simplier aarghhh (update group list)
-        var indexToRemove = local_groupList.indexOf(groupToBeRemoved);
-        if (indexToRemove !== -1) {
-            local_groupList.splice(indexToRemove, 1);
-        }
-
-        updateReviewerDetails(local_idCounter, local_amountOfItems, local_groupList)
-        hideEditor()
-        setTimeout(displayItems, 25);
-
-
-        
-        // then remove
-
-
-
-        /**/
-
-    }); 
 }
-//document.querySelector(".remove").addEventListener("click", removeValue);
+
+// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS
+// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS
+// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS
 
 function showEditor(index = -1, selectedGroup){
 
@@ -433,7 +450,6 @@ function showEditor(index = -1, selectedGroup){
     console.log("Hello World!", index, selectedGroup)
 }
 
-
 function hideEditor(){
     var html_overlay = document.getElementById("overlay") 
     var html_editBox = document.getElementById("editorId") 
@@ -444,6 +460,61 @@ function hideEditor(){
 }
 document.querySelector(".hideEditorFunc").addEventListener("click", hideEditor);
 
+function showOptionsBeforeReviTerm(){
+    localforage.getItem("selectedReviewer", function (err, reviewerName) {
+
+        var totalGroups = [...new Set(local_groupList)]; //without the duplicates
+
+        var html_overlay = document.getElementById("overlay") 
+        var html_initOptionsDIV = document.getElementById("initOptionsDIVId") 
+
+        var html_groupListContainer = document.querySelector(".groupListContainer")
+        var html_initOptionsReviewerName = document.querySelector(".initOptionsReviewerName")
+        var html_initOptionsTotalItems = document.querySelector(".initOptionsTotalItems")
+
+        html_initOptionsDIV.style.display = "block";
+        html_overlay.style.display = "block";            
+        
+        html_groupListContainer.innerHTML = ""
+
+        // lazyyy
+        var html_totalItems = document.querySelector(".totalItems").innerHTML
+        var html_reviewerName = document.querySelector(".reviewerName").innerHTML
+
+        html_initOptionsReviewerName.innerHTML = html_reviewerName
+        html_initOptionsTotalItems.innerHTML = html_totalItems
+
+
+
+        // print the html :)
+        for (var i in totalGroups){
+            html_groupListContainer.innerHTML += `
+				<div class="groupListItem">				
+					<div class="groupListItemCheckBox">
+						<input type="checkbox" class="itemDisabled" onclick='excludeGroup("`+totalGroups[i]+`")' checked>
+					</div>
+					`+totalGroups[i]+`
+				</div>
+            `
+        }
+        
+        //console.log(totalGroups)
+
+
+        //localforage.getItem("reviewerContent_"+reviewerName+"_Details", function (err, value) {
+        //})
+    })
+}
+
+function hideOptionsBeforeReviTerm(){
+    var html_overlay = document.getElementById("overlay") 
+    var html_initOptionsDIV = document.getElementById("initOptionsDIVId") 
+
+    html_initOptionsDIV.style.display = "none";
+    html_overlay.style.display = "none";        
+}
+document.querySelector(".initOptionsHide").addEventListener("click", hideOptionsBeforeReviTerm);
+
 // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK 
 // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK 
 // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK 
@@ -452,9 +523,15 @@ function gotoSelectReviewer(){
     window.location.replace("index.html");
 }
 
+function startReviterm(){
+    window.location.replace("reviGame.html");
+}
+//document.querySelector(".startReviterm").addEventListener("click", startReviterm);
 
 initialization()
 
 window.removeItem = removeItem
 window.gotoSelectReviewer = gotoSelectReviewer
 window.showEditor = showEditor
+window.showOptionsBeforeReviTerm = showOptionsBeforeReviTerm
+window.excludeGroup = excludeGroup

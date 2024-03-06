@@ -18,11 +18,11 @@
 			Total Items: <div class="totalItems"></div>
 		</div>
 
-		<a href="./reviGame.html">
+		<div onclick="showOptionsBeforeReviTerm()">
 			<div class="playButton">
 				ReviTerm!
 			</div>
-		</a>
+		</div>
 
 	</div>
 
@@ -105,6 +105,42 @@
 			</div>
 		</div>
 	</div> 
+
+
+	<div class="initOptionsDIV" id="initOptionsDIVId">
+		<h2>Starting ReviTerm!</h2>
+
+		<b>Title:</b> <div class="initOptionsReviewerName"></div><br/>
+		<b>Number Of Items:</b> <div class="initOptionsTotalItems"></div><br/>
+		 
+		<b>Mode:</b> <div style="display:inline-block; color: cornflowerblue;"><b>Practice</b></div> | Incremental | Survival
+
+		<br/>
+		<h3>Groups to be reviewed:</h3>
+			<div class="groupListContainer"> 				
+			</div>
+		<br/>
+
+
+		<div class="flexContainer">
+			<div class="flexItem">
+				<center>
+					<div class="initOptionsHide">Cancel</div>
+				</center>
+			</div>
+			<div class="flexItem">
+				<center>
+					<a href="reviGame.html" class="startReviterm"> ReviTerm! </a>
+					<!-- 
+						<input type="button" value="ReviTerm!" class="startReviterm">
+					-->
+					
+				</center>
+			</div>
+		</div>
+
+
+	</div>
 
 	<br/>
 	<br/>

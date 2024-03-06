@@ -14,14 +14,71 @@
 			</tr>
 		</table>
 		<input type="button" value="Add" class="addReviewer">
-		
 	</form> 
-
 
 	<br/><br/>
 	<b>Created Reviwers:</b>
 	<div class="listOfReviewer">
 		
+	</div>
+	
+	<div class="overlay" id="overlay"></div>
+
+	<div class="deleteContainer" id="deleteContainerId">
+		<h2>Deleting <div class="deleteName"></div> </h2>
+		Are you sure you want to delete <b><div class="deleteName"></div></b>?<br/>
+		It will be lost forever once its deleted!
+
+		<br/>
+		<br/>
+
+		<div class="flexContainer">
+			<div class="flexItem">
+				<center>
+					<div class="deleteMessageHide">No</div>
+				</center>
+			</div>
+			<div class="flexItem">
+				<center>
+					<div class="deleteMessageYes">Yes</div>
+				</center>
+			</div>
+		</div>
+
+	</div>
+
+
+	<div class="initOptionsDIV" id="initOptionsDIVId">
+		<h2>Starting ReviTerm!</h2>
+
+		<b>Title:</b> <div class="initOptionsReviewerName"></div><br/>
+		<b>Number Of Items:</b> <div class="initOptionsTotalItems"></div><br/>
+		 
+		<b>Mode:</b> <div style="display:inline-block; color: cornflowerblue;"><b>Practice</b></div> | Incremental | Survival
+
+		<br/>
+		<h3>Groups to be reviewed:</h3>
+			<div class="groupListContainer"> 				
+			</div>
+		<br/>
+
+
+		<div class="flexContainer">
+			<div class="flexItem">
+				<center>
+					<div class="initOptionsHide">Cancel</div>
+				</center>
+			</div>
+			<div class="flexItem">
+				<center>
+					<a href="reviGame.html" class="startReviterm"> ReviTerm! </a>
+					<!-- 
+						<input type="button" value="ReviTerm!" class="startReviterm">
+					-->
+					
+				</center>
+			</div>
+		</div>
 	</div>
 
 </body>
@@ -32,5 +89,5 @@
 	git push -u
 -->
 <script type="module" src="./files/reviMenu.js"></script>
-
+<link rel="stylesheet" href="./files/css/revMenu.css">
 </html>
