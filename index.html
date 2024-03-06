@@ -16,10 +16,14 @@
 		<input type="button" value="Add" class="addReviewer">
 	</form> 
 
+	<!-- Scrapped off :(
+		<h4>Import A Reviewer</h4>
+		<input type="file" id="importReviewer" name="files" accept=".rtr">		
+	-->
+
+
 	<h4>Import A Reviewer</h4>
-	<input type="file" id="importReviewer" name="files" accept=".rtr">
-
-
+	<input type="text" class="importReviewerValue" /><button class="importButton"> Import! </button>
 
 	<br/><br/>
 	<b>Created Reviwers:</b>
@@ -93,6 +97,8 @@
 	git commit -m "Maku v0.51" 
 	git push -u
 -->
+<script src="cordova.js"></script>
+<script src="./js/index.js"></script>
 <script src="./files/SheetJS/xlsx.full.min.js"></script>
 <script type="module" src="./files/reviMenu.js"></script>
 <link rel="stylesheet" href="./files/css/revMenu.css">

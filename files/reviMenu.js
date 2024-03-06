@@ -271,14 +271,17 @@ document.querySelector(".deleteMessageHide").addEventListener("click", hideDelet
 
 // EXPORT/IMPORT //// EXPORT/IMPORT //// EXPORT/IMPORT //// EXPORT/IMPORT //// EXPORT/IMPORT //// EXPORT/IMPORT //// EXPORT/IMPORT //
 
+
 function exportReviewer(index) {
+    
     localforage.getItem("reviewerNames", function (err, reviewerNames) {
-        var selectedReviewer = reviewerNames[index].ReviewerName;
+        var selectedReviewer = reviewerNames[index].ReviewerName
 
-        localforage.getItem(reviewerPath + selectedReviewer, function (err, content) {
-            var exportData = [[selectedReviewer + "_Export"]];
+        localforage.getItem(reviewerPath+selectedReviewer, function (err, content){
+            //console.log(reviewerPath+selectedReviewer)
+            var exportData = [[selectedReviewer+"_Export"]]
 
-            for (var i in content) {
+            for (var i in content){
                 var toBePushed = [[
                     content[i].answer,
                     0,                  //difficulty
@@ -288,38 +291,144 @@ function exportReviewer(index) {
                     content[i].id,
                     content[i].image,
                     content[i].question
-                ]];
+                ]]
 
-                exportData = [...exportData, ...toBePushed];
+                exportData = [...exportData, ...toBePushed]        
             }
 
-            console.log(exportData);
+            console.log(exportData)
 
+            /*/
             // Convert data to a string
             var rtrContent = exportData.map(row => row.join('\t')).join('\n');
+            
+            // Create a Blob with the content
+            var blob = new Blob([rtrContent], { type: 'text/plain' });
+            
+            // Create a download link
+            var downloadLink = document.createElement('a');
+            downloadLink.href = URL.createObjectURL(blob);
+            downloadLink.download = selectedReviewer+'.rtr';
+            
+            downloadLink.target = '_blank';
+            
+            // Append the link to the document body and trigger the download
+            document.body.appendChild(downloadLink);
+            //downloadLink.click();
+            
+            // Clean up
+            document.body.removeChild(downloadLink);
+            /**/
 
-            // Prompt the user to choose the directory
-            window.showDirectoryPicker().then(async function (directoryHandle) {
-                // Create a file handle for the new file
-                var fileHandle = await directoryHandle.getFileHandle(selectedReviewer + '.rtr', { create: true });
+            // Get the text field
+            var copyText = JSON.stringify(exportData)
 
-                // Create a writable stream
-                var writableStream = await fileHandle.createWritable();
+            console.log(copyText)
+            
+            // Select the text field
+            //copyText.setSelectionRange(0, 99999); // For mobile devices
 
-                // Write the content to the file
-                await writableStream.write(rtrContent);
+            // Copy the text inside the text field
+            navigator.clipboard.writeText(copyText);
 
-                // Close the stream
-                await writableStream.close();
-            }).catch(function (err) {
-                console.error('Directory picker error:', err);
-            });
+            // Alert the copied text
+            alert("Copied the content of "+selectedReviewer);
         });
+          /*/
+
+          /**/
+
     });
 }
 
+function importReviewer() {
 
-function importReviewer(event) {
+    var importValue = document.querySelector(".importReviewerValue").value 
+
+    try {
+        importValue = JSON.parse(importValue)
+    }catch(error){
+        alert("Invalid imported reviewer!")
+        return
+    }
+
+    /**/
+    var ReviewerName = importValue[0][0]
+    var Terms = 0
+    var Id = reviewerId
+    var Revi = {Id, ReviewerName, Terms}
+    var alreadyExisted = false
+
+    // the reviewerItems
+    var importedReviewerItems = importValue.slice(1)
+    var totalReviewerItems = []        
+    var reviewerDetails = {
+        idCounter: 0,
+        amountOfItems: 0,
+        groupList: []
+    }
+    var highestId = 0
+
+    console.log("importedReviewerItems ",importedReviewerItems)
+
+    // items to be added (just import stuff)
+    for (var i in importedReviewerItems){
+        var item = {
+            answer: importedReviewerItems[i][0],
+            difficulty: importedReviewerItems[i][1],
+            disabled: importedReviewerItems[i][2],
+            enumaration: importedReviewerItems[i][3],
+            group: importedReviewerItems[i][4],
+            id: importedReviewerItems[i][5],
+            image: importedReviewerItems[i][6],
+            question: importedReviewerItems[i][7]
+        }
+
+        // get the id
+        if (highestId < importedReviewerItems[i][5]){highestId = importedReviewerItems[i][5];} 
+        
+        reviewerDetails.amountOfItems += 1
+        reviewerDetails.idCounter = highestId+1
+        reviewerDetails["groupList"].push(importedReviewerItems[i][4])
+        totalReviewerItems.push(item)
+    }
+
+
+    /**/
+    // add to reviewerNames
+    localforage.getItem("reviewerNames", function (err, value) {
+        if (value.some(item => item["ReviewerName"] === ReviewerName)){
+            alert("Already existing Reviewer!")
+            return  
+        }
+
+        var newValue = value
+        newValue.push(Revi)
+        
+        localforage.setItem("reviewerNames", newValue)
+        console.log(newValue)
+
+        //document.querySelector(".userValue").value = ""
+        setTimeout(updateReviewerList, 100);
+
+        reviewerId += 1;
+        localforage.setItem("reviewerNamesId", reviewerId)
+
+        // add items to the content
+        console.log(reviewerPath+ReviewerName)
+        console.log(reviewerPath+ReviewerName+"Details")
+        localforage.setItem(reviewerPath+ReviewerName, totalReviewerItems)
+        localforage.setItem(reviewerPath+ReviewerName+"_Details", reviewerDetails)
+
+        document.querySelector(".importReviewerValue").value  = '';
+        alert("Imported "+ReviewerName+" Successfully!")
+    }); 
+    /**/
+
+}
+document.querySelector('.importButton').addEventListener('click', importReviewer);
+
+function OLDimportReviewer(event) {
     const file = event.target.files[0];
     if (!file) {
       return;
@@ -415,7 +524,7 @@ function importReviewer(event) {
   
     fileReader.readAsArrayBuffer(file);
 }
-document.getElementById('importReviewer').addEventListener('change', importReviewer);
+
 
 initialize()
 
