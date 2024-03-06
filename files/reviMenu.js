@@ -272,15 +272,13 @@ document.querySelector(".deleteMessageHide").addEventListener("click", hideDelet
 // EXPORT/IMPORT //// EXPORT/IMPORT //// EXPORT/IMPORT //// EXPORT/IMPORT //// EXPORT/IMPORT //// EXPORT/IMPORT //// EXPORT/IMPORT //
 
 function exportReviewer(index) {
-
     localforage.getItem("reviewerNames", function (err, reviewerNames) {
-        var selectedReviewer = reviewerNames[index].ReviewerName
+        var selectedReviewer = reviewerNames[index].ReviewerName;
 
-        localforage.getItem(reviewerPath+selectedReviewer, function (err, content){
-            //console.log(reviewerPath+selectedReviewer)
-            var exportData = [[selectedReviewer+"_Export"]]
+        localforage.getItem(reviewerPath + selectedReviewer, function (err, content) {
+            var exportData = [[selectedReviewer + "_Export"]];
 
-            for (var i in content){
+            for (var i in content) {
                 var toBePushed = [[
                     content[i].answer,
                     0,                  //difficulty
@@ -290,46 +288,33 @@ function exportReviewer(index) {
                     content[i].id,
                     content[i].image,
                     content[i].question
-                ]]
+                ]];
 
-                exportData = [...exportData, ...toBePushed]        
+                exportData = [...exportData, ...toBePushed];
             }
 
-            console.log(exportData)
+            console.log(exportData);
 
             // Convert data to a string
             var rtrContent = exportData.map(row => row.join('\t')).join('\n');
-            
-            // Create a Blob with the content
-            var blob = new Blob([rtrContent], { type: 'text/plain' });
-            
-            // Create a download link
-            var downloadLink = document.createElement('a');
-            downloadLink.href = URL.createObjectURL(blob);
-            downloadLink.download = selectedReviewer+'.rtr';
-            
-            downloadLink.target = '_blank';
-            
-            // Append the link to the document body and trigger the download
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            
-            // Clean up
-            document.body.removeChild(downloadLink);
 
+            // Prompt the user to choose the directory
+            window.showDirectoryPicker().then(async function (directoryHandle) {
+                // Create a file handle for the new file
+                var fileHandle = await directoryHandle.getFileHandle(selectedReviewer + '.rtr', { create: true });
 
+                // Create a writable stream
+                var writableStream = await fileHandle.createWritable();
 
+                // Write the content to the file
+                await writableStream.write(rtrContent);
+
+                // Close the stream
+                await writableStream.close();
+            }).catch(function (err) {
+                console.error('Directory picker error:', err);
+            });
         });
-
-
-
-
-
-        
-          /*/
-
-          /**/
-
     });
 }
 
