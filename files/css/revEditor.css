@@ -287,6 +287,8 @@ pre {
 .groupListItemCheckBox {
     position: relative;
     float: right;
+
+    margin-right: 3vw;
 }
 
 .groupListItem{

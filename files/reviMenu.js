@@ -272,7 +272,7 @@ document.querySelector(".deleteMessageHide").addEventListener("click", hideDelet
 // EXPORT/IMPORT //// EXPORT/IMPORT //// EXPORT/IMPORT //// EXPORT/IMPORT //// EXPORT/IMPORT //// EXPORT/IMPORT //// EXPORT/IMPORT //
 
 
-function exportReviewer(index) {
+function OLDExportReviewer(index) {
     
     localforage.getItem("reviewerNames", function (err, reviewerNames) {
         var selectedReviewer = reviewerNames[index].ReviewerName
@@ -324,9 +324,6 @@ function exportReviewer(index) {
             var copyText = JSON.stringify(exportData)
 
             console.log(copyText)
-            
-            // Select the text field
-            //copyText.setSelectionRange(0, 99999); // For mobile devices
 
             // Copy the text inside the text field
             navigator.clipboard.writeText(copyText);
@@ -341,7 +338,7 @@ function exportReviewer(index) {
     });
 }
 
-function importReviewer() {
+function OLDimportReviewer() {
 
     var importValue = document.querySelector(".importReviewerValue").value 
 
@@ -427,9 +424,9 @@ function importReviewer() {
     /**/
 
 }
-document.querySelector('.importButton').addEventListener('click', importReviewer);
 
-function OLDimportReviewer(event) {
+
+function importReviewer(event) {
     const file = event.target.files[0];
     if (!file) {
       return;
@@ -439,14 +436,13 @@ function OLDimportReviewer(event) {
   
     fileReader.onload = function(event) {
         var arrayBuffer = event.target.result;
-        var workbook = XLSX.read(arrayBuffer, { type: 'array' });
 
-        // Extract data from the first worksheet
-        var worksheetName = workbook.SheetNames[0];
-        var worksheet = workbook.Sheets[worksheetName];
-        var data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+        // Convert the array buffer to a string
+        var textContent = String.fromCharCode.apply(null, new Uint8Array(arrayBuffer));
+        var data = JSON.parse(textContent)
 
-        console.log(data[0][0])
+        // Process the text content here
+        console.log("ContentOfFile is", data);
 
         /**/
         var ReviewerName = data[0][0]
@@ -489,7 +485,7 @@ function OLDimportReviewer(event) {
             totalReviewerItems.push(item)
         }
 
-        /**/
+        
         // add to reviewerNames
         localforage.getItem("reviewerNames", function (err, value) {
             if (value.some(item => item["ReviewerName"] === ReviewerName)){
@@ -515,7 +511,7 @@ function OLDimportReviewer(event) {
             localforage.setItem(reviewerPath+ReviewerName, totalReviewerItems)
             localforage.setItem(reviewerPath+ReviewerName+"_Details", reviewerDetails)
 
-            document.getElementById('importReviewer').value = '';
+            document.getElementById('importReviewerId').value = '';
             alert("Imported "+data[0]+" Successfully!")
         }); 
         /**/
@@ -525,7 +521,59 @@ function OLDimportReviewer(event) {
   
     fileReader.readAsArrayBuffer(file);
 }
+document.querySelector('.importReviewer').addEventListener('change', importReviewer);
 
+function exportReviewer(index){
+    alert("Exporting")
+
+    localforage.getItem("reviewerNames", function (err, reviewerNames) {
+        var selectedReviewer = reviewerNames[index].ReviewerName
+
+        localforage.getItem(reviewerPath+selectedReviewer, function (err, content){
+            //console.log(reviewerPath+selectedReviewer)
+            var exportData = [[selectedReviewer+"_Export"]]
+
+            for (var i in content){
+                var toBePushed = [[
+                    content[i].answer,
+                    0,                  //difficulty
+                    content[i].disabled,
+                    content[i].enumaration,
+                    content[i].group,
+                    content[i].id,
+                    content[i].image,
+                    content[i].question
+                ]]
+
+                exportData = [...exportData, ...toBePushed]        
+            }
+
+            try {
+                alert("yes?")
+                var plugin = cordova.plugins.safMediastore;
+                alert("ok?")
+        
+                // Prompt the user to select a file location
+                var fileName = selectedReviewer+".txt";
+                var fileContent = JSON.stringify(exportData);
+                var base64Data = btoa(fileContent)
+        
+                try {
+                    plugin.writeFile({
+                        "data": base64Data,
+                        "filename": fileName
+                    });
+                    alert("File saved in the download!")
+                }catch(error2){
+                    alert(error2)
+                }
+            }catch(error){ 
+                alert(error)
+            }
+
+        });
+    });
+}
 
 initialize()
 

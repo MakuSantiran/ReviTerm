@@ -137,8 +137,10 @@ body {
 }
 
 .groupListItemCheckBox {
-    position: absolute;
-    right: 5%;
+    position: relative;
+    float: right;
+
+    margin-right: 3vw;
 }
 
 .groupListItem{
