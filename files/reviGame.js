@@ -1,5 +1,12 @@
 import localforage from "./localForage/localforage.js" 
 
+
+//just load the script
+//var VelocityJsScript = document.createElement('script');
+//VelocityJsScript.src = './files/VelocityJS/velocity.js';
+
+//document.body.appendChild(VelocityJsScript);
+
 // html
 var html_Question = document.getElementById("question")
 var html_Choice = document.getElementById("choices")
@@ -7,12 +14,21 @@ var html_Answer = document.getElementById("answer")
 var html_Feedback = document.getElementById("feedback")
 var html_GroupTitle = document.getElementById("groupTitle")
 var html_difficultyMeter = document.getElementById("difficultyMeter")
+var html_forgetfulFlagId = document.getElementById("forgetfulFlag_RedId")
+var html_forgetfulFlagYellowId = document.getElementById(".forgetfulFlag_YellowId")
+
+var html_forgetfulFlag = document.querySelector(".forgetfulFlag_Red")
+
+var html_forgetfulFlagYellow = document.querySelector(".forgetfulFlag_Yellow")
+var html_quizContainer = document.querySelector(".quizContainer")
 
 // variables
 var Game = {
     atNumber: 0,
     gotWrong: false,
     isGoingToNext: false,
+
+    flagShakeIntensity: 20 // the lower the more intense
 }
 var reviewItems_Groups = []     // the outline of this is {group: #, difficulty: #}
 var reviewItems_Choices = {}
@@ -158,6 +174,81 @@ function extractExclusionGroup(){
     console.log("reviewItems", reviewItems)
 }
 
+// Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations 
+// Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations 
+// Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations 
+
+function randomNumbers(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+function flagShakeAnimation() {
+    var properties = {
+        left: function() {
+          var leftValue = randomNumbers(-3,3)
+          return leftValue + 'px';
+        },
+        top: function() {
+            var leftValue = randomNumbers(-3,3)
+            return leftValue + 'px';
+        },
+    };
+
+    var options = {
+        duration: Game.flagShakeIntensity, // Duration of each shake (milliseconds)
+        easing: 'linear', // Linear easing for smooth motion
+    };
+
+    Velocity(html_forgetfulFlag,properties,options)
+}
+
+function wrongAnswerAnimation(){
+    var properties = {
+        left: function() {
+          var leftValue = randomNumbers(-2,2)
+          return 50 + leftValue + '%';
+        },
+        top: function() {
+            var leftValue = randomNumbers(-2,2)
+            return 50 + leftValue + '%';
+        },
+    };
+
+    var options = {
+        duration: 40, // Duration of each shake (milliseconds)
+        easing: 'linear', // Linear easing for smooth motion
+        loop: 1, // Number of times to repeat the animation
+        complete: function() {
+            // Chain another animation after fading out
+            Velocity(html_quizContainer, {left: "49%", top: "50%" }, { duration: 1 });
+        }
+    };   
+
+    Velocity(html_quizContainer,properties,options)
+}
+
+function updateForgetfulFlag(){
+    var forgetfulLevel = reviewItems[Game.atNumber].difficulty
+
+    if (forgetfulLevel > 2){
+        html_forgetfulFlagId.style.display = "flex";
+    } else {
+        html_forgetfulFlagId.style.display = "none";
+    }
+
+    if (forgetfulLevel >= 2 && forgetfulLevel < 4){
+        Game.flagShakeIntensity = 50
+        html_forgetfulFlagId.src = './files/img/SlightlyForgetful.png'
+    } else if (forgetfulLevel >= 4){
+        Game.flagShakeIntensity = 20
+        html_forgetfulFlagId.src = './files/img/ForgetfulFlag.png'
+    }
+
+    console.log(forgetfulLevel, Game.flagShakeIntensity)
+
+
+    //html_forgetfulFlagYellow
+}
 
 // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function 
 // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function 
@@ -188,7 +279,7 @@ function clearFeedback(){
 function displayQuestion(){
     html_GroupTitle.innerHTML =  reviewItems[Game.atNumber].group
     html_Question.innerHTML = reviewItems[Game.atNumber].question
-    html_difficultyMeter.innerHTML = "DifficultyMeter: "+reviewItems[Game.atNumber].difficulty
+    //html_difficultyMeter.innerHTML = "DifficultyMeter: "+reviewItems[Game.atNumber].difficulty
 }
 
 function reAllowToSubmit(){
@@ -202,10 +293,12 @@ function proceedToNextItem(){
         html_Answer.value = ""
         html_GroupTitle.innerHTML =  reviewItems[Game.atNumber].group
         html_Question.innerHTML = reviewItems[Game.atNumber].question
-        html_difficultyMeter.innerHTML = "DifficultyMeter: "+reviewItems[Game.atNumber].difficulty
+        //html_difficultyMeter.innerHTML = "DifficultyMeter: "+reviewItems[Game.atNumber].difficulty
         showChoices(reviewItems[Game.atNumber].group)   
         Game.isGoingToNext = false
         Game.gotWrong = false
+
+        updateForgetfulFlag()
 
     // if finished
     } else {
@@ -241,7 +334,6 @@ function checkAnswer(){
 
     var toCheck = reviewItems[Game.atNumber].answer.toLowerCase()
     
-
     if (!Game.isGoingToNext){
         // if correct
         if (toCheck == userAnswer){
@@ -249,7 +341,6 @@ function checkAnswer(){
             Game.isGoingToNext = true
 
             // decrease difficulty number
-
             if (Game.gotWrong == false){
 
                 if (reviewItems[Game.atNumber].difficulty > -difficultyRange){
@@ -259,10 +350,11 @@ function checkAnswer(){
                 displayQuestion()
             }
 
+            updateForgetfulFlag()
             Game.atNumber += 1
 
             html_Feedback.innerHTML = "Correct! "+userAnswer+" was the correct answer!"
-
+            
             setTimeout(clearFeedback, 1000);
             setTimeout(proceedToNextItem, 1000);
 
@@ -271,12 +363,14 @@ function checkAnswer(){
             
             Game.isGoingToNext = true
             Game.gotWrong = true
-
+            
             // add difficulty number
             if (reviewItems[Game.atNumber].difficulty < difficultyRange){
                 reviewItems[Game.atNumber].difficulty += 1
             }
 
+            updateForgetfulFlag()
+            wrongAnswerAnimation()
             displayQuestion()
             html_Feedback.innerHTML = "Wrong Answer!"
             setTimeout(clearFeedback, 1000);
@@ -307,11 +401,9 @@ function getReviewerContent(){
     });
 }
 
-
 function includeGroups(){
 
 }
-
 
 // start!
 function startReviTerm(){
@@ -331,6 +423,7 @@ function startReviTerm(){
     mayonnaiseAlgorithm()
     displayQuestion()
     showChoices(reviewItems[Game.atNumber].group)   
+    updateForgetfulFlag()
 
     Game.isGoingToNext = false
     Game.gotWrong = false
@@ -338,6 +431,8 @@ function startReviTerm(){
     //console.log(reviewItems_Choices)
 }
 
+
 getReviewerContent()
+setInterval(flagShakeAnimation, Game.flagShakeIntensity*3);
 
 window.checkAnswer = checkAnswer

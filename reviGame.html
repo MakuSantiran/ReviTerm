@@ -4,8 +4,15 @@
         <title>Leitner Quiz</title>
     </head>
     <body>
-        <div class="divThing">
-            <h2 id="groupTitle">Leitner Quiz</h2>
+        <div class="quizContainer">
+            <div class="groupTitleContainer" >
+                
+                <div class="inline-image">
+                    <img class="forgetfulFlag_Red" id="forgetfulFlag_RedId" />
+                </div>
+                <div class="groupTitle" id="groupTitle">Reviewer Doesn't Contain Anything :(</div>
+            </div>
+            
 
             <p id="question" class="question"></p>
             <br/><br/><br/><br/>
@@ -23,9 +30,12 @@
 
             <br/>
 
-            <div id="difficultyMeter"> </div>
+            <!--
+                <div id="difficultyMeter"> </div>
+            -->
         </div>
     </body>
+    <script src="./files/VelocityJS/velocity.js"></script>
     <script type="module" src="./files/reviGame.js"></script>
     <link rel="stylesheet" href="./files/css/revGame.css">
 </html>

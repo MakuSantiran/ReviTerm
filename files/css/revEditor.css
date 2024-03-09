@@ -3,6 +3,8 @@ body {
     /*display: flex;*/
     align-items: center;
     justify-content: center;
+
+    background-color: rgb(41, 41, 41);
 }
 
 
@@ -91,6 +93,8 @@ body {
     font-size: 3.5vw;
 
     user-select: none;
+
+    color: #efefef;
 }
 
 .groupHeader{
@@ -105,7 +109,7 @@ body {
 }
 
 .itemBox {
-    background: #ffffff;
+    background: #353535;
     border-color: #6e6e6e;
     border-style: solid;
     border-width: 1.2px;
@@ -116,6 +120,7 @@ body {
     padding-top: 2vh;
     padding-bottom: 2vh;
 
+    color: #efefef;
 }
 
 .textInItemBox {
@@ -170,7 +175,6 @@ pre {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 
     font-size: 5vw;
-
 }
 
 .itemDifficulty{

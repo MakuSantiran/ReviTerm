@@ -8,7 +8,6 @@ import localforage from "./localForage/localforage.js"
 */
 
 var reviewerPath = "reviewerContent_"
-
 var reviewerId = 0
 var selectedIndexToBeDeleted = -1
 
@@ -16,6 +15,19 @@ var selectedIndexToBeDeleted = -1
 // for exclusion
 var local_selectedGroupExclusion = []
 
+
+// html things
+var html_deleteName = document.querySelectorAll(".deleteName")
+
+var html_groupListContainer = document.querySelector(".groupListContainer")
+var html_initOptionsReviewerName = document.querySelector(".initOptionsReviewerName")
+var html_initOptionsTotalItems = document.querySelector(".initOptionsTotalItems")
+
+var html_overlay = document.getElementById("overlay") 
+var html_deleteContainer = document.getElementById("deleteContainerId")
+
+var html_initOptionsDIV = document.getElementById("initOptionsDIVId") 
+var html_addReviewerContainer = document.getElementById("addReviewerContainerId") 
 
 // initialization (create the database once opened)
 function initialize(){
@@ -101,7 +113,7 @@ function addReviewer(){
     localforage.getItem("reviewerNames", function (err, value) {
 
         if (value.some(item => item["ReviewerName"] === ReviewerName)){
-            alert("Already existing Reviewer!")
+            alert(ReviewerName+" is an already existing Reviewer!")
             return  
         }
 
@@ -112,13 +124,16 @@ function addReviewer(){
         console.log(newValue)
 
         //document.querySelector(".userValue").value = ""
+
+        alert("Created "+ReviewerName+" reviewer!")
+        hideReviewerContainer()
+
         setTimeout(updateReviewerList, 100);
 
         reviewerId += 1;
         localforage.setItem("reviewerNamesId", reviewerId)
     }); 
 }
-document.querySelector(".addReviewer").addEventListener("click", addReviewer);
 
 function updateReviewerList(){
     // then add
@@ -133,16 +148,42 @@ function updateReviewerList(){
             var theTerms = JSON.stringify(value[i]["Terms"])
 
             document.querySelector(".listOfReviewer").innerHTML += 
+            `            
+            <div class="reviewerItemContainer"> 
+                
+                <div class="flexContainer">
+                    <div class="flexItem">
+                        <center>
+                            `+theTitle+` 
+                        </center>
+                    </div>
+                    <div class="flexItem">
+                        <center>
+                            <div class="deleteReviewerButton" onclick="showDeleteMessage(`+i+`)">Delete</div>
+                        </center>
+                    </div>
+                    <div class="flexItem">
+                        <center>
+                            <div class="exportReviewerButton" onclick="exportReviewer(`+i+`)">Export</div>
+                        </center>
+                    </div>
+
+                    <div class="flexItem">
+                        <center>
+                            <div class="openReviewerButton" onclick='gotoEditor(`+theTitle+`)'>Open</div>
+                        </center>
+                    </div>
+
+                    <!--
+                    <div class="flexItem">
+                        <center>
+                            <button onclick='showOptionsBeforeReviTerm(`+theTitle+`)'>Play</button> 
+                        </center>
+                    </div>
+                    -->
+                </div>
+            </div>
             `
-            <br/>
-            Title: `+theTitle+`<br/>
-            <button onclick='showOptionsBeforeReviTerm(`+theTitle+`)'>Play</button> 
-            <button onclick='gotoEditor(`+theTitle+`)'>Edit</button>
-            <br/><br/>
-            <button onclick="exportReviewer(`+i+`)"> Export Reviewer </button>
-            <br/><br/>
-            <button onclick="showDeleteMessage(`+i+`)">Remove</button>
-            <br/><br/>`
         }
     });
 }
@@ -172,7 +213,6 @@ function deleteReviewer(){
         setTimeout(updateReviewerList, 100);
     }); 
 }
-document.querySelector(".deleteMessageYes").addEventListener("click", deleteReviewer);
 
 // INTERFACE // INTERFACE// INTERFACE // INTERFACE// INTERFACE // INTERFACE// INTERFACE // INTERFACE// INTERFACE // INTERFACE
 // INTERFACE // INTERFACE// INTERFACE // INTERFACE// INTERFACE // INTERFACE// INTERFACE // INTERFACE// INTERFACE // INTERFACE// INTERFACE // INTERFACE
@@ -190,13 +230,6 @@ function showOptionsBeforeReviTerm(name){
     localforage.getItem("reviewerContent_"+name+"_Details", function (err, reviewer) {
 
         var totalGroups = [...new Set(reviewer.groupList)]; //without the duplicates
-
-        var html_overlay = document.getElementById("overlay") 
-        var html_initOptionsDIV = document.getElementById("initOptionsDIVId") 
-        
-        var html_groupListContainer = document.querySelector(".groupListContainer")
-        var html_initOptionsReviewerName = document.querySelector(".initOptionsReviewerName")
-        var html_initOptionsTotalItems = document.querySelector(".initOptionsTotalItems")
 
         html_initOptionsDIV.style.display = "block";
         html_overlay.style.display = "block";            
@@ -228,24 +261,12 @@ function showOptionsBeforeReviTerm(name){
 }
 
 function hideOptionsBeforeReviTerm(){
-    var html_overlay = document.getElementById("overlay") 
-    var html_initOptionsDIV = document.getElementById("initOptionsDIVId") 
-
     html_initOptionsDIV.style.display = "none";
     html_overlay.style.display = "none";        
 }
-document.querySelector(".initOptionsHide").addEventListener("click", hideOptionsBeforeReviTerm);
-
 
 function showDeleteMessage(index){
-
     localforage.getItem("reviewerNames", function (err, value) {
-
-        var html_deleteName = document.querySelectorAll(".deleteName")
-
-        var html_overlay = document.getElementById("overlay") 
-        var html_deleteContainer = document.getElementById("deleteContainerId")
-
         // to affect all
         html_deleteName.forEach(element => {
             element.innerHTML = value[index].ReviewerName
@@ -261,16 +282,40 @@ function showDeleteMessage(index){
 }
 
 function hideDeleteMessage(){
-    var html_overlay = document.getElementById("overlay") 
-    var html_deleteContainer = document.getElementById("deleteContainerId") 
-
     html_deleteContainer.style.display = "none";
     html_overlay.style.display = "none";        
 }
-document.querySelector(".deleteMessageHide").addEventListener("click", hideDeleteMessage);
+
+function showReviewerContainer(){
+    html_addReviewerContainer.style.display = "block";
+    html_overlay.style.display = "block";   
+}
+
+function hideReviewerContainer(){
+    html_addReviewerContainer.style.display = "none";
+    html_overlay.style.display = "none";   
+}
 
 // EXPORT/IMPORT //// EXPORT/IMPORT //// EXPORT/IMPORT //// EXPORT/IMPORT //// EXPORT/IMPORT //// EXPORT/IMPORT //// EXPORT/IMPORT //
 
+
+function getDate() {
+    var date = new Date();
+
+    // Get date components
+    var month = String(date.getMonth() + 1).padStart(2, '0'); // Adding 1 because months are zero-indexed
+    var day = String(date.getDate()).padStart(2, '0');
+    var year = date.getFullYear();
+
+    // Get time components
+    var hours = String(date.getHours()).padStart(2, '0');
+    var minutes = String(date.getMinutes()).padStart(2, '0');
+    var seconds = String(date.getSeconds()).padStart(2, '0');
+    var ampm = date.getHours() >= 12 ? 'PM' : 'AM';
+
+    // Combine components into desired format
+    return month + day + year + hours + minutes + seconds + ampm;
+}
 
 function OLDExportReviewer(index) {
     
@@ -395,7 +440,7 @@ function OLDimportReviewer() {
     // add to reviewerNames
     localforage.getItem("reviewerNames", function (err, value) {
         if (value.some(item => item["ReviewerName"] === ReviewerName)){
-            alert("Already existing Reviewer!")
+            alert(ReviewerName+" is an already existing Reviewer!")
             return  
         }
 
@@ -425,7 +470,6 @@ function OLDimportReviewer() {
 
 }
 
-
 function importReviewer(event) {
     const file = event.target.files[0];
     if (!file) {
@@ -435,7 +479,19 @@ function importReviewer(event) {
     var fileReader = new FileReader();
   
     fileReader.onload = function(event) {
+        var file = event.target.file;
         var arrayBuffer = event.target.result;
+
+        // Get the file name
+        var fileName = document.getElementById('importReviewerId').value
+        var fileExtension = fileName.split('.').pop();
+
+        if (fileExtension != "rtr"){
+            alert("Please select an RTR file!")
+            document.getElementById('importReviewerId').value = '';
+            return
+        }
+
 
         // Convert the array buffer to a string
         var textContent = String.fromCharCode.apply(null, new Uint8Array(arrayBuffer));
@@ -489,7 +545,8 @@ function importReviewer(event) {
         // add to reviewerNames
         localforage.getItem("reviewerNames", function (err, value) {
             if (value.some(item => item["ReviewerName"] === ReviewerName)){
-                alert("Already existing Reviewer!")
+                alert(ReviewerName+" is an already existing Reviewer!")
+                document.getElementById('importReviewerId').value = '';
                 return  
             }
     
@@ -521,17 +578,16 @@ function importReviewer(event) {
   
     fileReader.readAsArrayBuffer(file);
 }
-document.querySelector('.importReviewer').addEventListener('change', importReviewer);
 
 function exportReviewer(index){
-    alert("Exporting")
 
     localforage.getItem("reviewerNames", function (err, reviewerNames) {
         var selectedReviewer = reviewerNames[index].ReviewerName
 
         localforage.getItem(reviewerPath+selectedReviewer, function (err, content){
             //console.log(reviewerPath+selectedReviewer)
-            var exportData = [[selectedReviewer+"_Export"]]
+            //var exportData = [[selectedReviewer+"_Export"]]
+            var exportData = [[selectedReviewer]]
 
             for (var i in content){
                 var toBePushed = [[
@@ -549,12 +605,11 @@ function exportReviewer(index){
             }
 
             try {
-                alert("yes?")
                 var plugin = cordova.plugins.safMediastore;
-                alert("ok?")
-        
+
                 // Prompt the user to select a file location
-                var fileName = selectedReviewer+".txt";
+                var dateString = getDate();
+                var fileName = selectedReviewer+dateString+".rtr";
                 var fileContent = JSON.stringify(exportData);
                 var base64Data = btoa(fileContent)
         
@@ -563,7 +618,7 @@ function exportReviewer(index){
                         "data": base64Data,
                         "filename": fileName
                     });
-                    alert("File saved in the download!")
+                    alert(""+fileName+" saved in your download folder!")
                 }catch(error2){
                     alert(error2)
                 }
@@ -575,9 +630,6 @@ function exportReviewer(index){
     });
 }
 
-initialize()
-
-
 // exports
 window.deleteReviewer = deleteReviewer
 window.gotoEditor = gotoEditor
@@ -585,3 +637,17 @@ window.showOptionsBeforeReviTerm = showOptionsBeforeReviTerm
 window.excludeGroup = excludeGroup
 window.showDeleteMessage = showDeleteMessage
 window.exportReviewer = exportReviewer
+
+
+// the button listeners
+document.querySelector(".addReviewerShow").addEventListener("click", showReviewerContainer);
+document.querySelector(".addReviewer").addEventListener("click", addReviewer);
+document.querySelector(".addReviewerContainerHide").addEventListener("click", hideReviewerContainer);
+
+document.querySelector(".deleteMessageHide").addEventListener("click", hideDeleteMessage);
+document.querySelector(".deleteMessageYes").addEventListener("click", deleteReviewer);
+
+document.querySelector(".initOptionsHide").addEventListener("click", hideOptionsBeforeReviTerm);
+document.querySelector('.importReviewerFileItself').addEventListener('change', importReviewer);
+
+initialize()

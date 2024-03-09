@@ -3,13 +3,17 @@ body {
     /*display: flex;*/
     align-items: center;
     justify-content: center;
+
+    background-color: rgb(69, 33, 69);
+    color: #ebebeb;
+
+    overflow-x: hidden;
 }
 
-
-.divThing {
+.quizContainer {
     text-align: center;
 
-    position: fixed;
+    position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -32,4 +36,40 @@ body {
 hr {
     margin-top: 5vw;
     width: 100%;
+}
+
+
+
+.groupTitleContainer {
+    padding: 3vw;
+    margin-bottom: 1vh;
+    font-size: 10vw;
+
+    text-align: center;
+}
+
+.groupTitle {
+    display: inline-block;
+}
+
+.forgetfulFlag_Red {
+    width: 13vw;
+    height: 13vw;
+    position: absolute;
+
+    display: none;
+}
+
+.forgetfulFlag_Yellow {
+    width: 13vw;
+    height: 13vw;
+    position: absolute;
+
+    display: none;
+}
+
+.inline-image {
+    position: absolute; /* Position the image absolutely */
+    right: 25vw;
+    top: -6vw;
 }
