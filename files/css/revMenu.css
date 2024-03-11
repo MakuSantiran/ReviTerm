@@ -1,5 +1,11 @@
+@font-face {
+    font-family: 'HeyComic'; /* Specify a name for your font */
+    src: url("../fonts/HeyComic.otf") format('opentype'); /* Specify the path to your .otf font file */
+}
+
 body {
-    font-family: 'arial', sans-serif;
+    font-family: 'HeyComic';
+
     /*display: flex;*/
     align-items: center;
     justify-content: center;
@@ -147,6 +153,7 @@ body {
 
     padding-top: 2vh;
     padding-bottom: 2vh;
+    padding-left: 2vw;
 
 
     width: 99%;

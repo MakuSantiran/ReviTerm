@@ -2,6 +2,8 @@
 <html>
 <head>
 	<title>Editor</title>
+	<script type="module" src="./files/reviEditor.js"></script>
+	<link rel="stylesheet" href="./files/css/revEditor.css">
 </head>
 <body>
 	
@@ -66,7 +68,11 @@
 				<input type="text" class="itemAnswer" >
 		
 				<br/><br/>
-				Disabled <input type="checkbox" class="itemDisabled">
+				<!--
+					Disabled <input type="checkbox" class="itemDisabled">
+				-->
+				Difficulty level: <div class="itemDifficulty">#</div>
+				
 			</div>
 
 			<div class="flexItem">
@@ -79,9 +85,12 @@
 
 			</div>
 		</div>
-		
+
+		<!--
 		<br/>
+		
 		Difficulty level: <div class="itemDifficulty">#</div>
+		-->
 
 		<br/><br/>
 
@@ -111,7 +120,7 @@
 		<b>Title:</b> <div class="initOptionsReviewerName"></div><br/>
 		<b>Number Of Items:</b> <div class="initOptionsTotalItems"></div><br/>
 		 
-		<b>Mode:</b> <div style="display:inline-block; color: cornflowerblue;"><b>Practice</b></div> | Incremental | Survival
+		<b>Mode:</b> <div style="display:inline-block; color: cornflowerblue;">Practice</div> | Survival | Endless
 
 		<br/>
 		<h3>Groups to be reviewed:</h3>
@@ -132,7 +141,6 @@
 					<!-- 
 						<input type="button" value="ReviTerm!" class="startReviterm">
 					-->
-					
 				</center>
 			</div>
 		</div>
@@ -147,9 +155,5 @@
 <!-- Uncomment this when exporting as an apk
 	<script src="cordova.js"></script>
 -->
-
-<script type="module" src="./files/reviEditor.js"></script>
-
-<link rel="stylesheet" href="./files/css/revEditor.css">
 </style>
 </html>

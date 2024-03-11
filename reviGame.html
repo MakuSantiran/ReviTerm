@@ -1,41 +1,83 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Leitner Quiz</title>
+        <title>Review Terminologies</title>
+        <script src="./files/VelocityJS/velocity.js"></script>
+        <script type="module" src="./files/reviGame.js"></script>
+
+        <!-- styles -->
+        <link rel="stylesheet" href="./files/css/revGame.css">
+        <link rel="stylesheet" href="./files/css/revGame/playerChoices.css">
     </head>
     <body>
         <div class="quizContainer">
             <div class="groupTitleContainer" >
-                
                 <div class="inline-image">
                     <img class="forgetfulFlag_Red" id="forgetfulFlag_RedId" />
                 </div>
                 <div class="groupTitle" id="groupTitle">Reviewer Doesn't Contain Anything :(</div>
             </div>
             
-
             <p id="question" class="question"></p>
-            <br/><br/><br/><br/>
 
-            <div id="feedback" class="feedback"></div>
+            <div class="restartContainer" id="restartContainerId">
+                <div class="flexContainer">
+                    <div class="flexItem">
+                        <div class="goBackButton">
+                            Im done!
+                        </div>
+                    </div>
+                    <div class="flexItem">
+                        <div class="restartButton">
+                            Restart
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            <input type="text" id="answer" placeholder="Your answer"> <br/><br/>
+            <br/><br/>
 
-            <button onclick="checkAnswer()">Submit</button>
+            <div class="choicesContainer" id="choicesContainerId">
+                <!-- Multiple Choices -->
+                <div class="choice1Container" onclick="checkAnswerMultipleChoice(1)">
+                    <div class="choice1" id="choice1Id">choice 1</div>
+                    <div class="health1" id="health1Id">
+                    </div>
+                </div>
+                <div class="choice2Container" onclick="checkAnswerMultipleChoice(2)">
+                    <div class="choice2" id="choice2Id">choice 2 </div>
+                    <div class="health2" id="health2Id">
+                    </div>
+                </div>
+                <div class="choice3Container" onclick="checkAnswerMultipleChoice(3)">
+                    <div class="choice3" id="choice3Id">choice 3 </div>
+                    <div class="health3" id="health3Id">
+                    </div>
+                </div>
+                <div class="choice4Container" onclick="checkAnswerMultipleChoice(4)">
+                    <div class="choice4" id="choice4Id">choice 4 </div>
+                    <div class="health4" id="health4Id">
+                    </div>
+                </div>
+            </div>
 
-            <hr/>
 
-            
-            <div id="choices"></div>
-
-            <br/>
+            <div style="display: none;">
+                <br/><br/>
+                <div id="feedback" class="feedback"></div>
+                <input type="text" id="answer" placeholder="Your answer"> <br/><br/>
+                <!--
+                    <button onclick="checkAnswerIdentification()">Submit</button>
+                -->
+                
+                <hr/>
+                <div id="choices"></div>
+                <br/>
+            </div>
 
             <!--
                 <div id="difficultyMeter"> </div>
             -->
         </div>
     </body>
-    <script src="./files/VelocityJS/velocity.js"></script>
-    <script type="module" src="./files/reviGame.js"></script>
-    <link rel="stylesheet" href="./files/css/revGame.css">
 </html>

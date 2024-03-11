@@ -1,5 +1,10 @@
+@font-face {
+    font-family: 'HeyComic'; /* Specify a name for your font */
+    src: url("../fonts/HeyComic.otf") format('opentype'); /* Specify the path to your .otf font file */
+}
+
 body {
-    font-family: 'arial', sans-serif;
+    font-family: 'HeyComic';
     /*display: flex;*/
     align-items: center;
     justify-content: center;
@@ -7,6 +12,26 @@ body {
     background-color: rgb(41, 41, 41);
 }
 
+/* to prevent overflowing */
+pre {
+    font-family: 'HeyComic';
+    font-weight: lighter;
+    white-space: pre-wrap;       /* Since CSS 2.1 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */;
+    margin-top: 1vw;
+    margin-bottom: 1vw;
+}
+
+h2 {
+    font-weight: 100;
+}
+
+h3 {
+    font-weight: 100;
+}
 
 /* EDITOR *//* EDITOR *//* EDITOR *//* EDITOR *//* EDITOR *//* EDITOR *//* EDITOR *//* EDITOR *//* EDITOR */
 /* EDITOR *//* EDITOR *//* EDITOR *//* EDITOR *//* EDITOR *//* EDITOR *//* EDITOR *//* EDITOR *//* EDITOR */
@@ -128,18 +153,6 @@ body {
     font-size: 4vw;
 
 }
-
-/* to prevent overflowing */
-pre {
-    white-space: pre-wrap;       /* Since CSS 2.1 */
-    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
-    white-space: -pre-wrap;      /* Opera 4-6 */
-    white-space: -o-pre-wrap;    /* Opera 7 */
-    word-wrap: break-word;       /* Internet Explorer 5.5+ */;
-    margin-top: 1vw;
-    margin-bottom: 1vw;
-}
-
 
 .itemAnswerText{
     color: #8d8d8d;
@@ -271,7 +284,7 @@ pre {
     
     display: none;
 
-    width: 90%;
+    width: 82%;
 
     font-size: 4vw;   
 }
@@ -319,10 +332,10 @@ button {
     background-color: #2c6b21;
     color: #ffffff;
 
-    padding: 3vw;
+    padding: 2vw;
 
     text-decoration: none; 
-    font-size: 5vw;
+    font-size: 4vw;
 
     user-select: none;
 
@@ -334,12 +347,12 @@ button {
     background-color: #c8c8c8;
     color: #000000;
 
-    padding: 3vw;
+    padding: 2vw;
 
     width: 16vw;
 
     text-decoration: none; 
-    font-size: 5vw;
+    font-size: 4vw;
 
     user-select: none;
 }

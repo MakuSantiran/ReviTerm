@@ -1,0 +1,129 @@
+:root {
+    --choiceBottomSpace: 5%;
+    --startingHealth: 100%;
+    --startingHealthColor: #646464;
+
+
+    --practiceHealthColor: #646464;
+    --highHealthColor: #4388a5;
+    --goodHealthColor:#41ad37;
+    --halfHealthColor: #f4f12b;
+    --lowHealthColor: #d13434;
+}  
+
+
+.choicesContainer{
+    position: relative;
+}
+
+.choice1Container {
+    background-color: #646464;
+    padding: 1vw;
+
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-bottom: var(--choiceBottomSpace);
+
+    position: relative;
+    user-select: none;
+    
+    cursor: pointer;
+
+    z-index: 1;
+}
+
+.choice2Container {
+    background-color: #646464;
+    padding: 1vw;
+
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-bottom: var(--choiceBottomSpace);
+
+    position: relative;
+    user-select: none;
+
+    cursor: pointer;
+
+    z-index: 1;
+}
+
+.choice3Container {
+    background-color: #646464;
+    padding: 1vw;
+
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-bottom: var(--choiceBottomSpace);
+
+    position: relative;
+    user-select: none;
+
+    cursor: pointer;
+
+    z-index: 1;
+}
+
+.choice4Container {
+    background-color: #646464;
+    padding: 1vw;
+
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-bottom: var(--choiceBottomSpace);
+
+    position: relative;
+    user-select: none;
+
+    cursor: pointer;
+
+    z-index: 1;
+}
+
+.health1 {
+    background-color: var(--startingHealthColor);
+    width: var(--startingHealth);
+    height: 100%;
+    position: absolute;
+
+    top: 0%;
+    left: 0%;
+
+    z-index: -3;
+}
+
+.health2 {
+    background-color: var(--startingHealthColor);
+    width: var(--startingHealth);
+    height: 100%;
+    position: absolute;
+
+    top: 0%;
+    left: 0%;
+
+    z-index: -3;
+}
+
+.health3 {
+    background-color: var(--startingHealthColor);
+    width: var(--startingHealth);
+    height: 100%;
+    position: absolute;
+
+    top: 0%;
+    left: 0%;
+
+    z-index: -3;
+}
+
+.health4 {
+    background-color: var(--startingHealthColor);
+    width: var(--startingHealth);
+    height: 100%;
+    position: absolute;
+
+    top: 0%;
+    left: 0%;
+
+    z-index: -3;
+}

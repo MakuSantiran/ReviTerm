@@ -15,10 +15,11 @@ var html_Feedback = document.getElementById("feedback")
 var html_GroupTitle = document.getElementById("groupTitle")
 var html_difficultyMeter = document.getElementById("difficultyMeter")
 var html_forgetfulFlagId = document.getElementById("forgetfulFlag_RedId")
-var html_forgetfulFlagYellowId = document.getElementById(".forgetfulFlag_YellowId")
+var html_forgetfulFlagYellowId = document.getElementById("forgetfulFlag_YellowId")
+var html_choicesContainer = document.getElementById("choicesContainerId")
+var html_restartContainer = document.getElementById("restartContainerId")
 
 var html_forgetfulFlag = document.querySelector(".forgetfulFlag_Red")
-
 var html_forgetfulFlagYellow = document.querySelector(".forgetfulFlag_Yellow")
 var html_quizContainer = document.querySelector(".quizContainer")
 
@@ -26,7 +27,17 @@ var html_quizContainer = document.querySelector(".quizContainer")
 var Game = {
     atNumber: 0,
     gotWrong: false,
-    isGoingToNext: false,
+    preventSubmission: false,
+
+    questionTypes: [
+        "MultipleChoice", 
+        "TrueOrFalse", 
+        "Scrambled", 
+        "Identification",
+        "WhichIsWrong"
+    ],
+
+    totalMistakes: 0,
 
     flagShakeIntensity: 20 // the lower the more intense
 }
@@ -54,7 +65,6 @@ function generateGroupList(){
     var tempGroupList = []
     var tempGroupListDifficulty = []
 
-
     // add the different types of group list
     for (var i in reviewItems){
         var theGroup = reviewItems[i]["group"]
@@ -73,6 +83,8 @@ function generateGroupList(){
             console.log("AH")
             tempGroupListDifficulty[indexOfGroup] = 0
         }
+
+        
 
         // add difficulty number
         tempGroupListDifficulty[indexOfGroup] = tempGroupListDifficulty[indexOfGroup] + groupDifficulty
@@ -156,6 +168,7 @@ function shuffleArray(array) {
 function extractExclusionGroup(){
     var tempReviewItems = [...reviewItems]
 
+    // basically get the excluded groups and save it to the temporarySaveForExcluded
     for (var i in local_selectedGroupExclusion){
         var extracted = reviewItems.filter(item => item.group == local_selectedGroupExclusion[i]);
         var tempReviewItems = tempReviewItems.filter(item => item.group != local_selectedGroupExclusion[i]);
@@ -174,42 +187,39 @@ function extractExclusionGroup(){
     console.log("reviewItems", reviewItems)
 }
 
+function randomNumbers(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations 
 // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations 
 // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations 
 
-function randomNumbers(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
+
 
 function flagShakeAnimation() {
     var properties = {
-        left: function() {
-          var leftValue = randomNumbers(-3,3)
-          return leftValue + 'px';
-        },
-        top: function() {
-            var leftValue = randomNumbers(-3,3)
-            return leftValue + 'px';
-        },
+        top: ['-10px', '10px'] // Bobbing range
     };
 
     var options = {
-        duration: Game.flagShakeIntensity, // Duration of each shake (milliseconds)
-        easing: 'linear', // Linear easing for smooth motion
+        duration: 1000, // Duration of each shake (milliseconds)
+        easing: 'easeInOutQuad', // Linear easing for smooth motion
+        loop: true
     };
 
     Velocity(html_forgetfulFlag,properties,options)
+
 }
 
 function wrongAnswerAnimation(){
     var properties = {
         left: function() {
-          var leftValue = randomNumbers(-2,2)
+          var leftValue = randomNumbers(-1,1)
           return 50 + leftValue + '%';
         },
         top: function() {
-            var leftValue = randomNumbers(-2,2)
+            var leftValue = randomNumbers(-1,1)
             return 50 + leftValue + '%';
         },
     };
@@ -237,10 +247,8 @@ function updateForgetfulFlag(){
     }
 
     if (forgetfulLevel >= 2 && forgetfulLevel < 4){
-        Game.flagShakeIntensity = 50
         html_forgetfulFlagId.src = './files/img/SlightlyForgetful.png'
     } else if (forgetfulLevel >= 4){
-        Game.flagShakeIntensity = 20
         html_forgetfulFlagId.src = './files/img/ForgetfulFlag.png'
     }
 
@@ -264,11 +272,25 @@ function showChoices(Group){
         theChoices.push(reviewItems_Choices[Group][i])
     }
 
+    // for multiple choice
     var randomizedChoices = shuffleArray(theChoices)
+    var correctIndexOfAnswer = randomNumbers(1,4)
+    
+    for (var i = 1; i<=4; i++){
+        var html_choice = document.getElementById("choice"+i+"Id")
+        
+        var randomIndex = randomNumbers(0, randomizedChoices.length-1)
+        var forMultipleChoice = randomizedChoices[randomIndex];
 
-    for (var i in reviewItems_Choices[Group]) {
-        html_Choice.innerHTML += randomizedChoices[i]+"<br/>"
+        html_choice.innerHTML = forMultipleChoice
     }
+
+    var html_correctChoice = document.getElementById("choice"+correctIndexOfAnswer+"Id")
+    html_correctChoice.innerHTML = reviewItems[Game.atNumber].answer
+
+
+
+    console.log("AAA")
 }
 
 function clearFeedback(){
@@ -283,99 +305,68 @@ function displayQuestion(){
 }
 
 function reAllowToSubmit(){
-    Game.isGoingToNext = false  
+    Game.preventSubmission = false  
+}
+
+function resetMultipleChoices(){
+    for (var i = 1; i<=4; i++){
+        var html_health = document.getElementById("health"+i+"Id")
+        html_health.style.backgroundColor = "#646464"
+    }
+}
+
+function displayCongrats(){
+    html_GroupTitle.innerHTML = "Nicely Done!"
+    html_Question.innerHTML =
+    `You completed the review session!<br/><br/>Total Items: `+(Game.atNumber)+`<br/>Total Mistakes: `+Game.totalMistakes+``
+    html_choicesContainer.style.display = "none"; 
+
+    resetMultipleChoices()
+
+    console.log(local_temporarySaveForExcluded)
+
+    // if there was an exclusion, before saving to database, put back the exclusion
+    if (local_temporarySaveForExcluded.length > 1){
+        console.log("The Old one", reviewItems)
+        reviewItems = [...reviewItems, ...local_temporarySaveForExcluded]
+        console.log("BackOriginal", reviewItems)
+    }
+
+    localforage.getItem(reviewerDatabase, function (err, value) {
+        console.log(value)
+        localforage.setItem(reviewerDatabase, reviewItems)
+        html_restartContainer.style.display = "block";
+        //html_restartContainer.innerHTML = "Saved!"        
+        //setTimeout(startReviTerm, 3000) 
+    })   
+}
+
+function restartingMessage(){
+    html_GroupTitle.innerHTML = "Restarting"
+    html_Question.innerHTML = ``
+    html_restartContainer.style.display = "none";
+    setTimeout(startReviTerm, 1000) 
 }
 
 function proceedToNextItem(){
 
     // if not finished
     if (reviewItems.length > Game.atNumber){
-        html_Answer.value = ""
+
+        
         html_GroupTitle.innerHTML =  reviewItems[Game.atNumber].group
         html_Question.innerHTML = reviewItems[Game.atNumber].question
         //html_difficultyMeter.innerHTML = "DifficultyMeter: "+reviewItems[Game.atNumber].difficulty
         showChoices(reviewItems[Game.atNumber].group)   
-        Game.isGoingToNext = false
+        Game.preventSubmission = false
         Game.gotWrong = false
 
+        resetMultipleChoices()
         updateForgetfulFlag()
 
     // if finished
     } else {
-        html_Question.innerHTML = "You completed the review session!, Restarting!"
-        html_Choice.innerHTML = ""
-        html_Answer.value = ""
-
-        // if there was an exclusion, before saving to database, put back the exclusion
-        if (local_temporarySaveForExcluded.length > 1){
-            console.log(reviewItems)
-            reviewItems = [...reviewItems, ...local_temporarySaveForExcluded]
-            console.log("BackOriginal", reviewItems)
-        }
-        
-        localforage.getItem(reviewerDatabase, function (err, value) {
-            console.log(value)
-            localforage.setItem(reviewerDatabase, reviewItems)
-            setTimeout(startReviTerm, 3000) 
-        })   
-
-        /*/
-      
-        /**/
-
-    }
-
-
-}
-
-function checkAnswer(){
-    var userAnswer = html_Answer.value.trimRight()
-    userAnswer = userAnswer.toLowerCase()
-
-    var toCheck = reviewItems[Game.atNumber].answer.toLowerCase()
-    
-    if (!Game.isGoingToNext){
-        // if correct
-        if (toCheck == userAnswer){
-
-            Game.isGoingToNext = true
-
-            // decrease difficulty number
-            if (Game.gotWrong == false){
-
-                if (reviewItems[Game.atNumber].difficulty > -difficultyRange){
-                    reviewItems[Game.atNumber].difficulty -= 1
-                }
-            
-                displayQuestion()
-            }
-
-            updateForgetfulFlag()
-            Game.atNumber += 1
-
-            html_Feedback.innerHTML = "Correct! "+userAnswer+" was the correct answer!"
-            
-            setTimeout(clearFeedback, 1000);
-            setTimeout(proceedToNextItem, 1000);
-
-        // if incorrect
-        } else {
-            
-            Game.isGoingToNext = true
-            Game.gotWrong = true
-            
-            // add difficulty number
-            if (reviewItems[Game.atNumber].difficulty < difficultyRange){
-                reviewItems[Game.atNumber].difficulty += 1
-            }
-
-            updateForgetfulFlag()
-            wrongAnswerAnimation()
-            displayQuestion()
-            html_Feedback.innerHTML = "Wrong Answer!"
-            setTimeout(clearFeedback, 1000);
-            setTimeout(reAllowToSubmit, 1000)
-        }
+        displayCongrats()
     }
 }
 
@@ -401,16 +392,111 @@ function getReviewerContent(){
     });
 }
 
-function includeGroups(){
+function goBackToEditor(){
+    window.location.replace("reviEditor.html");
+}
 
+// CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers 
+// CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers 
+// CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers 
+
+function checkAnswer(userAnswer){
+    userAnswer = userAnswer.toLowerCase()
+
+    var toCheck = reviewItems[Game.atNumber].answer.toLowerCase()
+    
+    console.log("ToCheck: "+userAnswer)
+    console.log("correctAnswer "+toCheck)
+
+    // if correct
+    if (toCheck == userAnswer){
+
+        // decrease difficulty number
+        if (Game.gotWrong == false){
+
+            if (reviewItems[Game.atNumber].difficulty > -difficultyRange){
+                reviewItems[Game.atNumber].difficulty -= 1
+            }
+        
+            displayQuestion()
+        }
+
+        updateForgetfulFlag()
+        Game.atNumber += 1
+
+        html_Feedback.innerHTML = "Correct! "+userAnswer+" was the correct answer!"
+        
+        
+        setTimeout(proceedToNextItem, 1000);
+
+        //setTimeout(clearFeedback, 1000);
+
+        return 1;
+
+    // if incorrect
+    } else {
+    
+        Game.gotWrong = true
+        Game.totalMistakes += 1
+
+        // add difficulty number
+        if (reviewItems[Game.atNumber].difficulty < difficultyRange){
+            reviewItems[Game.atNumber].difficulty += 1
+        }
+
+        updateForgetfulFlag()
+        wrongAnswerAnimation()
+        displayQuestion()
+        //html_Feedback.innerHTML = "Wrong Answer!"
+        //setTimeout(clearFeedback, 1000);
+        setTimeout(reAllowToSubmit, 300)
+        
+        return 0;
+    }
+    
+}
+
+function checkAnswerMultipleChoice(choiceNum){
+
+    if (!Game.preventSubmission){
+        Game.preventSubmission = true
+
+        var html_selectedChoice = document.getElementById("choice"+choiceNum+"Id")
+        var userAnswer = html_selectedChoice.innerHTML
+        var html_health = document.getElementById("health"+choiceNum+"Id")
+
+        // check First if user is trying to tap at the already wrong answer
+        if (html_health.style.backgroundColor != "rgb(209, 52, 52)"){
+            // if correct
+            if (checkAnswer(userAnswer)){
+                html_health.style.backgroundColor = "#41ad37"
+
+            }
+            // if wrong
+            else {
+                // this might change
+                html_health.style.backgroundColor = "#d13434"
+            }
+        } else {
+            reAllowToSubmit()
+        }
+
+        console.log(html_health.style.backgroundColor)
+    }
 }
 
 // start!
 function startReviTerm(){
     // reset variables
     Game.atNumber = 0
+    Game.gotWrong = 0
     reviewItems_Groups = []
+    local_temporarySaveForExcluded = []
     reviewItems_Choices = {}
+
+    html_restartContainer.style.display = "none";
+    html_choicesContainer.style.display = "block"
+    //html_restartContainer.innerHTML = "[ Saving ]"      
 
     // check for exclusions
     extractExclusionGroup()
@@ -425,14 +511,17 @@ function startReviTerm(){
     showChoices(reviewItems[Game.atNumber].group)   
     updateForgetfulFlag()
 
-    Game.isGoingToNext = false
+    Game.preventSubmission = false
     Game.gotWrong = false
     //console.log(reviewItems)
-    //console.log(reviewItems_Choices)
 }
 
 
 getReviewerContent()
-setInterval(flagShakeAnimation, Game.flagShakeIntensity*3);
+flagShakeAnimation()
 
-window.checkAnswer = checkAnswer
+
+window.checkAnswerMultipleChoice = checkAnswerMultipleChoice
+
+document.querySelector(".goBackButton").addEventListener("click", goBackToEditor);
+document.querySelector(".restartButton").addEventListener("click", restartingMessage);

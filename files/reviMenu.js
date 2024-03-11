@@ -150,13 +150,8 @@ function updateReviewerList(){
             document.querySelector(".listOfReviewer").innerHTML += 
             `            
             <div class="reviewerItemContainer"> 
-                
+                `+theTitle+` 
                 <div class="flexContainer">
-                    <div class="flexItem">
-                        <center>
-                            `+theTitle+` 
-                        </center>
-                    </div>
                     <div class="flexItem">
                         <center>
                             <div class="deleteReviewerButton" onclick="showDeleteMessage(`+i+`)">Delete</div>

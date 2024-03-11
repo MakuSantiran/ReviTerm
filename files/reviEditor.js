@@ -312,13 +312,10 @@ function initialization(){
 
             // if empty 
             if (value == null){
-
             }
 
             value = []
-
             console.log("Content of "+reviewerDatabaseName+" are "+value)
-
             var reviewerHeaderName = reviewerDatabaseName.replace(revieweraddOn, "");
 
             document.querySelector(".reviewerName").innerHTML += reviewerHeaderName
