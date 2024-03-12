@@ -575,7 +575,6 @@ function importReviewer(event) {
 }
 
 function exportReviewer(index){
-
     localforage.getItem("reviewerNames", function (err, reviewerNames) {
         var selectedReviewer = reviewerNames[index].ReviewerName
 

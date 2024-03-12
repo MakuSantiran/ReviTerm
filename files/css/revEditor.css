@@ -37,20 +37,55 @@ h3 {
 /* EDITOR *//* EDITOR *//* EDITOR *//* EDITOR *//* EDITOR *//* EDITOR *//* EDITOR *//* EDITOR *//* EDITOR */
 /* EDITOR *//* EDITOR *//* EDITOR *//* EDITOR *//* EDITOR *//* EDITOR *//* EDITOR *//* EDITOR *//* EDITOR */
 
+.typeSelectContainer {
+    display: flex;
+    width: 100%;
+}
+
+.typeItem {
+    flex: 1; /* Each item will grow equally to fill the available space */
+    width: 100%;
+}
+
+.QAButton {
+    background-color: #ffffff;
+    padding-left: 3vw;
+    user-select: none;
+    cursor: pointer;
+}
+
+.EnumButton {
+    background-color: #bbbbbb;
+    padding-left: 3vw;
+    user-select: none;
+    cursor: pointer;
+}
+
+.qAAContainer {
+    display: block;
+}
+
+.enumContainer {
+    display: none;
+}
+
 .editorBox {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: #ffffff;
-    padding: 2vw;
-    
     display: none;
-
     width: 90%;
-
     font-size: 4vw;
 }
+
+.editorContainer{
+    background-color: #ffffff;
+    padding: 2vw;
+
+    border-bottom-left-radius: 2vw;
+    border-bottom-right-radius: 2vw;
+}   
 
 .itemImage {
     background-color: #3a5775;
@@ -65,6 +100,7 @@ h3 {
     display: flex;
     justify-content: center; 
     align-items: center;
+
 }
 
 .itemGroup {
@@ -101,6 +137,59 @@ h3 {
     padding: 2vw;
     width: 100%;
 }
+
+.enumAnswersContainer{
+    width: 98%;
+    background-color: #aeaeae;
+    height: 20vh;
+
+    border-color: #6e6e6e;
+    border-style: solid;
+    border-width: 1.2px;
+
+    overflow: auto;
+    
+}
+
+.enumItemDelete {
+    user-select: none;
+    cursor: pointer;
+}
+
+.enumAnswer{
+    width: 55vw;
+    position: relative;
+
+    border: none;
+    background-color: #efefef;
+
+    font-family: 'HeyComic';
+    font-weight: lighter;
+}
+
+.enumItem{
+    background-color: #efefef;
+    border-color: #6e6e6e;
+    border-style: solid;
+    border-width: 1.2px;
+    border-top:#ffffff;
+
+    padding-left: 2vw;
+}
+
+.enumAddInit{
+    background: #2b5d8f;
+    color: white;
+    padding: 0.5%;
+    text-align: center;
+
+    margin-bottom: 5%;
+    font-size: 4vw;
+
+    user-select: none;
+    cursor: pointer;
+}
+
 
 /* ITEMS *//* ITEMS *//* ITEMS *//* ITEMS *//* ITEMS *//* ITEMS *//* ITEMS *//* ITEMS *//* ITEMS *//* ITEMS *//* ITEMS */
 /* ITEMS *//* ITEMS *//* ITEMS *//* ITEMS *//* ITEMS *//* ITEMS *//* ITEMS *//* ITEMS *//* ITEMS *//* ITEMS *//* ITEMS */
@@ -169,6 +258,8 @@ h3 {
     margin-bottom: 5%;
     
     font-size: 4vw;
+
+    cursor: pointer;
 }
 
 .addItemWithoutGroup {

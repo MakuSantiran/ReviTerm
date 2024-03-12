@@ -15,6 +15,9 @@ var local_groupList = []
 var local_selectedItem = []
 var local_selectedGroupExclusion = []
 
+var local_qType = 1 // 0 Question and Answer | 1 Enumaration
+var local_EnumarationItem = []
+
 // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS 
 // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS 
 // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS 
@@ -34,6 +37,9 @@ function findItemIndexById(array, id) {
     return -1; // Return -1 if item not found
 }
 
+function deleteIndexInArray(){
+    
+}
 
 // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE 
 // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE 
@@ -114,6 +120,36 @@ function displayItems(){
             `               
         }
     });
+}
+
+function displayEnumarationAns(enumarationItems){
+    var html_enumItemsContainers = document.querySelector(".enumItemsContainer")
+    html_enumItemsContainers.innerHTML = ""
+
+    for (var i in enumarationItems){
+        var enumarationitem = enumarationItems[i]
+
+        html_enumItemsContainers.innerHTML +=`
+        <div class="enumItem" id="enumItemId">
+            <div class="flexContainer">
+                <div class="flexItem">
+                    <input type="text" class="enumAnswer" id="enumAnswerId_`+i+`" value="`+enumarationitem+`" onchange="updateEnumarationAns(`+i+`)">
+                </div>
+                <div class="flexItem">
+                    <div class="enumItemDelete" onclick="deleteEnumerationAns(`+i+`)">
+                        Delete
+                    </div>
+                </div>
+            </div>
+        </div>
+        `
+    }
+}
+
+function updateEnumarationAns(index){
+    var html_enumAnswerContent = document.getElementById("enumAnswerId_"+index)
+    local_EnumarationItem[index] = html_enumAnswerContent.value
+    displayEnumarationAns(local_EnumarationItem)
 }
 
 // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD 
@@ -261,7 +297,6 @@ function addItem(){
 
 
 }
-document.querySelector(".addItemFunc").addEventListener("click", addItem);
 
 function removeItem(){
 
@@ -383,6 +418,17 @@ function excludeGroup(groupName){
 
 }
 
+function deleteEnumerationAns(index){
+    local_EnumarationItem.splice(index, 1);
+    displayEnumarationAns(local_EnumarationItem)
+}
+
+function addEnumaratorAns(){
+    local_EnumarationItem.push("Type an Answer!")
+    displayEnumarationAns(local_EnumarationItem)
+}
+
+
 // BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS
 // BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS
 // BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS
@@ -417,6 +463,7 @@ function showEditor(index = -1, selectedGroup){
     
     // if not
     } else {
+        // add mode
 
         local_selectedItem = {
             id: -1,
@@ -437,8 +484,7 @@ function showEditor(index = -1, selectedGroup){
         html_difficulty.innerHTML = 0
 
         console.log(local_selectedItem)
-
-        // add mode
+        
     }
 
     var html_overlay = document.getElementById("overlay") 
@@ -447,6 +493,7 @@ function showEditor(index = -1, selectedGroup){
     html_editBox.style.display = "block";
     html_overlay.style.display = "block";
 
+    displayEnumarationAns(local_EnumarationItem)
     console.log("Hello World!", index, selectedGroup)
 }
 
@@ -458,7 +505,6 @@ function hideEditor(){
     html_overlay.style.display = "none";
     
 }
-document.querySelector(".hideEditorFunc").addEventListener("click", hideEditor);
 
 function showOptionsBeforeReviTerm(){
     localforage.getItem("selectedReviewer", function (err, reviewerName) {
@@ -513,7 +559,31 @@ function hideOptionsBeforeReviTerm(){
     html_initOptionsDIV.style.display = "none";
     html_overlay.style.display = "none";        
 }
-document.querySelector(".initOptionsHide").addEventListener("click", hideOptionsBeforeReviTerm);
+
+function selectQType(type){
+    var html_QAAB = document.getElementById("QAButtonId")
+    var html_EnumB = document.getElementById("EnumButtonId")
+    var html_qAAContainer = document.getElementById("qAAContainerId")
+    var html_enumContainer = document.getElementById("enumContainerId")
+
+    var COLOR_white = "#ffffff"
+    var COLOR_gray = "#bbbbbb"
+
+    // show questionAndAnswer
+    if (type == 0){
+        html_enumContainer.style.display = "none"
+        html_EnumB.style.backgroundColor = COLOR_gray
+        html_qAAContainer.style.display = "block"
+        html_QAAB.style.backgroundColor = COLOR_white
+    } else {
+        html_qAAContainer.style.display = "none"
+        html_QAAB.style.backgroundColor = COLOR_gray
+        html_enumContainer.style.display = "block"
+        html_EnumB.style.backgroundColor = COLOR_white       
+    }
+
+    console.log(type)
+}
 
 // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK 
 // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK 
@@ -531,7 +601,16 @@ function startReviterm(){
 initialization()
 
 window.removeItem = removeItem
+window.hideEditor = hideEditor
+
 window.gotoSelectReviewer = gotoSelectReviewer
 window.showEditor = showEditor
 window.showOptionsBeforeReviTerm = showOptionsBeforeReviTerm
 window.excludeGroup = excludeGroup
+window.selectQType = selectQType
+window.addEnumaratorAns = addEnumaratorAns
+window.updateEnumarationAns = updateEnumarationAns
+window.deleteEnumerationAns = deleteEnumerationAns
+
+document.querySelector(".initOptionsHide").addEventListener("click", hideOptionsBeforeReviTerm);
+document.querySelector(".addItemFunc").addEventListener("click", addItem);

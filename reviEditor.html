@@ -46,70 +46,135 @@
 
 	<div class="overlay" id="overlay">
 	</div>
-
-	<div class="editorBox" id="editorId">
-
-		<!--
-		Enumaration Mode? (YES/NO)<br/>
-		<br/>
-		-->
-		Question(Max 255)<br/>
-		<textarea  class="itemQuestion" name="w3review" rows="4" cols="50"></textarea>
-		
-		<div class="flexContainer">
-			<div class="flexItem">
-				<br/>
-				Group<br/>
-				<input type="text" class="itemGroup" >
-		
-				<br/><br/>
-				Answer<br/>
-				
-				<input type="text" class="itemAnswer" >
-		
-				<br/><br/>
-				<!--
-					Disabled <input type="checkbox" class="itemDisabled">
-				-->
-				Difficulty level: <div class="itemDifficulty">#</div>
-				
+	
+	<div class="editorBox" id="editorId">	
+		<div class="typeSelectContainer" id="TypeSelectContainerId">
+			<div class="typeItem">
+				<div class="QAButton" id="QAButtonId" onclick="selectQType(0)"> QuestionAndAnswer </div>
 			</div>
-
-			<div class="flexItem">
-				<br/>
-				Picture<br/>
-
-				<div class="itemImage">
-					Coming Soon!
-				</div>
-
+			<div class="typeItem">
+				<div class="EnumButton" id="EnumButtonId" onclick="selectQType(1)"> Enumaration </div>
 			</div>
 		</div>
 
-		<!--
-		<br/>
-		
-		Difficulty level: <div class="itemDifficulty">#</div>
-		-->
+		<div class="editorContainer" id="editorContainerId">
+			<div class="qAAContainer" id="qAAContainerId">
+				Question(Max 255)<br/>
+				<textarea  class="itemQuestion" name="w3review" rows="4" cols="50"></textarea>
+				
+				<div class="flexContainer">
+					<div class="flexItem">
+						<br/>
+						Group<br/>
+						<input type="text" class="itemGroup" >
+				
+						<br/><br/>
+						Answer<br/>
+						
+						<input type="text" class="itemAnswer" >
+				
+						<br/><br/>
+						<!--
+							Disabled <input type="checkbox" class="itemDisabled">
+						-->
+						Difficulty level: <div class="itemDifficulty">#</div>
+						
+					</div>
 
-		<br/><br/>
+					<div class="flexItem">
+						<br/>
+						Picture<br/>
 
-		<div class="flexContainer">
-			<div class="flexItem">
-				<center>
-					<input type="button" value="Cancel" class="hideEditorFunc">
-				</center>
+						<div class="itemImage">
+							Coming Soon!
+						</div>
+
+					</div>
+				</div>
+
+				<!--
+				<br/>
+				
+				Difficulty level: <div class="itemDifficulty">#</div>
+				-->
+
+				<br/><br/>
+				<div class="flexContainer">
+					<div class="flexItem">
+						<center>
+							<input type="button" value="Cancel" class="hideEditorFunc" onclick="hideEditor()">
+						</center>
+					</div>
+					<div class="flexItem">
+						<center>
+							<input type="button" value="Delete" class="removeItemFunc" onclick="removeItem()">
+						</center>
+					</div>
+					<div class="flexItem">
+						<center>
+							<input type="button" value="Add" class="addItemFunc">
+						</center>
+					</div>
+				</div>
 			</div>
-			<div class="flexItem">
-				<center>
-					<input type="button" value="Delete" class="removeItemFunc" onclick="removeItem()">
-				</center>
+
+			<div class="enumContainer" id="enumContainerId">
+				Question(Max 255)<br/>
+				<textarea  class="itemQuestion" name="w3review" rows="4" cols="50"></textarea>		
+				
+				<br/><br/>
+				Answers<br/>
+				<div class="enumAnswersContainer" id="enumAnswersContainerId">	
+					
+					<div class="enumItemsContainer">
+						<!-- Answer Collection goes here -->
+					</div>
+					
+					<div class="enumAddInit" id="enumAddInitId" onclick="addEnumaratorAns()">
+						<center>
+							+
+						</center>
+					</div>
+					<!--
+
+					-->
+				</div>
+
+				<br/>
+				<div class="flexContainer">
+					<div class="flexItem">
+						Group <input type="text" class="itemGroup" >
+						<br/><br/>
+					</div>
+
+					<div class="flexItem">
+						In Order <input type="checkbox" class="enumInOrder">
+					</div>
+				</div>
+
+
+				Difficulty level: <div class="itemDifficulty">#</div>
+
+				<br/><br/>
+				<div class="flexContainer">
+					<div class="flexItem">
+						<center>
+							<input type="button" value="Cancel" class="hideEditorFunc" onclick="hideEditor()">
+						</center>
+					</div>
+					<div class="flexItem">
+						<center>
+							<input type="button" value="Delete" class="removeItemFunc" onclick="removeItem()">
+						</center>
+					</div>
+					<div class="flexItem">
+						<center>
+							<input type="button" value="Add" class="addItemFunc">
+						</center>
+					</div>
+				</div>		
 			</div>
-			<div class="flexItem">
-				<center>
-					<input type="button" value="Add" class="addItemFunc">
-				</center>
-			</div>
+
 		</div>
 	</div> 
 

@@ -29,12 +29,14 @@ var Game = {
     gotWrong: false,
     preventSubmission: false,
 
+    // sneak peak :)
     questionTypes: [
-        "MultipleChoice", 
+        "MultipleChoice",
         "TrueOrFalse", 
         "Scrambled", 
         "Identification",
-        "WhichIsWrong"
+        "WhichIsWrong",
+        "EnumarateTheDefinition"
     ],
 
     totalMistakes: 0,
@@ -194,8 +196,6 @@ function randomNumbers(min, max) {
 // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations 
 // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations 
 // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations 
-
-
 
 function flagShakeAnimation() {
     var properties = {
@@ -515,7 +515,6 @@ function startReviTerm(){
     Game.gotWrong = false
     //console.log(reviewItems)
 }
-
 
 getReviewerContent()
 flagShakeAnimation()
