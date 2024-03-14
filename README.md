@@ -7,7 +7,7 @@ A reviewer app in a form of quiz creator that specifically helps to <b><u>Re</u>
   <li> Quick creation of reviewers by just putting a question and answer </li>
   <li> Choices are automatically shuffled based on the groupings </li>
   <li> Remix mode! (ex: multiple choice becomes true or false, or question becomes shuffled modes)</li>
-  <li> Ability to share your reviewers to other people </li>
+  <li> Ability to share your reviewers to other people (import/export) </li>
   <li> Implementation of unique algorithm that prioritizes the items that you forget the most (Mayonnaise Algorithm) </li>
   <li> Good accessibility options while maintaining gamified aspects </li>
 </ul>
