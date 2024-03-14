@@ -27,7 +27,7 @@ var html_question = document.querySelector(".itemQuestion")
 var html_answer = document.querySelector(".itemAnswer")
 var html_image = document.querySelector(".itemImage")
 var html_addButton = document.querySelector(".addItemFunc")
-var html_difficulty = document.querySelector(".itemDifficulty")
+var html_difficulty = document.querySelectorAll(".itemDifficulty")
 
 var html_enumQuestion = document.querySelector(".enumItemQuestion")
 var html_enumGroup = document.querySelector(".enumItemGroup")
@@ -615,6 +615,9 @@ function showEditor(index = -1, selectedGroup){
                 html_enumQuestion.value = local_selectedItem.question
                 html_enumInOrder.checked = local_selectedItem.enumInOrder
                 local_EnumarationItem = local_selectedItem.answer
+                html_difficulty.forEach(function(element) {
+                    element.innerHTML = local_selectedItem.difficulty
+                });
 
                 local_atQuestionType = 1
                 selectQType(1)
@@ -630,8 +633,11 @@ function showEditor(index = -1, selectedGroup){
                 html_question.value = local_selectedItem.question
                 html_answer.value = local_selectedItem.answer
                 html_image.value = local_selectedItem.image
-                html_difficulty.innerHTML = local_selectedItem.difficulty
 
+                html_difficulty.forEach(function(element) {
+                    element.innerHTML = local_selectedItem.difficulty
+                });
+                
                 console.log(local_selectedItem)
 
                 updateBothQEQuestions()
@@ -662,7 +668,9 @@ function showEditor(index = -1, selectedGroup){
         html_image.value = local_selectedItem.image
         html_addButton.value = "Add"
         html_addEnumButton.value = "Add"
-        html_difficulty.innerHTML = 0
+        html_difficulty.forEach(function(element) {
+            element.innerHTML = 0
+        });
 
         console.log(local_selectedItem)
         updateBothQEQuestions()

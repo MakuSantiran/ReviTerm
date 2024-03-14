@@ -7,7 +7,7 @@ import localforage from "./localForage/localforage.js"
 
 //document.body.appendChild(VelocityJsScript);
 
-// html
+// html things
 var html_Question = document.getElementById("question")
 var html_Choice = document.getElementById("choices")
 var html_Answer = document.getElementById("answer")
@@ -21,12 +21,15 @@ var html_restartContainer = document.getElementById("restartContainerId")
 
 var html_multipleChoiceContainer = document.getElementById("multipleChoiceContainerId")
 var html_enumarationId = document.getElementById("enumarationId")
+var html_enumSubmit = document.getElementById("enumSubmitId")
+var html_enumChoicesId = document.getElementById("enumChoicesId")
 
 var html_forgetfulFlag = document.querySelector(".forgetfulFlag_Red")
 var html_forgetfulFlagYellow = document.querySelector(".forgetfulFlag_Yellow")
 var html_quizContainer = document.querySelector(".quizContainer")
 var html_enumFlexContainer = document.querySelector(".enumFlexContainer")
 var html_enumAnswer = document.querySelector(".enumAnswer")
+
 
 // variables
 var Game = {
@@ -52,6 +55,7 @@ var Game = {
     enumFocusHidePercent: 65,
     enumFocusIndex: 0
 }
+
 var reviewItems_Groups = []     // the outline of this is {group: #, difficulty: #}
 var reviewItems_Choices = {}
 
@@ -61,12 +65,15 @@ var local_temporarySaveForExcluded = []
 var local_enumarationItems = []
 var local_enumarationItemsP = []
 var local_enumAlreadyAnswered = []
+var local_enumInOrder = false
 
 
 // Define sample quiz questions
 var reviewItems = [];
 var reviewerDatabase = ""
-var difficultyRange = 16
+var difficultyRange = 6
+var yellowFlagRange = 3
+var redFlagRange = 6
 
 // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms 
 // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms 
@@ -149,7 +156,11 @@ function mayonnaiseAlgorithm(){
             if (itemsToBeScanned[j].group == selectedGroup){
                 
                 temporarySFS.push(itemsToBeScanned[j])
-                generateChoicesBasedOnGroup(selectedGroup, itemsToBeScanned[j].answer)                    
+
+                // only choose the question and answer
+                if (checkIfStringOrArray(itemsToBeScanned[j].answer)){
+                    generateChoicesBasedOnGroup(selectedGroup, itemsToBeScanned[j].answer)  
+                }    
             }
         }
 
@@ -251,6 +262,14 @@ function scanString(arr, string) {
     return -1;
 }
 
+// for enumaration
+function checkIfTheSame(toBeCmp, string){
+    if (toBeCmp == string){ 
+        return Game.enumFocusIndex
+    }
+    return -1
+}
+
 // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations 
 // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations 
 // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations 
@@ -298,20 +317,19 @@ function wrongAnswerAnimation(){
 function updateForgetfulFlag(){
     var forgetfulLevel = reviewItems[Game.atNumber].difficulty
 
-    if (forgetfulLevel > 2){
+    if (forgetfulLevel > yellowFlagRange){
         html_forgetfulFlagId.style.display = "flex";
     } else {
         html_forgetfulFlagId.style.display = "none";
     }
 
-    if (forgetfulLevel >= 2 && forgetfulLevel < 4){
+    if (forgetfulLevel >= yellowFlagRange && forgetfulLevel < redFlagRange){
         html_forgetfulFlagId.src = './files/img/SlightlyForgetful.png'
-    } else if (forgetfulLevel >= 4){
+    } else if (forgetfulLevel >= redFlagRange){
         html_forgetfulFlagId.src = './files/img/ForgetfulFlag.png'
     }
 
     console.log(forgetfulLevel, Game.flagShakeIntensity)
-
 
     //html_forgetfulFlagYellow
 }
@@ -325,8 +343,12 @@ function multipleChoice(Group){
     var theChoices = []
 
     for (var i in reviewItems_Choices[Group]) {
-        theChoices.push(reviewItems_Choices[Group][i])
+        if (checkIfStringOrArray(reviewItems_Choices[Group][i])){
+            theChoices.push(reviewItems_Choices[Group][i])
+        }
     }
+
+    console.log("AAAsaadsdsa", reviewItems_Choices[Group])
 
     // for multiple choice
     var randomizedChoices = shuffleArray(theChoices)
@@ -344,7 +366,7 @@ function multipleChoice(Group){
     var html_correctChoice = document.getElementById("choice"+correctIndexOfAnswer+"Id")
     html_correctChoice.innerHTML = reviewItems[Game.atNumber].answer
 
-    console.log("AAA")
+
 }
 
 function enumarationShowClues(){
@@ -359,15 +381,28 @@ function enumarationShowClues(){
                     `+hideCharacter(local_enumarationItems[i], local_enumarationItemsP[i])+`
                 </div>
             </div>
-            `
+            `    
         } else {
-            html_enumFlexContainer.innerHTML += `
-            <div class="enumFlexItem" id="enumFlexItemId`+i+`">
-                <div class="enumClue`+i+`">
-                    `+hideCharacter(local_enumarationItems[i], local_enumarationItemsP[i])+`
+            // lazy
+            if (local_enumInOrder){
+                html_enumFlexContainer.innerHTML += `
+                <div class="enumFlexItem" id="enumFlexItemId`+i+`">
+                    <div class="enumClue`+i+`" style="color: #616161;">
+                        `+hideCharacter(local_enumarationItems[i], local_enumarationItemsP[i])+`
+                    </div>
                 </div>
-            </div>
-            `
+                `
+            } else {
+                html_enumFlexContainer.innerHTML += `
+                <div class="enumFlexItem" id="enumFlexItemId`+i+`">
+                    <div class="enumClue`+i+`">
+                        `+hideCharacter(local_enumarationItems[i], local_enumarationItemsP[i])+`
+                    </div>
+                </div>
+                `
+            }
+            
+
         }
     }
 }
@@ -385,6 +420,7 @@ function showChoices(Group){
     // if Q and A
     if (checkIfStringOrArray(currentItem)) {
         // if multiple Choice
+        html_multipleChoiceContainer.style.display = "block"
         html_enumarationId.style.display = "none"
 
         multipleChoice(Group)
@@ -395,10 +431,16 @@ function showChoices(Group){
         html_multipleChoiceContainer.style.display = "none"
         html_enumarationId.style.display = "block"
 
-        var enumInOrder = reviewItems[Game.atNumber].enumInOrder
-        local_enumarationItems = [...currentItem]
+        local_enumarationItems = []
+        local_enumarationItemsP = []
+        local_enumAlreadyAnswered = []
+        html_enumChoicesId.style.color = "#FFFFFF"
 
-        if (enumInOrder == false){
+        local_enumInOrder = reviewItems[Game.atNumber].enumInOrder
+        local_enumarationItems = [...currentItem]
+        Game.enumFocusIndex = 0
+
+        if (local_enumInOrder == false){
             local_enumarationItems = shuffleArray(local_enumarationItems)
         }
 
@@ -406,10 +448,9 @@ function showChoices(Group){
             local_enumarationItemsP.push(Game.enumHidePercent)
         }
 
+        Game.gotWrong = false
         enumarationShowClues()
     }
-    
-
 }
 
 function clearFeedback(){
@@ -424,6 +465,7 @@ function displayQuestion(){
 }
 
 function reAllowToSubmit(){
+    html_enumSubmit.style.backgroundColor = "#646464"
     Game.preventSubmission = false  
 }
 
@@ -468,7 +510,6 @@ function restartingMessage(){
 }
 
 function proceedToNextItem(){
-
     // if not finished
     if (reviewItems.length > Game.atNumber){
 
@@ -606,43 +647,93 @@ function checkAnswerMultipleChoice(choiceNum){
 function scanIfAnsweredAllEnum(){
     console.log(local_enumarationItemsP)
 
+    var enumCompleted = true
     Game.enumFocusIndex = 0
+
 
     for (var i in local_enumarationItemsP){
         if (local_enumarationItemsP[i] == 0){
             Game.enumFocusIndex += 1
         } else {
+            enumCompleted = false
             break
         }
     }
+
     enumarationShowClues()
+
+    if (enumCompleted){
+
+        // decrease difficulty number
+        if (Game.gotWrong == false){
+            if (reviewItems[Game.atNumber].difficulty > -difficultyRange){
+                reviewItems[Game.atNumber].difficulty -= 1
+                updateForgetfulFlag()
+            }
+        }
+        Game.gotWrong = false
+        html_enumChoicesId.style.color = "#60ff51"
+        Game.atNumber += 1
+        setTimeout(proceedToNextItem, 1000);
+    }
 }
 
 function checkAnswerEnumeration(){
     if (!Game.preventSubmission){
-        //Game.preventSubmission = true
+        Game.preventSubmission = true
         var userEnumAnswer = html_enumAnswer.value.toLowerCase()
         userEnumAnswer = userEnumAnswer.trimRight()
 
         var correctIndex = scanString(local_enumarationItems, userEnumAnswer)
 
+        // 
+        if (local_enumInOrder){
+            correctIndex = checkIfTheSame(local_enumarationItems[Game.enumFocusIndex].toLowerCase(), userEnumAnswer)
+        }
+
+
         console.log("The correct index "+correctIndex)
 
+        //local_enumInOrder
+
+        // if correct answer
         if (correctIndex > -1){
             if (scanString(local_enumAlreadyAnswered, userEnumAnswer) == -1){
                 local_enumarationItemsP[correctIndex] = 0
                 document.querySelector(".enumClue"+correctIndex).innerHTML = hideCharacter(local_enumarationItems[correctIndex], local_enumarationItemsP[correctIndex])
                 local_enumAlreadyAnswered.push(userEnumAnswer)
+                
+                html_enumSubmit.style.backgroundColor = "#41ad37"
+                html_enumAnswer.value = ""
+
                 scanIfAnsweredAllEnum()
+                setTimeout(reAllowToSubmit, 500)
             } else {
+                html_enumSubmit.style.backgroundColor = "#363636"
+                setTimeout(reAllowToSubmit, 100)
                 console.log("Already Answered!")
             }
 
         } else {
+        // if wrong answer
+
             console.log("Wrong!", userEnumAnswer)
             local_enumarationItemsP[Game.enumFocusIndex] = local_enumarationItemsP[Game.enumFocusIndex] - 10
             document.querySelector(".enumClue"+Game.enumFocusIndex).innerHTML = hideCharacter(local_enumarationItems[Game.enumFocusIndex], local_enumarationItemsP[Game.enumFocusIndex])
+            html_enumSubmit.style.backgroundColor = "#d13434"
+            console.log(html_enumSubmit.style.backgroundColor)
 
+
+            // add difficulty number
+            if (reviewItems[Game.atNumber].difficulty < difficultyRange){
+                reviewItems[Game.atNumber].difficulty += 1
+                Game.gotWrong = true
+            }
+
+            updateForgetfulFlag()
+            wrongAnswerAnimation()
+            setTimeout(reAllowToSubmit, 500) 
+            
         }
     }
 }
