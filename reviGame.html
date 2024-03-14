@@ -9,7 +9,7 @@
         <link rel="stylesheet" href="./files/css/revGame.css">
         <link rel="stylesheet" href="./files/css/revGame/playerChoices.css">
     </head>
-    <body>
+    <body background="files/img/bg/bg3phone.png">
         <div class="quizContainer">
             <div class="groupTitleContainer" >
                 <div class="inline-image">
@@ -38,40 +38,59 @@
             <br/><br/>
 
             <div class="choicesContainer" id="choicesContainerId">
-                <!-- Multiple Choices -->
-                <div class="choice1Container" onclick="checkAnswerMultipleChoice(1)">
-                    <div class="choice1" id="choice1Id">choice 1</div>
-                    <div class="health1" id="health1Id">
+                <div class="multipleChoiceContainer" id="multipleChoiceContainerId">
+                    <!-- Multiple Choices -->
+                    <div class="choice1Container" onclick="checkAnswerMultipleChoice(1)">
+                        <div class="choice1" id="choice1Id">choice 1</div>
+                        <div class="health1" id="health1Id">
+                        </div>
+                    </div>
+                    <div class="choice2Container" onclick="checkAnswerMultipleChoice(2)">
+                        <div class="choice2" id="choice2Id">choice 2 </div>
+                        <div class="health2" id="health2Id">
+                        </div>
+                    </div>
+                    <div class="choice3Container" onclick="checkAnswerMultipleChoice(3)">
+                        <div class="choice3" id="choice3Id">choice 3 </div>
+                        <div class="health3" id="health3Id">
+                        </div>
+                    </div>
+                    <div class="choice4Container" onclick="checkAnswerMultipleChoice(4)">
+                        <div class="choice4" id="choice4Id">choice 4 </div>
+                        <div class="health4" id="health4Id">
+                        </div>
                     </div>
                 </div>
-                <div class="choice2Container" onclick="checkAnswerMultipleChoice(2)">
-                    <div class="choice2" id="choice2Id">choice 2 </div>
-                    <div class="health2" id="health2Id">
+
+                <div class="enumarationId" id="enumarationId">
+
+                    <input type="text" class="enumAnswer" id="enumAnswerId" placeholder="Your answer"> 
+                    <center>
+                        <div class="enumSubmit" onclick="checkAnswerEnumeration()"> Submit </div>
+                    </center>
+        
+                    <br/><br/>
+                    
+                    <div class="enumChoices" id="enumChoicesId">
+                        <div class="enumFlexContainer">
+                        </div>
                     </div>
                 </div>
-                <div class="choice3Container" onclick="checkAnswerMultipleChoice(3)">
-                    <div class="choice3" id="choice3Id">choice 3 </div>
-                    <div class="health3" id="health3Id">
-                    </div>
-                </div>
-                <div class="choice4Container" onclick="checkAnswerMultipleChoice(4)">
-                    <div class="choice4" id="choice4Id">choice 4 </div>
-                    <div class="health4" id="health4Id">
-                    </div>
-                </div>
+
             </div>
 
 
             <div style="display: none;">
                 <br/><br/>
                 <div id="feedback" class="feedback"></div>
-                <input type="text" id="answer" placeholder="Your answer"> <br/><br/>
+                <input type="text" id="answer" placeholder="Your answer"> 
+                <br/><br/>
                 <!--
                     <button onclick="checkAnswerIdentification()">Submit</button>
                 -->
                 
                 <hr/>
-                <div id="choices"></div>
+
                 <br/>
             </div>
 

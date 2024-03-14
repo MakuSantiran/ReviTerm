@@ -19,9 +19,14 @@ var html_forgetfulFlagYellowId = document.getElementById("forgetfulFlag_YellowId
 var html_choicesContainer = document.getElementById("choicesContainerId")
 var html_restartContainer = document.getElementById("restartContainerId")
 
+var html_multipleChoiceContainer = document.getElementById("multipleChoiceContainerId")
+var html_enumarationId = document.getElementById("enumarationId")
+
 var html_forgetfulFlag = document.querySelector(".forgetfulFlag_Red")
 var html_forgetfulFlagYellow = document.querySelector(".forgetfulFlag_Yellow")
 var html_quizContainer = document.querySelector(".quizContainer")
+var html_enumFlexContainer = document.querySelector(".enumFlexContainer")
+var html_enumAnswer = document.querySelector(".enumAnswer")
 
 // variables
 var Game = {
@@ -41,7 +46,11 @@ var Game = {
 
     totalMistakes: 0,
 
-    flagShakeIntensity: 20 // the lower the more intense
+    flagShakeIntensity: 20,  // the lower the more intense
+
+    enumHidePercent: 65,
+    enumFocusHidePercent: 65,
+    enumFocusIndex: 0
 }
 var reviewItems_Groups = []     // the outline of this is {group: #, difficulty: #}
 var reviewItems_Choices = {}
@@ -49,11 +58,15 @@ var reviewItems_Choices = {}
 var local_selectedGroupExclusion = []
 var local_temporarySaveForExcluded = []
 
+var local_enumarationItems = []
+var local_enumarationItemsP = []
+var local_enumAlreadyAnswered = []
+
+
 // Define sample quiz questions
 var reviewItems = [];
 var reviewerDatabase = ""
-
-var difficultyRange = 5
+var difficultyRange = 16
 
 // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms 
 // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms 
@@ -193,6 +206,51 @@ function randomNumbers(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function checkIfStringOrArray(variable){
+    if (typeof variable === 'string') {
+        return true
+    } else if (Array.isArray(answer)) {
+        return false
+    }
+}
+
+function hideCharacter(str, percentage) {
+    if (percentage < 10){
+        return str
+    }
+
+    if (percentage >= 10 && percentage <= 100) {
+        var numCharsToHide = Math.round(str.length * (percentage / 100));
+        var hiddenIndexes = [];
+        
+        // Generate random indexes to hide
+        while (hiddenIndexes.length < numCharsToHide) {
+        var index = Math.floor(Math.random() * str.length);
+            if (!hiddenIndexes.includes(index)) {
+                hiddenIndexes.push(index);
+            }
+        }
+        
+        // Replace characters at random indexes with "_"
+        var hiddenStr = str.split('').map((char, index) => {
+            return hiddenIndexes.includes(index) ? '*' : char;
+        }).join('');
+        
+        return hiddenStr;
+    } else {
+        return "Percentage should be between 0 and 100.";
+    }
+}
+
+function scanString(arr, string) {
+    for (let i = 0; i < arr.length; i++) {
+        if (string == arr[i].toLowerCase()){
+            return i;
+        }
+    }
+    return -1;
+}
+
 // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations 
 // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations 
 // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations 
@@ -258,14 +316,12 @@ function updateForgetfulFlag(){
     //html_forgetfulFlagYellow
 }
 
-// Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function 
-// Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function 
-// Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function 
 
-function showChoices(Group){
-    
-    html_Choice.innerHTML = "<br/>Choices: <br/>"
+// QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes 
+// QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes 
+// QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes 
 
+function multipleChoice(Group){
     var theChoices = []
 
     for (var i in reviewItems_Choices[Group]) {
@@ -288,9 +344,72 @@ function showChoices(Group){
     var html_correctChoice = document.getElementById("choice"+correctIndexOfAnswer+"Id")
     html_correctChoice.innerHTML = reviewItems[Game.atNumber].answer
 
-
-
     console.log("AAA")
+}
+
+function enumarationShowClues(){
+
+    html_enumFlexContainer.innerHTML = ``    
+
+    for (var i in local_enumarationItems){
+        if (i == Game.enumFocusIndex){
+            html_enumFlexContainer.innerHTML += `
+            <div class="enumFlexItem" id="enumFlexItemId`+i+`">
+                <div class="enumClue`+i+`" style="color: #77ccf0">
+                    `+hideCharacter(local_enumarationItems[i], local_enumarationItemsP[i])+`
+                </div>
+            </div>
+            `
+        } else {
+            html_enumFlexContainer.innerHTML += `
+            <div class="enumFlexItem" id="enumFlexItemId`+i+`">
+                <div class="enumClue`+i+`">
+                    `+hideCharacter(local_enumarationItems[i], local_enumarationItemsP[i])+`
+                </div>
+            </div>
+            `
+        }
+    }
+}
+
+
+// Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function 
+// Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function 
+// Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function 
+
+function showChoices(Group){
+
+    // check first if the current item is 
+    var currentItem = reviewItems[Game.atNumber].answer
+
+    // if Q and A
+    if (checkIfStringOrArray(currentItem)) {
+        // if multiple Choice
+        html_enumarationId.style.display = "none"
+
+        multipleChoice(Group)
+
+
+    } else {
+        // if enumaration
+        html_multipleChoiceContainer.style.display = "none"
+        html_enumarationId.style.display = "block"
+
+        var enumInOrder = reviewItems[Game.atNumber].enumInOrder
+        local_enumarationItems = [...currentItem]
+
+        if (enumInOrder == false){
+            local_enumarationItems = shuffleArray(local_enumarationItems)
+        }
+
+        for (var i in local_enumarationItems){
+            local_enumarationItemsP.push(Game.enumHidePercent)
+        }
+
+        enumarationShowClues()
+    }
+    
+
 }
 
 function clearFeedback(){
@@ -457,7 +576,6 @@ function checkAnswer(userAnswer){
 }
 
 function checkAnswerMultipleChoice(choiceNum){
-
     if (!Game.preventSubmission){
         Game.preventSubmission = true
 
@@ -485,7 +603,54 @@ function checkAnswerMultipleChoice(choiceNum){
     }
 }
 
-// start!
+function scanIfAnsweredAllEnum(){
+    console.log(local_enumarationItemsP)
+
+    Game.enumFocusIndex = 0
+
+    for (var i in local_enumarationItemsP){
+        if (local_enumarationItemsP[i] == 0){
+            Game.enumFocusIndex += 1
+        } else {
+            break
+        }
+    }
+    enumarationShowClues()
+}
+
+function checkAnswerEnumeration(){
+    if (!Game.preventSubmission){
+        //Game.preventSubmission = true
+        var userEnumAnswer = html_enumAnswer.value.toLowerCase()
+        userEnumAnswer = userEnumAnswer.trimRight()
+
+        var correctIndex = scanString(local_enumarationItems, userEnumAnswer)
+
+        console.log("The correct index "+correctIndex)
+
+        if (correctIndex > -1){
+            if (scanString(local_enumAlreadyAnswered, userEnumAnswer) == -1){
+                local_enumarationItemsP[correctIndex] = 0
+                document.querySelector(".enumClue"+correctIndex).innerHTML = hideCharacter(local_enumarationItems[correctIndex], local_enumarationItemsP[correctIndex])
+                local_enumAlreadyAnswered.push(userEnumAnswer)
+                scanIfAnsweredAllEnum()
+            } else {
+                console.log("Already Answered!")
+            }
+
+        } else {
+            console.log("Wrong!", userEnumAnswer)
+            local_enumarationItemsP[Game.enumFocusIndex] = local_enumarationItemsP[Game.enumFocusIndex] - 10
+            document.querySelector(".enumClue"+Game.enumFocusIndex).innerHTML = hideCharacter(local_enumarationItems[Game.enumFocusIndex], local_enumarationItemsP[Game.enumFocusIndex])
+
+        }
+    }
+}
+
+// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!
+// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!
+// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!
+
 function startReviTerm(){
     // reset variables
     Game.atNumber = 0
@@ -521,6 +686,7 @@ flagShakeAnimation()
 
 
 window.checkAnswerMultipleChoice = checkAnswerMultipleChoice
+window.checkAnswerEnumeration = checkAnswerEnumeration
 
 document.querySelector(".goBackButton").addEventListener("click", goBackToEditor);
 document.querySelector(".restartButton").addEventListener("click", restartingMessage);

@@ -107,12 +107,21 @@ h3 {
     width: 98%;
 }
 
+.enumItemGroup {
+    width: 98%;
+}
+
 .itemAnswer {
     width: 98%;
 }
 
+.enumItemQuestion{
+    width: 99%;
+    resize: none;
+}
+
 .itemQuestion{
-    width: 100%;
+    width: 99%;
     resize: none;
 }
 
@@ -246,6 +255,12 @@ h3 {
 .itemAnswerText{
     color: #8d8d8d;
     font-size: 4vw;
+    padding-right: 1vw;
+    white-space: pre-wrap;       /* Since CSS 2.1 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */;
 }
 
 .addItem {

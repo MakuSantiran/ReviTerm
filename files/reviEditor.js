@@ -15,8 +15,34 @@ var local_groupList = []
 var local_selectedItem = []
 var local_selectedGroupExclusion = []
 
-var local_qType = 1 // 0 Question and Answer | 1 Enumaration
+var local_qType = 0 // 0 Question and Answer | 1 Enumaration
 var local_EnumarationItem = []
+
+var local_questionPlaceHolder = ""
+var local_groupPlaceHolder = ""
+var local_atQuestionType = 0
+
+var html_group = document.querySelector(".itemGroup")
+var html_question = document.querySelector(".itemQuestion")
+var html_answer = document.querySelector(".itemAnswer")
+var html_image = document.querySelector(".itemImage")
+var html_addButton = document.querySelector(".addItemFunc")
+var html_difficulty = document.querySelector(".itemDifficulty")
+
+var html_enumQuestion = document.querySelector(".enumItemQuestion")
+var html_enumGroup = document.querySelector(".enumItemGroup")
+var html_enumInOrder = document.querySelector(".enumInOrder")
+var html_addEnumButton = document.querySelector(".addEnumItemFunc")
+
+var html_enumInOrderId = document.getElementById("enumInOrderId")
+var html_QAAB = document.getElementById("QAButtonId")
+var html_EnumB = document.getElementById("EnumButtonId")
+var html_qAAContainer = document.getElementById("qAAContainerId")
+var html_enumContainer = document.getElementById("enumContainerId")
+
+var html_overlay = document.getElementById("overlay") 
+var html_editBox = document.getElementById("editorId") 
+var html_initOptionsDIV = document.getElementById("initOptionsDIVId") 
 
 // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS 
 // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS // OTHER FUNCTIONS 
@@ -44,6 +70,18 @@ function deleteIndexInArray(){
 // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE 
 // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE 
 // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE 
+
+function answerTypeIndicator(answer){
+    if (typeof answer === 'string') {
+        return("Answer ["+answer+"]")
+
+    } else if (Array.isArray(answer)) {
+
+    console.log(answer)
+    return("Enumarated Answer &lt;"+answer+"&gt;")
+
+    }
+}
 
 function displayItems(){
     // then add
@@ -95,7 +133,7 @@ function displayItems(){
                                     <pre>`+value[j].question+`</pre>
                                 </div>
                                 
-                                <div class="itemAnswerText">Answer [`+value[j].answer+`]</div>
+                                <div class="itemAnswerText">`+answerTypeIndicator(value[j].answer)+`</div>
                             </div>                            
                         `
 
@@ -133,7 +171,7 @@ function displayEnumarationAns(enumarationItems){
         <div class="enumItem" id="enumItemId">
             <div class="flexContainer">
                 <div class="flexItem">
-                    <input type="text" class="enumAnswer" id="enumAnswerId_`+i+`" value="`+enumarationitem+`" onchange="updateEnumarationAns(`+i+`)">
+                    <input placeholder="Type an Answer!" type="text" class="enumAnswer" id="enumAnswerId_`+i+`" value="`+enumarationitem+`" onchange="updateEnumarationAns(`+i+`)">
                 </div>
                 <div class="flexItem">
                     <div class="enumItemDelete" onclick="deleteEnumerationAns(`+i+`)">
@@ -150,190 +188,37 @@ function updateEnumarationAns(index){
     var html_enumAnswerContent = document.getElementById("enumAnswerId_"+index)
     local_EnumarationItem[index] = html_enumAnswerContent.value
     displayEnumarationAns(local_EnumarationItem)
+    updateBothQEQuestions()
 }
 
-// CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD 
-// CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD 
-// CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD 
+function updateBothQEQuestions(){
+    console.log("The questionTypeVal", local_atQuestionType)
 
-function updateReviewerDetails(updId, updAOI, updGL){
-    localforage.getItem(reviewerDatabaseName+"_Details", function (err, value) {
+    console.log("S The value is ",local_selectedItem.answer)
 
-        var html_totalItems = document.querySelector(".totalItems")
-        html_totalItems.innerHTML = updAOI
+    // question Type
+    if (local_atQuestionType == 0){
+        html_enumQuestion.value = html_question.value
+        html_enumGroup.value = html_group.value
+        local_EnumarationItem[0] = html_answer.value
+        displayEnumarationAns(local_EnumarationItem)
+        console.log("Q The value is ",local_EnumarationItem[0])
+    } 
 
-        value.idCounter = updId
-        value.amountOfItems = updAOI
-        value.groupList = updGL
-
-        localforage.setItem(reviewerDatabaseName+"_Details", value)
-        console.log(reviewerDatabaseName+"_Details is updated!")
-    
-    })
-}
-
-function addItem(){
-
-    console.log(local_selectedItem.id)
-
-    var group = document.querySelector(".itemGroup").value
-    var question = document.querySelector(".itemQuestion").value
-    var answer = document.querySelector(".itemAnswer").value
-    var image = document.querySelector(".itemImage").value
-
-
-    // if the local_selectedItem is -1, it means just to add a new non existing.. but if its not
-    // then update
-    if (local_selectedItem.id == -1){
-
-        // other things
-        var id = local_idCounter
-        var enumaration = false
-        var difficulty = 0
-        var disabled = false
-
-        // check first if valid text
-        if (group == "" || question == "" || answer == ""){
-            alert("Please enter something!")
-            return;
-        }  
-
-        // trim the right/left spaces
-        group = group.trimRight()
-        question = question.trimRight()
-        answer = answer.trimRight()
-
-        var item = {id, enumaration, group, question, answer, image, difficulty, disabled}
-        console.log(item)
-
-        // add new item
-        localforage.getItem(reviewerDatabaseName, function (err, value) {
-
-            // check first if the database is empty
-            if (value == null){
-                value = []
-            }
-
-            var newValue = value
-            newValue.push(item)
-
-            localforage.setItem(reviewerDatabaseName, newValue)
-            console.log(newValue)
-
-
-            // update reviewerDetails
-            local_idCounter += 1
-            local_amountOfItems += 1
-            local_groupList.push(group)
-            updateReviewerDetails(local_idCounter, local_amountOfItems, local_groupList)
-
-            //document.querySelector(".userValue").value = ""
-            hideEditor()
-            setTimeout(displayItems, 25);
-        }); 
-
-
-    // if the local_selectedItem is -1(which means the item is existing)
-    // this is the update part :)
-    } else {
-
-        console.log("I see update :)")
-        // other things
-        var id = local_selectedItem.id
-        var enumaration = local_selectedItem.enumaration
-        var difficulty = local_selectedItem.difficulty
-        var disabled = local_selectedItem.disabled
-        var changedGroup = false
-
-        // check first if valid text
-        if (group == "" || question == "" || answer == ""){
-            alert("Please enter something!")
-            return;
-        }  
-
-        // trim the right/left spaces
-        group = group.trimRight()
-        question = question.trimRight()
-        answer = answer.trimRight()
-
-        var updatedItem = {id, enumaration, group, question, answer, image, difficulty, disabled}
-
-        console.log("["+group+"]")
-
-        // check if they changed the group
-        if (local_selectedItem.group != group){
-            changedGroup = true
-            console.log("changed group!")
-        }
-
-        // add new item
-        localforage.getItem(reviewerDatabaseName, function (err, value) {
-
-            var selectedITBU_Index = findItemIndexById(value, id) // selected Item To Be Updated
-
-            value[selectedITBU_Index] = updatedItem
-            var newValue = value
-
-            // if changed Group then
-            if (changedGroup){
-
-                local_groupList.push(group)
-
-                var indexToRemove = local_groupList.indexOf(local_selectedItem.group);
-                if (indexToRemove !== -1) {
-                    local_groupList.splice(indexToRemove, 1);
-                }
-
-                updateReviewerDetails(local_idCounter, local_amountOfItems, local_groupList)
-            }
-
-            localforage.setItem(reviewerDatabaseName, newValue)
-
-            hideEditor()
-            setTimeout(displayItems, 25);
-        }); 
+    // if enumaration Type
+    else if(local_atQuestionType == 1){
+        html_question.value = html_enumQuestion.value
+        html_group.value = html_enumGroup.value
+        console.log("The value is ",local_EnumarationItem[0])
+        html_answer.value = local_EnumarationItem[0]
     }
 
 
-
 }
 
-function removeItem(){
-
-    if (local_selectedItem.id == -1){
-        console.log("Nothing to be deleted")
-    }
-
-    // remove item
-    localforage.getItem(reviewerDatabaseName, function (err, value) {
-
-        // get the item to be removed
-        var selectedITBR_Index = findItemIndexById(value, local_selectedItem.id) // selected Item To Be Removed
-        
-        // get the group first
-        var groupToBeRemoved = value[selectedITBR_Index]["group"]
-
-        // with the deleted
-        var newValue = value
-        newValue.splice(selectedITBR_Index, 1);
-
-        localforage.setItem(reviewerDatabaseName, newValue)
-        console.log(newValue)
-
-        // update reviewerDetails
-        local_amountOfItems -= 1
-        
-        // this could've been simplier aarghhh (update group list)
-        var indexToRemove = local_groupList.indexOf(groupToBeRemoved);
-        if (indexToRemove !== -1) {
-            local_groupList.splice(indexToRemove, 1);
-        }
-
-        updateReviewerDetails(local_idCounter, local_amountOfItems, local_groupList)
-        hideEditor()
-        setTimeout(displayItems, 25);
-    }); 
-}
+// CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD 
+// CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD 
+// CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD 
 
 // kunin muna yung "selectedReviewer"
 function initialization(){
@@ -400,6 +285,288 @@ function initialization(){
     })
 }
 
+function updateReviewerDetails(updId, updAOI, updGL){
+    localforage.getItem(reviewerDatabaseName+"_Details", function (err, value) {
+
+        var html_totalItems = document.querySelector(".totalItems")
+        html_totalItems.innerHTML = updAOI
+
+        value.idCounter = updId
+        value.amountOfItems = updAOI
+        value.groupList = updGL
+
+        localforage.setItem(reviewerDatabaseName+"_Details", value)
+        console.log(reviewerDatabaseName+"_Details is updated!")
+    
+    })
+}
+
+function addItem(){
+
+    console.log("LOCAL QUESTION TYPE "+local_atQuestionType)
+
+    var group = document.querySelector(".itemGroup").value
+    var question = document.querySelector(".itemQuestion").value
+    var answer = document.querySelector(".itemAnswer").value
+    var image = document.querySelector(".itemImage").value
+
+    var enumAnswer = local_EnumarationItem
+    var enumInOrder = html_enumInOrder.checked
+
+    // if going to add a questionAndAnswer
+    if (local_atQuestionType == 0){
+        // if the local_selectedItem is -1, it means just to add a new non existing.. but if its not
+        // then update
+        if (local_selectedItem.id == -1){
+
+            // other things
+            var id = local_idCounter
+            var enumaration = false
+            var difficulty = 0
+            var disabled = false
+
+            // check first if valid text
+            if (group == "" || question == "" || answer == ""){
+                alert("Please enter something!")
+                return;
+            }  
+
+            // trim the right/left spaces
+            group = group.trimRight()
+            question = question.trimRight()
+            answer = answer.trimRight()
+
+            var item = {id, enumaration, group, question, answer, image, difficulty, disabled}
+            console.log(item)
+
+            // add new item
+            localforage.getItem(reviewerDatabaseName, function (err, value) {
+
+                // check first if the database is empty
+                if (value == null){
+                    value = []
+                }
+
+                var newValue = value
+                newValue.push(item)
+
+                localforage.setItem(reviewerDatabaseName, newValue)
+                console.log(newValue)
+
+
+                // update reviewerDetails
+                local_idCounter += 1
+                local_amountOfItems += 1
+                local_groupList.push(group)
+                updateReviewerDetails(local_idCounter, local_amountOfItems, local_groupList)
+
+                //document.querySelector(".userValue").value = ""
+                hideEditor()
+                setTimeout(displayItems, 25);
+            }); 
+        } else {
+        // if the local_selectedItem is -1(which means the item is existing)
+        // this is the update part :)
+
+            console.log("I see update :)")
+            // other things
+            var id = local_selectedItem.id
+            var enumaration = false
+            var difficulty = local_selectedItem.difficulty
+            var disabled = local_selectedItem.disabled
+            var changedGroup = false
+
+            // check first if valid text
+            if (group == "" || question == "" || answer == ""){
+                alert("Please enter something!")
+                return;
+            }  
+
+            // trim the right/left spaces
+            group = group.trimRight()
+            question = question.trimRight()
+            answer = answer.trimRight()
+
+            var updatedItem = {id, enumaration, group, question, answer, image, difficulty, disabled}
+
+            console.log("["+group+"]")
+
+            // check if they changed the group
+            if (local_selectedItem.group != group){
+                changedGroup = true
+                console.log("changed group!")
+            }
+
+            // add new item
+            localforage.getItem(reviewerDatabaseName, function (err, value) {
+                var selectedITBU_Index = findItemIndexById(value, id) // selected Item To Be Updated
+                value[selectedITBU_Index] = updatedItem
+                var newValue = value
+
+                // if changed Group then
+                if (changedGroup){
+                    local_groupList.push(group)
+                    var indexToRemove = local_groupList.indexOf(local_selectedItem.group);
+                    if (indexToRemove !== -1) {
+                        local_groupList.splice(indexToRemove, 1);
+                    }
+                    updateReviewerDetails(local_idCounter, local_amountOfItems, local_groupList)
+                }
+
+                localforage.setItem(reviewerDatabaseName, newValue)
+                hideEditor()
+                setTimeout(displayItems, 25);
+            }); 
+        }
+    } else {
+        // if going to add an enumaration question type
+        if (local_selectedItem.id == -1){
+
+            // other things
+            var id = local_idCounter
+            var enumaration = true
+            var difficulty = 0
+            var disabled = false
+
+            // check first if valid text
+            if (group == "" || question == "" || enumAnswer.length<=0){
+                alert("Please enter something!")
+                return;
+            }  
+
+            // trim the right/left spaces
+            group = group.trimRight()
+            question = question.trimRight()
+            //answer = answer.trimRight()
+
+            // remove the image in enumaration
+            image = ""
+
+            var item = {id, enumaration, group, question, answer: enumAnswer, image, difficulty, disabled, enumInOrder}
+            console.log(item)
+
+            /**/ 
+            // add new item
+            localforage.getItem(reviewerDatabaseName, function (err, value) {
+
+                // check first if the database is empty
+                if (value == null){
+                    value = []
+                }
+
+                var newValue = value
+                newValue.push(item)
+
+                localforage.setItem(reviewerDatabaseName, newValue)
+                console.log(newValue)
+
+
+                // update reviewerDetails
+                local_idCounter += 1
+                local_amountOfItems += 1
+                local_groupList.push(group)
+                updateReviewerDetails(local_idCounter, local_amountOfItems, local_groupList)
+
+                //document.querySelector(".userValue").value = ""
+                hideEditor()
+                setTimeout(displayItems, 25);
+            }); 
+             /**/
+        } else {
+        // if the local_selectedItem is -1(which means the item is existing)
+        // this is the update part for enumeration :)
+
+            console.log("I see update :)")
+            // other things
+            var id = local_selectedItem.id
+            var enumaration = true
+            var difficulty = local_selectedItem.difficulty
+            var disabled = local_selectedItem.disabled
+            var changedGroup = false
+
+            // check first if valid text
+            if (group == "" || question == "" || enumAnswer.length<=0){
+                alert("Please enter something!")
+                return;
+            }  
+
+            // trim the right/left spaces
+            group = group.trimRight()
+            question = question.trimRight()
+
+            var updatedItem = {id, enumaration, group, question, answer: enumAnswer, image, difficulty, disabled, enumInOrder}
+            console.log("["+group+"]")
+            console.log(updatedItem)
+
+            // check if they changed the group
+            if (local_selectedItem.group != group){
+                changedGroup = true
+                console.log("changed group!")
+            }
+
+            /**/ 
+            // update item
+            localforage.getItem(reviewerDatabaseName, function (err, value) {
+                var selectedITBU_Index = findItemIndexById(value, id) // selected Item To Be Updated
+                value[selectedITBU_Index] = updatedItem
+                var newValue = value
+
+                // if changed Group then
+                if (changedGroup){
+                    local_groupList.push(group)
+                    var indexToRemove = local_groupList.indexOf(local_selectedItem.group);
+                    if (indexToRemove !== -1) {
+                        local_groupList.splice(indexToRemove, 1);
+                    }
+                    updateReviewerDetails(local_idCounter, local_amountOfItems, local_groupList)
+                }
+
+                localforage.setItem(reviewerDatabaseName, newValue)
+                hideEditor()
+                setTimeout(displayItems, 25);
+            }); 
+            /**/
+        }
+    }
+}
+
+function removeItem(){
+
+    if (local_selectedItem.id == -1){
+        console.log("Nothing to be deleted")
+    }
+
+    // remove item
+    localforage.getItem(reviewerDatabaseName, function (err, value) {
+
+        // get the item to be removed
+        var selectedITBR_Index = findItemIndexById(value, local_selectedItem.id) // selected Item To Be Removed
+        
+        // get the group first
+        var groupToBeRemoved = value[selectedITBR_Index]["group"]
+
+        // with the deleted
+        var newValue = value
+        newValue.splice(selectedITBR_Index, 1);
+
+        localforage.setItem(reviewerDatabaseName, newValue)
+        console.log(newValue)
+
+        // update reviewerDetails
+        local_amountOfItems -= 1
+        
+        // this could've been simplier aarghhh (update group list)
+        var indexToRemove = local_groupList.indexOf(groupToBeRemoved);
+        if (indexToRemove !== -1) {
+            local_groupList.splice(indexToRemove, 1);
+        }
+
+        updateReviewerDetails(local_idCounter, local_amountOfItems, local_groupList)
+        hideEditor()
+        setTimeout(displayItems, 25);
+    }); 
+}
+
 function excludeGroup(groupName){
     // works like checkbox thing
 
@@ -421,43 +588,56 @@ function excludeGroup(groupName){
 function deleteEnumerationAns(index){
     local_EnumarationItem.splice(index, 1);
     displayEnumarationAns(local_EnumarationItem)
+    updateBothQEQuestions()
 }
 
 function addEnumaratorAns(){
-    local_EnumarationItem.push("Type an Answer!")
+    local_EnumarationItem.push("")
     displayEnumarationAns(local_EnumarationItem)
 }
-
 
 // BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS
 // BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS
 // BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS
 
 function showEditor(index = -1, selectedGroup){
-
-    var html_group = document.querySelector(".itemGroup")
-    var html_question = document.querySelector(".itemQuestion")
-    var html_answer = document.querySelector(".itemAnswer")
-    var html_image = document.querySelector(".itemImage")
-    var html_addButton = document.querySelector(".addItemFunc")
-    var html_difficulty = document.querySelector(".itemDifficulty")
-
     // if selected an existing item
     if (index != -1){
         localforage.getItem(reviewerDatabaseName, function (err, item) {
             
             local_selectedItem = getItemById(item, index)
 
-            // assign it to the html groupings
-            html_group.value = local_selectedItem.group
-            html_question.value = local_selectedItem.question
-            html_answer.value = local_selectedItem.answer
-            html_image.value = local_selectedItem.image
-            html_difficulty.innerHTML = local_selectedItem.difficulty
-
             console.log(local_selectedItem)
 
-            //update mode
+            // enumaration mode
+            if (local_selectedItem.enumaration){
+                html_enumGroup.value = local_selectedItem.group
+                html_enumQuestion.value = local_selectedItem.question
+                html_enumInOrder.checked = local_selectedItem.enumInOrder
+                local_EnumarationItem = local_selectedItem.answer
+
+                local_atQuestionType = 1
+                selectQType(1)
+                displayEnumarationAns(local_EnumarationItem)
+
+                //update mode
+
+            } else {
+            // Q&A mode
+                
+                // assign it to the html groupings
+                html_group.value = local_selectedItem.group
+                html_question.value = local_selectedItem.question
+                html_answer.value = local_selectedItem.answer
+                html_image.value = local_selectedItem.image
+                html_difficulty.innerHTML = local_selectedItem.difficulty
+
+                console.log(local_selectedItem)
+
+                updateBothQEQuestions()
+            }
+
+            html_addEnumButton.value = "Update"
             html_addButton.value = "Update"
         })
     
@@ -481,29 +661,33 @@ function showEditor(index = -1, selectedGroup){
         html_answer.value = local_selectedItem.answer
         html_image.value = local_selectedItem.image
         html_addButton.value = "Add"
+        html_addEnumButton.value = "Add"
         html_difficulty.innerHTML = 0
 
         console.log(local_selectedItem)
+        updateBothQEQuestions()
         
     }
-
-    var html_overlay = document.getElementById("overlay") 
-    var html_editBox = document.getElementById("editorId") 
 
     html_editBox.style.display = "block";
     html_overlay.style.display = "block";
 
     displayEnumarationAns(local_EnumarationItem)
+    selectQType(0)
     console.log("Hello World!", index, selectedGroup)
+    
 }
 
 function hideEditor(){
-    var html_overlay = document.getElementById("overlay") 
-    var html_editBox = document.getElementById("editorId") 
+    html_enumQuestion.value = ""
+    html_enumGroup.value = ""
+    local_EnumarationItem = []
 
     html_editBox.style.display = "none";
     html_overlay.style.display = "none";
     
+    local_atQuestionType = 0
+    selectQType(0)
 }
 
 function showOptionsBeforeReviTerm(){
@@ -553,21 +737,15 @@ function showOptionsBeforeReviTerm(){
 }
 
 function hideOptionsBeforeReviTerm(){
-    var html_overlay = document.getElementById("overlay") 
-    var html_initOptionsDIV = document.getElementById("initOptionsDIVId") 
-
     html_initOptionsDIV.style.display = "none";
     html_overlay.style.display = "none";        
 }
 
 function selectQType(type){
-    var html_QAAB = document.getElementById("QAButtonId")
-    var html_EnumB = document.getElementById("EnumButtonId")
-    var html_qAAContainer = document.getElementById("qAAContainerId")
-    var html_enumContainer = document.getElementById("enumContainerId")
-
     var COLOR_white = "#ffffff"
     var COLOR_gray = "#bbbbbb"
+
+    local_atQuestionType = type
 
     // show questionAndAnswer
     if (type == 0){
@@ -582,7 +760,8 @@ function selectQType(type){
         html_EnumB.style.backgroundColor = COLOR_white       
     }
 
-    console.log(type)
+    console.log(local_atQuestionType)
+    updateBothQEQuestions()
 }
 
 // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK 
@@ -611,6 +790,9 @@ window.selectQType = selectQType
 window.addEnumaratorAns = addEnumaratorAns
 window.updateEnumarationAns = updateEnumarationAns
 window.deleteEnumerationAns = deleteEnumerationAns
+window.updateBothQEQuestions = updateBothQEQuestions
+window.addItem = addItem
+
 
 document.querySelector(".initOptionsHide").addEventListener("click", hideOptionsBeforeReviTerm);
-document.querySelector(".addItemFunc").addEventListener("click", addItem);
+//document.querySelector(".addItemFunc").addEventListener("click", addItem);

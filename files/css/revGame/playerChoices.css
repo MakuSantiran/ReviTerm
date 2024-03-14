@@ -11,6 +11,10 @@
     --lowHealthColor: #d13434;
 }  
 
+@font-face {
+    font-family: 'HeyComic'; /* Specify a name for your font */
+    src: url("../fonts/HeyComic.otf") format('opentype'); /* Specify the path to your .otf font file */
+}
 
 .choicesContainer{
     position: relative;
@@ -126,4 +130,59 @@
     left: 0%;
 
     z-index: -3;
+}
+
+/* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ 
+/* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ 
+/* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ 
+
+.enumAnswer {
+    width: 85%;
+    font-family: 'HeyComic';
+
+    text-align: center;
+
+    padding: 2vw;
+    font-size: 5vw;
+}
+
+.enumSubmit {
+    background-color: var(--practiceHealthColor);
+    color: #ffffff;
+    font-family: 'HeyComic';
+
+    font-size: 5vw;
+    padding: 2vw;
+
+    margin-top: 4vw;
+
+    width: 70%;
+    user-select: none;
+
+    cursor: pointer;
+}
+
+.enumChoices{
+    font-family: 'HeyComic';
+
+    text-shadow:
+    -2px -2px 0 #000,
+    2px -2px 0 #000,
+    -2px 2px 0 #000,
+    2px 2px 0 #000;  
+
+    font-size: 4.5vw;
+}
+
+.enumFlexContainer{
+    display: flex;
+    width: 90%;
+    margin-top: 3vw;
+    flex-wrap: wrap;
+}
+
+.enumFlexItem{
+    flex: 1; /* Each item will grow equally to fill the available space */
+    padding: 2vw;
+    width: 100%;
 }

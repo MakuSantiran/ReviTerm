@@ -60,18 +60,18 @@
 		<div class="editorContainer" id="editorContainerId">
 			<div class="qAAContainer" id="qAAContainerId">
 				Question(Max 255)<br/>
-				<textarea  class="itemQuestion" name="w3review" rows="4" cols="50"></textarea>
+				<textarea placeholder="Type the question here" class="itemQuestion" name="w3review" rows="4" cols="50" onchange="updateBothQEQuestions()"></textarea>
 				
 				<div class="flexContainer">
 					<div class="flexItem">
 						<br/>
 						Group<br/>
-						<input type="text" class="itemGroup" >
+						<input placeholder="GroupName" type="text" class="itemGroup" onchange="updateBothQEQuestions()">
 				
 						<br/><br/>
 						Answer<br/>
 						
-						<input type="text" class="itemAnswer" >
+						<input placeholder="AnswerHere" type="text" class="itemAnswer" onchange="updateBothQEQuestions()">
 				
 						<br/><br/>
 						<!--
@@ -112,7 +112,7 @@
 					</div>
 					<div class="flexItem">
 						<center>
-							<input type="button" value="Add" class="addItemFunc">
+							<input type="button" value="Add" class="addItemFunc" onclick="addItem(0)">
 						</center>
 					</div>
 				</div>
@@ -120,9 +120,9 @@
 
 			<div class="enumContainer" id="enumContainerId">
 				Question(Max 255)<br/>
-				<textarea  class="itemQuestion" name="w3review" rows="4" cols="50"></textarea>		
+				<textarea placeholder="Type the question here" class="enumItemQuestion" name="w3review" rows="4" cols="50" onchange="updateBothQEQuestions()"></textarea>		
 				
-				<br/><br/>
+				<br/>
 				Answers<br/>
 				<div class="enumAnswersContainer" id="enumAnswersContainerId">	
 					
@@ -140,19 +140,21 @@
 					-->
 				</div>
 
-				<br/>
 				<div class="flexContainer">
 					<div class="flexItem">
-						Group <input type="text" class="itemGroup" >
-						<br/><br/>
+						<div style="display: inline-flex">
+							Group&nbsp<input placeholder="GroupName" type="text" class="enumItemGroup" onchange="updateBothQEQuestions()">
+						</div>
+						
+						<br/>
 					</div>
-
 					<div class="flexItem">
-						In Order <input type="checkbox" class="enumInOrder">
+						<div style="display: inline-flex;">
+							In Order <input type="checkbox" class="enumInOrder" id="enumInOrderId">
+						</div>
 					</div>
 				</div>
-
-
+				<br/>
 				Difficulty level: <div class="itemDifficulty">#</div>
 
 				<br/><br/>
@@ -169,7 +171,7 @@
 					</div>
 					<div class="flexItem">
 						<center>
-							<input type="button" value="Add" class="addItemFunc">
+							<input type="button" value="Add" class="addEnumItemFunc" onclick="addItem(1)">
 						</center>
 					</div>
 				</div>		
