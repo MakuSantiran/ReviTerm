@@ -63,9 +63,22 @@ function findItemIndexById(array, id) {
     return -1; // Return -1 if item not found
 }
 
-function deleteIndexInArray(){
-    
+function checkDuplicates(arr) {
+
+    // Check for duplicates
+    const uniqueSet = new Set(arr);
+    if (uniqueSet.size !== arr.length) {
+        return true;
+    }
+
+    return false;
 }
+
+function trimStringArray(arr) {
+    // Map over the array and trim each string
+    return arr.map(str => str.trim()).filter(str => str !== "");
+}
+
 
 // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE 
 // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE 
@@ -116,18 +129,28 @@ function displayItems(){
             // this is unoptimized but gets the job done
             for (var i in totalGroups){
                 html_listOfItems.innerHTML += `
-                    <div class="groupHeader">
-                        `+totalGroups[i]+`
+                    <div class="groupHeaderFlexContainer">
+                        <div class="groupHeaderHideButton" id="groupHideButtonId`+i+`" onclick="showOrHideGroup(`+i+`)">^</div>
+
+                        <div class="groupHeaderFlexItemTitle">
+                            <div class="groupHeader">
+                                `+totalGroups[i]+`
+                            </div>
+                        </div>
                     </div>
+                
+                    <div class="groupSectionClass`+i+`" id="groupSectionId`+i+`"></div>
                 `
+
+                var html_groupSection = document.querySelector(".groupSectionClass"+i)
 
                 // so for each items (that is related to the group)
                 for (var j in value){
-                    
+
                     // now display the only related item to the group
                     if (value[j].group == totalGroups[i]) {
 
-                        html_listOfItems.innerHTML += `
+                        html_groupSection.innerHTML += `
                             <div class="itemBox" onclick="showEditor(`+value[j].id+`,'`+value[j].group+`')">
                                 <div class="textInItemBox"> 
                                     <pre>`+value[j].question+`</pre>
@@ -141,7 +164,7 @@ function displayItems(){
                     }
                 }
 
-                html_listOfItems.innerHTML += `
+                html_groupSection.innerHTML += `
                     <div class="addItem" onclick="showEditor(`+-1+`,'`+totalGroups[i]+`')">
                         +
                     </div>
@@ -310,6 +333,9 @@ function addItem(){
     var answer = document.querySelector(".itemAnswer").value
     var image = document.querySelector(".itemImage").value
 
+    // remove whiteSpaces
+    local_EnumarationItem = trimStringArray(local_EnumarationItem)
+
     var enumAnswer = local_EnumarationItem
     var enumInOrder = html_enumInOrder.checked
 
@@ -428,11 +454,23 @@ function addItem(){
             var difficulty = 0
             var disabled = false
 
+            // trim left or right and remove ""
+            enumAnswer = trimStringArray(enumAnswer)
+            displayEnumarationAns(trimStringArray(enumAnswer))
+
+            // check for duplicates
+            if (checkDuplicates(enumAnswer)){
+                alert("Please make sure the answers aren't duplicated!")
+                return
+            }
+
             // check first if valid text
             if (group == "" || question == "" || enumAnswer.length<=0){
-                alert("Please enter something!")
+                alert("Please enter the missing fields")
                 return;
             }  
+
+            
 
             // trim the right/left spaces
             group = group.trimRight()
@@ -483,6 +521,16 @@ function addItem(){
             var difficulty = local_selectedItem.difficulty
             var disabled = local_selectedItem.disabled
             var changedGroup = false
+
+            // trim left or right and remove ""
+            enumAnswer = trimStringArray(enumAnswer)
+            displayEnumarationAns(trimStringArray(enumAnswer))
+
+            // check for duplicates
+            if (checkDuplicates(enumAnswer)){
+                alert("Please make sure the answers aren't duplicated!")
+                return
+            }
 
             // check first if valid text
             if (group == "" || question == "" || enumAnswer.length<=0){
@@ -772,6 +820,22 @@ function selectQType(type){
     updateBothQEQuestions()
 }
 
+function showOrHideGroup(id){
+    var buttonContent = document.getElementById("groupHideButtonId"+id)
+    var groupSection = document.getElementById("groupSectionId"+id)
+
+    if (buttonContent.innerHTML == "^"){
+        buttonContent.innerHTML = "v"
+        groupSection.style.display = "none"
+
+    } else if (buttonContent.innerHTML == "v"){
+        buttonContent.innerHTML = "^"
+        groupSection.style.display = "block"
+    }
+
+    console.log(buttonContent.innerHTML)
+}
+
 // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK 
 // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK 
 // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK 
@@ -789,7 +853,6 @@ initialization()
 
 window.removeItem = removeItem
 window.hideEditor = hideEditor
-
 window.gotoSelectReviewer = gotoSelectReviewer
 window.showEditor = showEditor
 window.showOptionsBeforeReviTerm = showOptionsBeforeReviTerm
@@ -800,6 +863,7 @@ window.updateEnumarationAns = updateEnumarationAns
 window.deleteEnumerationAns = deleteEnumerationAns
 window.updateBothQEQuestions = updateBothQEQuestions
 window.addItem = addItem
+window.showOrHideGroup = showOrHideGroup
 
 
 document.querySelector(".initOptionsHide").addEventListener("click", hideOptionsBeforeReviTerm);

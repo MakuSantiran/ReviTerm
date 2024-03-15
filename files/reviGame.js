@@ -377,32 +377,50 @@ function enumarationShowClues(){
         if (i == Game.enumFocusIndex){
             html_enumFlexContainer.innerHTML += `
             <div class="enumFlexItem" id="enumFlexItemId`+i+`">
-                <div class="enumClue`+i+`" style="color: #77ccf0">
+                <div class="enumClue`+i+`" id="enumClueId`+i+`" style="color: #77ccf0">
                     `+hideCharacter(local_enumarationItems[i], local_enumarationItemsP[i])+`
                 </div>
             </div>
             `    
         } else {
-            // lazy
+            // lazyyy
             if (local_enumInOrder){
-                html_enumFlexContainer.innerHTML += `
-                <div class="enumFlexItem" id="enumFlexItemId`+i+`">
-                    <div class="enumClue`+i+`" style="color: #616161;">
-                        `+hideCharacter(local_enumarationItems[i], local_enumarationItemsP[i])+`
+                if (local_enumarationItemsP[i] != 0){
+                    html_enumFlexContainer.innerHTML += `
+                    <div class="enumFlexItem" id="enumFlexItemId`+i+`">
+                        <div class="enumClue`+i+`" id="enumClueId`+i+`" style="color: #616161;">
+                            `+hideCharacter(local_enumarationItems[i], local_enumarationItemsP[i])+`
+                        </div>
                     </div>
-                </div>
-                `
+                    `                    
+                } else {
+                    html_enumFlexContainer.innerHTML += `
+                    <div class="enumFlexItem" id="enumFlexItemId`+i+`">
+                        <div class="enumClue`+i+`" id="enumClueId`+i+`" style="color: #60ff51;">
+                            `+hideCharacter(local_enumarationItems[i], local_enumarationItemsP[i])+`
+                        </div>
+                    </div>
+                    `    
+                }
             } else {
+                if (local_enumarationItemsP[i] != 0){
                 html_enumFlexContainer.innerHTML += `
-                <div class="enumFlexItem" id="enumFlexItemId`+i+`">
-                    <div class="enumClue`+i+`">
-                        `+hideCharacter(local_enumarationItems[i], local_enumarationItemsP[i])+`
+                    <div class="enumFlexItem" id="enumFlexItemId`+i+`">
+                        <div class="enumClue`+i+`" id="enumClueId`+i+`">
+                            `+hideCharacter(local_enumarationItems[i], local_enumarationItemsP[i])+`
+                        </div>
                     </div>
-                </div>
-                `
+                    `
+                } else {
+                    html_enumFlexContainer.innerHTML += `
+                    <div class="enumFlexItem" id="enumFlexItemId`+i+`">
+                        <div class="enumClue`+i+`" id="enumClueId`+i+`" style="color: #60ff51;">
+                            `+hideCharacter(local_enumarationItems[i], local_enumarationItemsP[i])+`
+                        </div>
+                    </div>
+                    ` 
+                }
             }
-            
-
         }
     }
 }
@@ -661,6 +679,8 @@ function scanIfAnsweredAllEnum(){
     }
 
     enumarationShowClues()
+    // 
+    
 
     if (enumCompleted){
 

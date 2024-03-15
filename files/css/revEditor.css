@@ -221,15 +221,58 @@ h3 {
 }
 
 .groupHeader{
-    background: #2b5d8f;
+    position: relative;
     color: white;
     padding: 0.5%;
 
     /* font-size: 3vw; For Phone */
     font-size: 6vw;
 
+    width: 100%;
     
 }
+
+.groupHeaderFlexContainer{
+    display: flex;
+    background: #2b5d8f;
+    position: relative; /* Set parent container position to relative */
+    justify-content: space-between; /* Ensure elements are spaced evenly */
+    align-items: center; /* Align items vertically */
+    margin-top: 4vw;
+}
+
+.groupHeaderFlexItemTitle{
+    width: 80%;
+    padding-left: 2vw;
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */;
+}
+
+
+.groupHeaderFlexItem {
+    flex: 1; /* Each item will grow equally to fill the available space */
+    padding: 2vw;
+    width: 100%;
+}
+
+.groupHeaderHideButton{
+    position: absolute; /* Position the button absolutely */
+    top: 0;
+    right: 0; /* Align the button to the right */
+    text-align: right;
+    user-select: none;
+    cursor: pointer;
+    color: #ffffff;
+    background-color: #204367;
+    font-size: 6vw;
+    padding: 0.5vw;
+
+    padding-right: 2vw;
+    padding-left: 2vw;
+
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+
 
 .itemBox {
     background: #353535;
@@ -410,7 +453,6 @@ h3 {
 .groupListItemCheckBox {
     position: relative;
     float: right;
-
     margin-right: 3vw;
 }
 
@@ -421,12 +463,12 @@ h3 {
     border-width: 1.2px;
     border-top:#ffffff;
 
-    height: 3vh;
-
     padding-left: 2vw;
 
     padding-top: 2vh;
     padding-bottom: 2vh;
+
+    word-wrap: break-word; 
 }
 
 button {
