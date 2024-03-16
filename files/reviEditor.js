@@ -4,9 +4,11 @@ import localforage from "./localForage/localforage.js"
 var reviewerDatabaseName = "reviewerContent"
 var revieweraddOn = "reviewerContent_"
 
-// selectedGroupExclusion --> includes the group that would not be taken in the reviterm
-
-//  ^-- This might change especially for the structure of file
+// selectedGroupExclusion --> includes the group that would not be taken in the reviterm (This might change especially for the structure of file)
+// reviewerContent_NAME --> contains the items of the reviewer
+// reviewerContent_NAME_Details --> contains other aspects of reviewer
+// reviTermGameMode --> contains which game mode will be used in the review session
+// selectedCharacter --> contains which character did the user picked
 
 // temporary/local values to be updated in the reviewerContent_NAME_Details database
 var local_idCounter = 0
@@ -21,6 +23,8 @@ var local_EnumarationItem = []
 var local_questionPlaceHolder = ""
 var local_groupPlaceHolder = ""
 var local_atQuestionType = 0
+
+var local_whichGroupsAreHidden = []
 
 var html_group = document.querySelector(".itemGroup")
 var html_question = document.querySelector(".itemQuestion")
@@ -79,6 +83,18 @@ function trimStringArray(arr) {
     return arr.map(str => str.trim()).filter(str => str !== "");
 }
 
+function removeHiddenGroup(arr, id) {
+    // Find the index of the number in the array
+    var index = arr.indexOf(id);
+
+    // If the number exists in the array, remove it
+    if (index !== -1) {
+        arr.splice(index, 1);
+    }
+
+    // Return the modified array
+    return arr;
+}
 
 // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE 
 // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE 
@@ -144,6 +160,11 @@ function displayItems(){
 
                 var html_groupSection = document.querySelector(".groupSectionClass"+i)
 
+                if ( local_whichGroupsAreHidden.includes(parseInt(i, 10))){
+                    removeHiddenGroup(local_whichGroupsAreHidden, parseInt(i, 10))
+                    showOrHideGroup(parseInt(i, 10)) // restore the hidden option?
+                }
+
                 // so for each items (that is related to the group)
                 for (var j in value){
 
@@ -170,6 +191,9 @@ function displayItems(){
                     </div>
                 `
             }
+
+
+
         } else {
             // display empty message if empty
             var html_listOfItems = document.querySelector(".listOfItems")
@@ -827,13 +851,20 @@ function showOrHideGroup(id){
     if (buttonContent.innerHTML == "^"){
         buttonContent.innerHTML = "v"
         groupSection.style.display = "none"
+        local_whichGroupsAreHidden.push(id)
 
     } else if (buttonContent.innerHTML == "v"){
         buttonContent.innerHTML = "^"
         groupSection.style.display = "block"
+        removeHiddenGroup(local_whichGroupsAreHidden, id)
     }
+    
+    console.log(buttonContent.innerHTML, local_whichGroupsAreHidden)
+}
 
-    console.log(buttonContent.innerHTML)
+function getListOfShowOrHide(){
+    //var buttonContent = document.getElementById("groupHideButtonId"+id)
+    //var groupSection = document.getElementById("groupSectionId"+id)
 }
 
 // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK 

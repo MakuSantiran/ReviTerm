@@ -32,7 +32,7 @@ var html_enumAnswer = document.querySelector(".enumAnswer")
 
 
 // variables
-var Game = {
+var reviGame = {
     atNumber: 0,
     gotWrong: false,
     preventSubmission: false,
@@ -44,7 +44,7 @@ var Game = {
         "Scrambled", 
         "Identification",
         "WhichIsWrong",
-        "EnumarateTheDefinition"
+        "FillInTheBlank"
     ],
 
     totalMistakes: 0,
@@ -71,9 +71,9 @@ var local_enumInOrder = false
 // Define sample quiz questions
 var reviewItems = [];
 var reviewerDatabase = ""
-var difficultyRange = 6
-var yellowFlagRange = 3
-var redFlagRange = 6
+var difficultyRange = 5
+var yellowFlagRange = 1
+var redFlagRange = 3
 
 // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms 
 // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms 
@@ -265,7 +265,7 @@ function scanString(arr, string) {
 // for enumaration
 function checkIfTheSame(toBeCmp, string){
     if (toBeCmp == string){ 
-        return Game.enumFocusIndex
+        return reviGame.enumFocusIndex
     }
     return -1
 }
@@ -315,7 +315,7 @@ function wrongAnswerAnimation(){
 }
 
 function updateForgetfulFlag(){
-    var forgetfulLevel = reviewItems[Game.atNumber].difficulty
+    var forgetfulLevel = reviewItems[reviGame.atNumber].difficulty
 
     if (forgetfulLevel > yellowFlagRange){
         html_forgetfulFlagId.style.display = "flex";
@@ -329,7 +329,7 @@ function updateForgetfulFlag(){
         html_forgetfulFlagId.src = './files/img/ForgetfulFlag.png'
     }
 
-    console.log(forgetfulLevel, Game.flagShakeIntensity)
+    console.log(forgetfulLevel, reviGame.flagShakeIntensity)
 
     //html_forgetfulFlagYellow
 }
@@ -342,6 +342,26 @@ function updateForgetfulFlag(){
 function multipleChoice(Group){
     var theChoices = []
 
+    var amountOfChoices = 4
+
+    // display the other 2
+    document.getElementById("choice1ContainerId3").style.display = "block"
+    document.getElementById("choice1ContainerId4").style.display = "block"
+    
+    // dynamic difficult :) [if yellow flag]
+    if (reviewItems[reviGame.atNumber].difficulty > yellowFlagRange && reviewItems[reviGame.atNumber].difficulty < redFlagRange){
+        amountOfChoices = 3
+        document.getElementById("choice1ContainerId4").style.display = "none"
+    }
+
+    // if red flag
+    if (reviewItems[reviGame.atNumber].difficulty >= redFlagRange){
+        amountOfChoices = 2
+        document.getElementById("choice1ContainerId3").style.display = "none"
+        document.getElementById("choice1ContainerId4").style.display = "none"
+    }
+
+
     for (var i in reviewItems_Choices[Group]) {
         if (checkIfStringOrArray(reviewItems_Choices[Group][i])){
             theChoices.push(reviewItems_Choices[Group][i])
@@ -352,9 +372,9 @@ function multipleChoice(Group){
 
     // for multiple choice
     var randomizedChoices = shuffleArray(theChoices)
-    var correctIndexOfAnswer = randomNumbers(1,4)
+    var correctIndexOfAnswer = randomNumbers(1,amountOfChoices)
     
-    for (var i = 1; i<=4; i++){
+    for (var i = 1; i<=amountOfChoices; i++){
         var html_choice = document.getElementById("choice"+i+"Id")
         
         var randomIndex = randomNumbers(0, randomizedChoices.length-1)
@@ -364,9 +384,7 @@ function multipleChoice(Group){
     }
 
     var html_correctChoice = document.getElementById("choice"+correctIndexOfAnswer+"Id")
-    html_correctChoice.innerHTML = reviewItems[Game.atNumber].answer
-
-
+    html_correctChoice.innerHTML = reviewItems[reviGame.atNumber].answer
 }
 
 function enumarationShowClues(){
@@ -374,7 +392,7 @@ function enumarationShowClues(){
     html_enumFlexContainer.innerHTML = ``    
 
     for (var i in local_enumarationItems){
-        if (i == Game.enumFocusIndex){
+        if (i == reviGame.enumFocusIndex){
             html_enumFlexContainer.innerHTML += `
             <div class="enumFlexItem" id="enumFlexItemId`+i+`">
                 <div class="enumClue`+i+`" id="enumClueId`+i+`" style="color: #77ccf0">
@@ -433,7 +451,7 @@ function enumarationShowClues(){
 function showChoices(Group){
 
     // check first if the current item is 
-    var currentItem = reviewItems[Game.atNumber].answer
+    var currentItem = reviewItems[reviGame.atNumber].answer
 
     // if Q and A
     if (checkIfStringOrArray(currentItem)) {
@@ -454,19 +472,36 @@ function showChoices(Group){
         local_enumAlreadyAnswered = []
         html_enumChoicesId.style.color = "#FFFFFF"
 
-        local_enumInOrder = reviewItems[Game.atNumber].enumInOrder
+        local_enumInOrder = reviewItems[reviGame.atNumber].enumInOrder
         local_enumarationItems = [...currentItem]
-        Game.enumFocusIndex = 0
+        reviGame.enumFocusIndex = 0
 
         if (local_enumInOrder == false){
             local_enumarationItems = shuffleArray(local_enumarationItems)
         }
 
-        for (var i in local_enumarationItems){
-            local_enumarationItemsP.push(Game.enumHidePercent)
+        // reset value
+        reviGame.enumHidePercent = 70
+        reviGame.enumFocusHidePercent = 70
+
+        // dynamic difficult :) [if yellow flag]
+        if (reviewItems[reviGame.atNumber].difficulty > yellowFlagRange && reviewItems[reviGame.atNumber].difficulty < redFlagRange){
+            reviGame.enumHidePercent = 50
+            reviGame.enumFocusHidePercent = 50
         }
 
-        Game.gotWrong = false
+        // if red flag
+        if (reviewItems[reviGame.atNumber].difficulty >= redFlagRange){
+            reviGame.enumHidePercent = 30
+            reviGame.enumFocusHidePercent = 30
+        }
+
+        // push the hide percentage
+        for (var i in local_enumarationItems){
+            local_enumarationItemsP.push(reviGame.enumHidePercent)
+        }
+
+        reviGame.gotWrong = false
         enumarationShowClues()
     }
 }
@@ -477,14 +512,14 @@ function clearFeedback(){
 }
 
 function displayQuestion(){
-    html_GroupTitle.innerHTML =  reviewItems[Game.atNumber].group
-    html_Question.innerHTML = reviewItems[Game.atNumber].question
-    //html_difficultyMeter.innerHTML = "DifficultyMeter: "+reviewItems[Game.atNumber].difficulty
+    html_GroupTitle.innerHTML =  reviewItems[reviGame.atNumber].group
+    html_Question.innerHTML = reviewItems[reviGame.atNumber].question
+    //html_difficultyMeter.innerHTML = "DifficultyMeter: "+reviewItems[reviGame.atNumber].difficulty
 }
 
 function reAllowToSubmit(){
     html_enumSubmit.style.backgroundColor = "#646464"
-    Game.preventSubmission = false  
+    reviGame.preventSubmission = false  
 }
 
 function resetMultipleChoices(){
@@ -497,7 +532,7 @@ function resetMultipleChoices(){
 function displayCongrats(){
     html_GroupTitle.innerHTML = "Nicely Done!"
     html_Question.innerHTML =
-    `You completed the review session!<br/><br/>Total Items: `+(Game.atNumber)+`<br/>Total Mistakes: `+Game.totalMistakes+``
+    `You completed the review session!<br/><br/>Total Items: `+(reviGame.atNumber)+`<br/>Total Mistakes: `+reviGame.totalMistakes+``
     html_choicesContainer.style.display = "none"; 
 
     resetMultipleChoices()
@@ -529,15 +564,15 @@ function restartingMessage(){
 
 function proceedToNextItem(){
     // if not finished
-    if (reviewItems.length > Game.atNumber){
+    if (reviewItems.length > reviGame.atNumber){
 
         
-        html_GroupTitle.innerHTML =  reviewItems[Game.atNumber].group
-        html_Question.innerHTML = reviewItems[Game.atNumber].question
-        //html_difficultyMeter.innerHTML = "DifficultyMeter: "+reviewItems[Game.atNumber].difficulty
-        showChoices(reviewItems[Game.atNumber].group)   
-        Game.preventSubmission = false
-        Game.gotWrong = false
+        html_GroupTitle.innerHTML =  reviewItems[reviGame.atNumber].group
+        html_Question.innerHTML = reviewItems[reviGame.atNumber].question
+        //html_difficultyMeter.innerHTML = "DifficultyMeter: "+reviewItems[reviGame.atNumber].difficulty
+        showChoices(reviewItems[reviGame.atNumber].group)   
+        reviGame.preventSubmission = false
+        reviGame.gotWrong = false
 
         resetMultipleChoices()
         updateForgetfulFlag()
@@ -581,7 +616,7 @@ function goBackToEditor(){
 function checkAnswer(userAnswer){
     userAnswer = userAnswer.toLowerCase()
 
-    var toCheck = reviewItems[Game.atNumber].answer.toLowerCase()
+    var toCheck = reviewItems[reviGame.atNumber].answer.toLowerCase()
     
     console.log("ToCheck: "+userAnswer)
     console.log("correctAnswer "+toCheck)
@@ -590,17 +625,17 @@ function checkAnswer(userAnswer){
     if (toCheck == userAnswer){
 
         // decrease difficulty number
-        if (Game.gotWrong == false){
+        if (reviGame.gotWrong == false){
 
-            if (reviewItems[Game.atNumber].difficulty > -difficultyRange){
-                reviewItems[Game.atNumber].difficulty -= 1
+            if (reviewItems[reviGame.atNumber].difficulty > -difficultyRange){
+                reviewItems[reviGame.atNumber].difficulty -= 1
             }
         
             displayQuestion()
         }
 
         updateForgetfulFlag()
-        Game.atNumber += 1
+        reviGame.atNumber += 1
 
         html_Feedback.innerHTML = "Correct! "+userAnswer+" was the correct answer!"
         
@@ -614,12 +649,12 @@ function checkAnswer(userAnswer){
     // if incorrect
     } else {
     
-        Game.gotWrong = true
-        Game.totalMistakes += 1
+        reviGame.gotWrong = true
+        reviGame.totalMistakes += 1
 
         // add difficulty number
-        if (reviewItems[Game.atNumber].difficulty < difficultyRange){
-            reviewItems[Game.atNumber].difficulty += 1
+        if (reviewItems[reviGame.atNumber].difficulty < difficultyRange){
+            reviewItems[reviGame.atNumber].difficulty += 1
         }
 
         updateForgetfulFlag()
@@ -635,8 +670,8 @@ function checkAnswer(userAnswer){
 }
 
 function checkAnswerMultipleChoice(choiceNum){
-    if (!Game.preventSubmission){
-        Game.preventSubmission = true
+    if (!reviGame.preventSubmission){
+        reviGame.preventSubmission = true
 
         var html_selectedChoice = document.getElementById("choice"+choiceNum+"Id")
         var userAnswer = html_selectedChoice.innerHTML
@@ -666,12 +701,12 @@ function scanIfAnsweredAllEnum(){
     console.log(local_enumarationItemsP)
 
     var enumCompleted = true
-    Game.enumFocusIndex = 0
+    reviGame.enumFocusIndex = 0
 
 
     for (var i in local_enumarationItemsP){
         if (local_enumarationItemsP[i] == 0){
-            Game.enumFocusIndex += 1
+            reviGame.enumFocusIndex += 1
         } else {
             enumCompleted = false
             break
@@ -685,22 +720,22 @@ function scanIfAnsweredAllEnum(){
     if (enumCompleted){
 
         // decrease difficulty number
-        if (Game.gotWrong == false){
-            if (reviewItems[Game.atNumber].difficulty > -difficultyRange){
-                reviewItems[Game.atNumber].difficulty -= 1
+        if (reviGame.gotWrong == false){
+            if (reviewItems[reviGame.atNumber].difficulty > -difficultyRange){
+                reviewItems[reviGame.atNumber].difficulty -= 1
                 updateForgetfulFlag()
             }
         }
-        Game.gotWrong = false
+        reviGame.gotWrong = false
         html_enumChoicesId.style.color = "#60ff51"
-        Game.atNumber += 1
+        reviGame.atNumber += 1
         setTimeout(proceedToNextItem, 1000);
     }
 }
 
 function checkAnswerEnumeration(){
-    if (!Game.preventSubmission){
-        Game.preventSubmission = true
+    if (!reviGame.preventSubmission){
+        reviGame.preventSubmission = true
         var userEnumAnswer = html_enumAnswer.value.toLowerCase()
         userEnumAnswer = userEnumAnswer.trimRight()
 
@@ -708,7 +743,7 @@ function checkAnswerEnumeration(){
 
         // 
         if (local_enumInOrder){
-            correctIndex = checkIfTheSame(local_enumarationItems[Game.enumFocusIndex].toLowerCase(), userEnumAnswer)
+            correctIndex = checkIfTheSame(local_enumarationItems[reviGame.enumFocusIndex].toLowerCase(), userEnumAnswer)
         }
 
 
@@ -738,16 +773,16 @@ function checkAnswerEnumeration(){
         // if wrong answer
 
             console.log("Wrong!", userEnumAnswer)
-            local_enumarationItemsP[Game.enumFocusIndex] = local_enumarationItemsP[Game.enumFocusIndex] - 10
-            document.querySelector(".enumClue"+Game.enumFocusIndex).innerHTML = hideCharacter(local_enumarationItems[Game.enumFocusIndex], local_enumarationItemsP[Game.enumFocusIndex])
+            local_enumarationItemsP[reviGame.enumFocusIndex] = local_enumarationItemsP[reviGame.enumFocusIndex] - 10
+            document.querySelector(".enumClue"+reviGame.enumFocusIndex).innerHTML = hideCharacter(local_enumarationItems[reviGame.enumFocusIndex], local_enumarationItemsP[reviGame.enumFocusIndex])
             html_enumSubmit.style.backgroundColor = "#d13434"
             console.log(html_enumSubmit.style.backgroundColor)
 
 
             // add difficulty number
-            if (reviewItems[Game.atNumber].difficulty < difficultyRange){
-                reviewItems[Game.atNumber].difficulty += 1
-                Game.gotWrong = true
+            if (reviewItems[reviGame.atNumber].difficulty < difficultyRange){
+                reviewItems[reviGame.atNumber].difficulty += 1
+                reviGame.gotWrong = true
             }
 
             updateForgetfulFlag()
@@ -764,8 +799,8 @@ function checkAnswerEnumeration(){
 
 function startReviTerm(){
     // reset variables
-    Game.atNumber = 0
-    Game.gotWrong = 0
+    reviGame.atNumber = 0
+    reviGame.gotWrong = 0
     reviewItems_Groups = []
     local_temporarySaveForExcluded = []
     reviewItems_Choices = {}
@@ -784,11 +819,11 @@ function startReviTerm(){
     generateGroupList()
     mayonnaiseAlgorithm()
     displayQuestion()
-    showChoices(reviewItems[Game.atNumber].group)   
+    showChoices(reviewItems[reviGame.atNumber].group)   
     updateForgetfulFlag()
 
-    Game.preventSubmission = false
-    Game.gotWrong = false
+    reviGame.preventSubmission = false
+    reviGame.gotWrong = false
     //console.log(reviewItems)
 }
 

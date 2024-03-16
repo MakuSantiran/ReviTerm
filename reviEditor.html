@@ -10,7 +10,19 @@
 	<!--
 		<button onclick="gotoSelectQuiz()"> Go Back </button>
 	-->
-	
+
+	<div style="margin-bottom: 22vw;"></div>
+
+
+
+
+	<div class="addItemWithoutGroup" onclick="showEditor(-1,'')">
+		Add Item
+	</div>
+
+	<div class="listOfItems">
+	</div>
+
 	<div class="topScreen">
 		<div class="reviewerNameHeader">
 			<a href="./index.html" class="goBackLink"> < </a> <div class="reviewerName"></div>
@@ -25,23 +37,6 @@
 				Play
 			</div>
 		</div>
-	</div>
-
-	<div style="margin-bottom: 22vw;"></div>
-
-
-
-
-	<div class="addItemWithoutGroup" onclick="showEditor(-1,'')">
-		Add Item
-	</div>
-
-	<!--
-		<b>Review Terms??</b><a href="./game.html"> ReviTerm! </a>
-	-->
-	
-
-	<div class="listOfItems">
 	</div>
 
 	<div class="overlay" id="overlay">
@@ -187,13 +182,16 @@
 		<b>Title:</b> <div class="initOptionsReviewerName"></div><br/>
 		<b>Number Of Items:</b> <div class="initOptionsTotalItems"></div><br/>
 		 
-		<b>Mode:</b> <div style="display:inline-block; color: cornflowerblue;">Practice</div> | Survival | Endless
+		<b>Mode:</b> <div style="display:inline-block; color: cornflowerblue;">Practice</div> | Classic | Master
 
 		<br/>
-		<h3>Groups to be reviewed:</h3>
-			<div class="groupListContainer"> 				
-			</div>
-		<br/>
+
+		<div class="practiceModeContainer">
+			<h3>Groups to be practiced:</h3>
+				<div class="groupListContainer"> 				
+				</div>
+			<br/>
+		</div>
 
 
 		<div class="flexContainer">
@@ -210,13 +208,13 @@
 					-->
 				</center>
 			</div>
-		</div>
-
-
+		</div>	
 	</div>
 
 	<br/>
 	<br/>
+
+
 </body>
 
 <!-- Uncomment this when exporting as an apk
