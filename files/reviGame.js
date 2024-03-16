@@ -36,6 +36,7 @@ var reviGame = {
     atNumber: 0,
     gotWrong: false,
     preventSubmission: false,
+    options: [],
 
     // sneak peak :)
     questionTypes: [
@@ -43,7 +44,7 @@ var reviGame = {
         "TrueOrFalse", 
         "Scrambled", 
         "Identification",
-        "WhichIsWrong",
+        "PickTheWrong",
         "FillInTheBlank"
     ],
 
@@ -67,7 +68,6 @@ var local_enumarationItemsP = []
 var local_enumAlreadyAnswered = []
 var local_enumInOrder = false
 
-
 // Define sample quiz questions
 var reviewItems = [];
 var reviewerDatabase = ""
@@ -75,12 +75,44 @@ var difficultyRange = 5
 var yellowFlagRange = 1
 var redFlagRange = 3
 
+// Remix mode stuff
+var whichDifficultyType = "difficulty"
+var remixModeValue = 2
+var trueOrFalseAnswer = true
+var unscrambledChoices = []
+
 // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms 
 // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms 
 // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms 
 
+function randomNumbers(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+function shuffleString(str) {
+    // Convert the string to an array of characters
+    const charArray = str.split('');
+    
+    // Shuffle the array
+    for (let i = charArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [charArray[i], charArray[j]] = [charArray[j], charArray[i]]; // Swap elements
+    }
+    
+    // Join the shuffled array back into a string
+    return charArray.join('');
+}
+
 // addToGroupList first if it doesn't exists {}
-function generateGroupList(){
+function generateGroupList(typeOfDifficulty){
 
     // first scan the damn GrOUp you piece of sh-
     var lengthOfItems = reviewItems.length
@@ -97,7 +129,7 @@ function generateGroupList(){
         }
 
         // now if it exists
-        var groupDifficulty = reviewItems[i]["difficulty"]
+        var groupDifficulty = reviewItems[i][typeOfDifficulty]
         var indexOfGroup = tempGroupList.indexOf(theGroup)
 
         // if it doesnt exist
@@ -105,8 +137,6 @@ function generateGroupList(){
             console.log("AH")
             tempGroupListDifficulty[indexOfGroup] = 0
         }
-
-        
 
         // add difficulty number
         tempGroupListDifficulty[indexOfGroup] = tempGroupListDifficulty[indexOfGroup] + groupDifficulty
@@ -183,12 +213,84 @@ function mayonnaiseAlgorithm(){
     reviewItems = temporaryFO
 }
 
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+// same as mayonnaise but this time it randomizes if its going to sort from easiest to hardest or vice versa randomly 
+// (this also includes the group)
+function ketchupAlgorithm(typeOfDifficulty){
+    var temporarySFS = []; // temporarySpaceForSorting
+    var temporaryFO = []; // temporaryOutput
+    var itemsToBeScanned = [...reviewItems]
+
+    var randomizer = randomNumbers(1, 4)
+
+
+    // this is for ketchupAlgorithm (to do variation and unpredictability)
+
+    if (randomizer == 1){
+        // first sort the group depending in the randomizer (from hardest to easiest)
+        reviewItems_Groups.sort((a, b) => b[typeOfDifficulty] - a[typeOfDifficulty]);
     }
-    return array;
+    else if (randomizer == 2){
+        // first sort the group depending in the randomizer (from easiest to hardest)
+        reviewItems_Groups.sort((a, b) => a[typeOfDifficulty] - b[typeOfDifficulty]);
+    } 
+    else if (randomizer == 3){
+        // or shuffle them
+        var shuffledGroups = shuffleArray(reviewItems_Groups)
+        reviewItems_Groups = shuffledGroups
+    }  // or do nothing
+
+    console.log("KetchupRandomizer: ",randomizer)
+
+    // for each group
+    for (var i in reviewItems_Groups){
+        var selectedGroup = reviewItems_Groups[i].group
+
+        console.log("|| "+selectedGroup+" ||")
+
+        // then find the matching ones in the itemsTobeScanned
+        for (var j in itemsToBeScanned){
+
+            // add them to temporarySFS and choicesBasedOnGroup
+            if (itemsToBeScanned[j].group == selectedGroup){
+                
+                temporarySFS.push(itemsToBeScanned[j])
+
+                // only choose the question and answer
+                if (checkIfStringOrArray(itemsToBeScanned[j].answer)){
+                    generateChoicesBasedOnGroup(selectedGroup, itemsToBeScanned[j].answer)  
+                }    
+            }
+        }
+
+        // do another shuffle
+        randomizer = randomNumbers(1, 4)
+
+        if (randomizer == 1){
+            // sort item difficulty (from hardest to easiest)
+            temporarySFS.sort((a, b) => b[typeOfDifficulty] - a[typeOfDifficulty]);
+        }
+        else if (randomizer == 2){
+            // sort item difficulty (from easiest to hardest)
+            temporarySFS.sort((a, b) => a[typeOfDifficulty] - b[typeOfDifficulty]);
+        } 
+        else if (randomizer == 3){
+            // or shuffle them
+            var shuffledItems = shuffleArray(temporarySFS)
+            temporarySFS = shuffledItems
+        }  // or do nothing
+
+        console.log("RandomizerItems", randomizer, temporarySFS)
+
+        // add to the final output
+        temporaryFO = temporaryFO.concat(temporarySFS)
+
+        // empty the SFS
+        temporarySFS = [];
+    }
+
+    // clear the review Items then copy it to Temporary FO
+    reviewItems = []
+    reviewItems = temporaryFO
 }
 
 function extractExclusionGroup(){
@@ -211,10 +313,6 @@ function extractExclusionGroup(){
 
     console.log("Extracted: ",local_temporarySaveForExcluded)
     console.log("reviewItems", reviewItems)
-}
-
-function randomNumbers(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 function checkIfStringOrArray(variable){
@@ -314,8 +412,8 @@ function wrongAnswerAnimation(){
     Velocity(html_quizContainer,properties,options)
 }
 
-function updateForgetfulFlag(){
-    var forgetfulLevel = reviewItems[reviGame.atNumber].difficulty
+function updateForgetfulFlag(difficultyType){
+    var forgetfulLevel = reviewItems[reviGame.atNumber][difficultyType]
 
     if (forgetfulLevel > yellowFlagRange){
         html_forgetfulFlagId.style.display = "flex";
@@ -341,7 +439,6 @@ function updateForgetfulFlag(){
 
 function multipleChoice(Group){
     var theChoices = []
-
     var amountOfChoices = 4
 
     // display the other 2
@@ -349,13 +446,13 @@ function multipleChoice(Group){
     document.getElementById("choice1ContainerId4").style.display = "block"
     
     // dynamic difficult :) [if yellow flag]
-    if (reviewItems[reviGame.atNumber].difficulty > yellowFlagRange && reviewItems[reviGame.atNumber].difficulty < redFlagRange){
+    if (reviewItems[reviGame.atNumber][whichDifficultyType] > yellowFlagRange && reviewItems[reviGame.atNumber][whichDifficultyType] < redFlagRange){
         amountOfChoices = 3
         document.getElementById("choice1ContainerId4").style.display = "none"
     }
 
     // if red flag
-    if (reviewItems[reviGame.atNumber].difficulty >= redFlagRange){
+    if (reviewItems[reviGame.atNumber][whichDifficultyType] >= redFlagRange){
         amountOfChoices = 2
         document.getElementById("choice1ContainerId3").style.display = "none"
         document.getElementById("choice1ContainerId4").style.display = "none"
@@ -385,6 +482,64 @@ function multipleChoice(Group){
 
     var html_correctChoice = document.getElementById("choice"+correctIndexOfAnswer+"Id")
     html_correctChoice.innerHTML = reviewItems[reviGame.atNumber].answer
+}
+
+function scrambledMultipleChoice(Group){
+    var theChoices = []
+    var amountOfChoices = 4
+
+    // display the other 2
+    document.getElementById("choice1ContainerId3").style.display = "block"
+    document.getElementById("choice1ContainerId4").style.display = "block"
+    
+    // dynamic difficult :) [if yellow flag]
+    if (reviewItems[reviGame.atNumber][whichDifficultyType] > yellowFlagRange && reviewItems[reviGame.atNumber][whichDifficultyType] < redFlagRange){
+        amountOfChoices = 3
+        document.getElementById("choice1ContainerId4").style.display = "none"
+    }
+
+    // if red flag
+    if (reviewItems[reviGame.atNumber][whichDifficultyType] >= redFlagRange){
+        amountOfChoices = 2
+        document.getElementById("choice1ContainerId3").style.display = "none"
+        document.getElementById("choice1ContainerId4").style.display = "none"
+    }
+
+
+    for (var i in reviewItems_Choices[Group]) {
+        if (checkIfStringOrArray(reviewItems_Choices[Group][i])){
+            theChoices.push(reviewItems_Choices[Group][i])
+        }
+    }
+
+    console.log("AAAsaadsdsa", reviewItems_Choices[Group])
+
+    // for multiple choice
+    var randomizedChoices = shuffleArray(theChoices)
+    var correctIndexOfAnswer = randomNumbers(1,amountOfChoices)
+
+    unscrambledChoices = []
+    
+    for (var i = 1; i<=amountOfChoices; i++){
+        var html_choice = document.getElementById("choice"+i+"Id")
+        
+        var randomIndex = randomNumbers(0, randomizedChoices.length-1)
+        var forMultipleChoice = randomizedChoices[randomIndex];
+
+        unscrambledChoices.push(forMultipleChoice)
+
+        html_choice.innerHTML = shuffleString(forMultipleChoice)
+        console.log(forMultipleChoice)
+    }  
+
+    unscrambledChoices[correctIndexOfAnswer-1] = reviewItems[reviGame.atNumber].answer
+
+    var html_correctChoice = document.getElementById("choice"+correctIndexOfAnswer+"Id")
+    html_correctChoice.innerHTML = shuffleString(unscrambledChoices[correctIndexOfAnswer-1])
+
+    
+
+    console.log("unscrambledChoices", correctIndexOfAnswer, unscrambledChoices)
 }
 
 function enumarationShowClues(){
@@ -443,6 +598,47 @@ function enumarationShowClues(){
     }
 }
 
+function trueOrFalse(Group){
+    var theChoices = []
+
+    var html_true = document.getElementById("choice1Id")
+    var html_false = document.getElementById("choice2Id")
+
+    trueOrFalseAnswer = false
+
+    document.getElementById("choice1ContainerId3").style.display = "none"
+    document.getElementById("choice1ContainerId4").style.display = "none"
+
+    html_true.innerHTML = "True"
+    html_false.innerHTML = "False"
+
+    for (var i in reviewItems_Choices[Group]) {
+        if (checkIfStringOrArray(reviewItems_Choices[Group][i])){
+            theChoices.push(reviewItems_Choices[Group][i])
+        }
+    }
+
+    theChoices = shuffleArray(theChoices)
+    var toDisplay = theChoices[0]
+    var fiftyFifty = randomNumbers(1,2)
+
+    // if the shuffle somehow ended up making the correct answer
+    if (reviewItems[reviGame.atNumber].answer == toDisplay){
+        console.log("Won shuffle")
+        toDisplay = reviewItems[reviGame.atNumber].answer
+        trueOrFalseAnswer = true
+    }
+
+    if (fiftyFifty == 2){
+        console.log("Won fifty fifty!")
+        toDisplay = reviewItems[reviGame.atNumber].answer
+        trueOrFalseAnswer = true
+    }
+
+    console.log(trueOrFalseAnswer, toDisplay, theChoices)
+
+    displayTrueFalse(toDisplay)    
+}
 
 // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function 
 // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function // Game Function 
@@ -453,14 +649,29 @@ function showChoices(Group){
     // check first if the current item is 
     var currentItem = reviewItems[reviGame.atNumber].answer
 
+    
     // if Q and A
     if (checkIfStringOrArray(currentItem)) {
-        // if multiple Choice
-        html_multipleChoiceContainer.style.display = "block"
-        html_enumarationId.style.display = "none"
 
-        multipleChoice(Group)
+        // if Multiple Choice
+        if (remixModeValue == 0){
+            html_multipleChoiceContainer.style.display = "block"
+            html_enumarationId.style.display = "none"
+            multipleChoice(Group)
+        }
+        // True or False
+        if (remixModeValue == 1){
+            html_multipleChoiceContainer.style.display = "block"
+            html_enumarationId.style.display = "none"
+            trueOrFalse(Group)
+        }
 
+        // Scrambled
+        if (remixModeValue == 2){
+            html_multipleChoiceContainer.style.display = "block"
+            html_enumarationId.style.display = "none"
+            scrambledMultipleChoice(Group)
+        }
 
     } else {
         // if enumaration
@@ -485,13 +696,13 @@ function showChoices(Group){
         reviGame.enumFocusHidePercent = 70
 
         // dynamic difficult :) [if yellow flag]
-        if (reviewItems[reviGame.atNumber].difficulty > yellowFlagRange && reviewItems[reviGame.atNumber].difficulty < redFlagRange){
+        if (reviewItems[reviGame.atNumber][whichDifficultyType] > yellowFlagRange && reviewItems[reviGame.atNumber][whichDifficultyType] < redFlagRange){
             reviGame.enumHidePercent = 50
             reviGame.enumFocusHidePercent = 50
         }
 
         // if red flag
-        if (reviewItems[reviGame.atNumber].difficulty >= redFlagRange){
+        if (reviewItems[reviGame.atNumber][whichDifficultyType] >= redFlagRange){
             reviGame.enumHidePercent = 30
             reviGame.enumFocusHidePercent = 30
         }
@@ -514,7 +725,12 @@ function clearFeedback(){
 function displayQuestion(){
     html_GroupTitle.innerHTML =  reviewItems[reviGame.atNumber].group
     html_Question.innerHTML = reviewItems[reviGame.atNumber].question
-    //html_difficultyMeter.innerHTML = "DifficultyMeter: "+reviewItems[reviGame.atNumber].difficulty
+    //html_difficultyMeter.innerHTML = "DifficultyMeter: "+reviewItems[reviGame.atNumber][whichDifficultyType]
+}
+
+function displayTrueFalse(toCheck){
+    html_GroupTitle.innerHTML =  reviewItems[reviGame.atNumber].group
+    html_Question.innerHTML = reviewItems[reviGame.atNumber].question+`<br/><br/><div style="display: inline-block; color: #77ccf0;">`+toCheck+`</div> is the answer!`
 }
 
 function reAllowToSubmit(){
@@ -539,11 +755,13 @@ function displayCongrats(){
 
     console.log(local_temporarySaveForExcluded)
 
-    // if there was an exclusion, before saving to database, put back the exclusion
-    if (local_temporarySaveForExcluded.length > 1){
-        console.log("The Old one", reviewItems)
-        reviewItems = [...reviewItems, ...local_temporarySaveForExcluded]
-        console.log("BackOriginal", reviewItems)
+    if (reviGame.options.mode == "Practice"){
+        // if there was an exclusion, before saving to database, put back the exclusion
+        if (local_temporarySaveForExcluded.length > 1){
+            console.log("The Old one", reviewItems)
+            reviewItems = [...reviewItems, ...local_temporarySaveForExcluded]
+            console.log("BackOriginal", reviewItems)
+        }
     }
 
     localforage.getItem(reviewerDatabase, function (err, value) {
@@ -569,13 +787,13 @@ function proceedToNextItem(){
         
         html_GroupTitle.innerHTML =  reviewItems[reviGame.atNumber].group
         html_Question.innerHTML = reviewItems[reviGame.atNumber].question
-        //html_difficultyMeter.innerHTML = "DifficultyMeter: "+reviewItems[reviGame.atNumber].difficulty
+        //html_difficultyMeter.innerHTML = "DifficultyMeter: "+reviewItems[reviGame.atNumber][whichDifficultyType]
         showChoices(reviewItems[reviGame.atNumber].group)   
         reviGame.preventSubmission = false
         reviGame.gotWrong = false
 
         resetMultipleChoices()
-        updateForgetfulFlag()
+        updateForgetfulFlag(whichDifficultyType)
 
     // if finished
     } else {
@@ -597,9 +815,16 @@ function getReviewerContent(){
                 local_selectedGroupExclusion = exGroup
                 console.log(exGroup)
 
-                // then start the reviTerm!
-                startReviTerm()
+                // uhhhh                
+                localforage.getItem("reviTermGameOptions", function (err, gameOptions) {
+                    reviGame.options = gameOptions
 
+                    console.log("EXTRACTED GAMEMODE: "+gameOptions)
+
+                    // then start the reviTerm!
+                    startReviTerm()
+                })
+                
             });
         });
     });
@@ -627,14 +852,14 @@ function checkAnswer(userAnswer){
         // decrease difficulty number
         if (reviGame.gotWrong == false){
 
-            if (reviewItems[reviGame.atNumber].difficulty > -difficultyRange){
-                reviewItems[reviGame.atNumber].difficulty -= 1
+            if (reviewItems[reviGame.atNumber][whichDifficultyType] > -difficultyRange){
+                reviewItems[reviGame.atNumber][whichDifficultyType] -= 1
             }
         
-            displayQuestion()
+            //displayQuestion()
         }
 
-        updateForgetfulFlag()
+        updateForgetfulFlag(whichDifficultyType)
         reviGame.atNumber += 1
 
         html_Feedback.innerHTML = "Correct! "+userAnswer+" was the correct answer!"
@@ -653,48 +878,112 @@ function checkAnswer(userAnswer){
         reviGame.totalMistakes += 1
 
         // add difficulty number
-        if (reviewItems[reviGame.atNumber].difficulty < difficultyRange){
-            reviewItems[reviGame.atNumber].difficulty += 1
+        if (reviewItems[reviGame.atNumber][whichDifficultyType] < difficultyRange){
+            reviewItems[reviGame.atNumber][whichDifficultyType] += 1
         }
 
-        updateForgetfulFlag()
+        updateForgetfulFlag(whichDifficultyType)
         wrongAnswerAnimation()
-        displayQuestion()
+        //displayQuestion()
         //html_Feedback.innerHTML = "Wrong Answer!"
         //setTimeout(clearFeedback, 1000);
         setTimeout(reAllowToSubmit, 300)
         
+        console.log("SADSADSA")
+
         return 0;
     }
     
 }
 
 function checkAnswerMultipleChoice(choiceNum){
-    if (!reviGame.preventSubmission){
-        reviGame.preventSubmission = true
 
-        var html_selectedChoice = document.getElementById("choice"+choiceNum+"Id")
-        var userAnswer = html_selectedChoice.innerHTML
-        var html_health = document.getElementById("health"+choiceNum+"Id")
-
-        // check First if user is trying to tap at the already wrong answer
-        if (html_health.style.backgroundColor != "rgb(209, 52, 52)"){
-            // if correct
-            if (checkAnswer(userAnswer)){
-                html_health.style.backgroundColor = "#41ad37"
-
+    // multipleChoice
+    if (remixModeValue == 0){
+        if (!reviGame.preventSubmission){
+            reviGame.preventSubmission = true
+    
+            var html_selectedChoice = document.getElementById("choice"+choiceNum+"Id")
+            var userAnswer = html_selectedChoice.innerHTML
+            var html_health = document.getElementById("health"+choiceNum+"Id")
+    
+            // check First if user is trying to tap at the already wrong answer
+            if (html_health.style.backgroundColor != "rgb(209, 52, 52)"){
+                // if correct
+                if (checkAnswer(userAnswer)){
+                    html_health.style.backgroundColor = "#41ad37"
+    
+                }
+                // if wrong
+                else {
+                    // this might change
+                    html_health.style.backgroundColor = "#d13434"
+                }
+            } else {
+                reAllowToSubmit()
             }
-            // if wrong
-            else {
-                // this might change
-                html_health.style.backgroundColor = "#d13434"
-            }
-        } else {
-            reAllowToSubmit()
+    
+            console.log(html_health.style.backgroundColor)
         }
-
-        console.log(html_health.style.backgroundColor)
     }
+
+    // TF
+    if (remixModeValue == 1){
+        if (!reviGame.preventSubmission){
+            reviGame.preventSubmission = true
+            var html_selectedChoice = document.getElementById("choice"+choiceNum+"Id")
+            var html_health = document.getElementById("health"+choiceNum+"Id")        
+
+            // check First if user is trying to tap at the already wrong answer
+            if (html_health.style.backgroundColor != "rgb(209, 52, 52)"){
+                // if correct
+                if ((trueOrFalseAnswer && choiceNum == 1) || (trueOrFalseAnswer == false && choiceNum == 2)){
+                    html_health.style.backgroundColor = "#41ad37"
+                    checkAnswer(reviewItems[reviGame.atNumber].answer)
+                }
+                // if wrong
+                else {
+                    // this might change
+                    html_health.style.backgroundColor = "#d13434"
+                    checkAnswer("")
+                }
+            } else {
+                reAllowToSubmit()
+            }
+        }
+    }
+
+    // Scrambled
+    if (remixModeValue == 2){
+        if (!reviGame.preventSubmission){
+            reviGame.preventSubmission = true
+    
+            var html_selectedChoice = document.getElementById("choice"+choiceNum+"Id")
+            var userAnswer = unscrambledChoices[choiceNum-1]
+            var html_health = document.getElementById("health"+choiceNum+"Id")
+    
+            // check First if user is trying to tap at the already wrong answer
+            if (html_health.style.backgroundColor != "rgb(209, 52, 52)"){
+                // if correct
+                if (checkAnswer(userAnswer)){
+                    html_health.style.backgroundColor = "#41ad37"
+                    html_selectedChoice.innerHTML = userAnswer
+                    unscrambledChoices = []
+                }
+                // if wrong
+                else {
+                    // this might change
+                    html_health.style.backgroundColor = "#d13434"
+                    html_selectedChoice.innerHTML = userAnswer
+                }
+            } else {
+                reAllowToSubmit()
+            }
+    
+            console.log(html_health.style.backgroundColor)
+        }
+    }    
+
 }
 
 function scanIfAnsweredAllEnum(){
@@ -721,9 +1010,9 @@ function scanIfAnsweredAllEnum(){
 
         // decrease difficulty number
         if (reviGame.gotWrong == false){
-            if (reviewItems[reviGame.atNumber].difficulty > -difficultyRange){
-                reviewItems[reviGame.atNumber].difficulty -= 1
-                updateForgetfulFlag()
+            if (reviewItems[reviGame.atNumber][whichDifficultyType] > -difficultyRange){
+                reviewItems[reviGame.atNumber][whichDifficultyType] -= 1
+                updateForgetfulFlag(whichDifficultyType)
             }
         }
         reviGame.gotWrong = false
@@ -780,12 +1069,12 @@ function checkAnswerEnumeration(){
 
 
             // add difficulty number
-            if (reviewItems[reviGame.atNumber].difficulty < difficultyRange){
-                reviewItems[reviGame.atNumber].difficulty += 1
+            if (reviewItems[reviGame.atNumber][whichDifficultyType] < difficultyRange){
+                reviewItems[reviGame.atNumber][whichDifficultyType] += 1
                 reviGame.gotWrong = true
             }
 
-            updateForgetfulFlag()
+            updateForgetfulFlag(whichDifficultyType)
             wrongAnswerAnimation()
             setTimeout(reAllowToSubmit, 500) 
             
@@ -797,8 +1086,49 @@ function checkAnswerEnumeration(){
 // start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!
 // start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!
 
+function practiceMode(){
+    // check for exclusions
+    extractExclusionGroup()
+
+    // shuffle first
+    reviewItems = shuffleArray(reviewItems)
+
+    // start the functions
+    generateGroupList("difficulty")
+    mayonnaiseAlgorithm()
+    displayQuestion()
+    showChoices(reviewItems[reviGame.atNumber].group)   
+    updateForgetfulFlag(whichDifficultyType)
+
+    reviGame.preventSubmission = false
+    reviGame.gotWrong = false
+    //console.log(reviewItems)
+}
+
+function classicMode(){
+    console.log("HelloThere! Classic!")
+
+    // shuffle first
+    reviewItems = shuffleArray(reviewItems)
+
+    // start the functions
+    generateGroupList("difficultyClassic")
+    ketchupAlgorithm("difficultyClassic")
+    displayQuestion()
+    showChoices(reviewItems[reviGame.atNumber].group)   
+    updateForgetfulFlag(whichDifficultyType)
+
+    reviGame.preventSubmission = false
+    reviGame.gotWrong = false
+}
+
+function perfectionMode(){
+
+}
+
 function startReviTerm(){
     // reset variables
+    reviGame.totalMistakes = 0
     reviGame.atNumber = 0
     reviGame.gotWrong = 0
     reviewItems_Groups = []
@@ -809,22 +1139,17 @@ function startReviTerm(){
     html_choicesContainer.style.display = "block"
     //html_restartContainer.innerHTML = "[ Saving ]"      
 
-    // check for exclusions
-    extractExclusionGroup()
+    console.log("GAME MODE "+reviGame.options.mode)
 
-    // shuffle first
-    reviewItems = shuffleArray(reviewItems)
-
-    // start the functions
-    generateGroupList()
-    mayonnaiseAlgorithm()
-    displayQuestion()
-    showChoices(reviewItems[reviGame.atNumber].group)   
-    updateForgetfulFlag()
-
-    reviGame.preventSubmission = false
-    reviGame.gotWrong = false
-    //console.log(reviewItems)
+    if (reviGame.options.mode == "Practice"){
+        whichDifficultyType = "difficulty"
+        practiceMode()
+    } else if (reviGame.options.mode == "Classic"){
+        whichDifficultyType = "difficultyClassic"
+        classicMode()
+    } else if (reviGame.options.mode == "Perfection"){
+        perfectionMode()
+    }
 }
 
 getReviewerContent()

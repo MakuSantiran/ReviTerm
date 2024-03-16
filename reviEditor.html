@@ -175,41 +175,112 @@
 		</div>
 	</div> 
 
-
 	<div class="initOptionsDIV" id="initOptionsDIVId">
-		<h2>Starting ReviTerm!</h2>
-
-		<b>Title:</b> <div class="initOptionsReviewerName"></div><br/>
-		<b>Number Of Items:</b> <div class="initOptionsTotalItems"></div><br/>
-		 
-		<b>Mode:</b> <div style="display:inline-block; color: cornflowerblue;">Practice</div> | Classic | Master
-
-		<br/>
-
-		<div class="practiceModeContainer">
-			<h3>Groups to be practiced:</h3>
-				<div class="groupListContainer"> 				
-				</div>
-			<br/>
+		<div class="typeSelectContainer" id="TypeSelectContainerId">
+			<div class="typeItem">
+				<div class="practiceModeButton" id="practiceModeButtonId" onclick="switchGameModeMenu(0)"> Practice </div>
+			</div>
+			<div class="typeItem">
+				<div class="classicModeButton" id="classicModeButtonId" onclick="switchGameModeMenu(1)"> Classic </div>
+			</div>
+			<div class="typeItem">
+				<div class="perfectionModeButton" id="perfectionModeButtonId" onclick="switchGameModeMenu(2)"> Perfection </div>
+			</div>
 		</div>
-
-
-		<div class="flexContainer">
-			<div class="flexItem">
-				<center>
-					<div class="initOptionsHide">Cancel</div>
-				</center>
+		<div class="initOptionsBg">
+			<div class="flexContainer">
+				<div class="flexItem">
+					<b>Title:</b> <div class="initOptionsReviewerName"></div><br/>
+					<b>No. Of Items:</b> <div class="initOptionsTotalItems"></div><br/>
+				</div>
+				<div class="flexItem">
+					<b>Flag: - -</b>
+				</div>
 			</div>
-			<div class="flexItem">
-				<center>
-					<a href="reviGame.html" class="startReviterm"> ReviTerm! </a>
-					<!-- 
-						<input type="button" value="ReviTerm!" class="startReviterm">
-					-->
-				</center>
+
+			<!--
+				<b>Mode:</b> <div style="display:inline-block; color: cornflowerblue;">Practice</div> | Classic | Perfection
+				<b>Mode:</b> Practice | <div style="display:inline-block; color: rgb(255, 108, 23);">Classic</div> | Perfection
+			-->
+
+			<div class="practiceModeContainer" id="practiceModeContainerId">
+				<h3>Groups to be practiced:</h3>
+					<div class="groupListContainer"> 				
+					</div>
+				<div class="classicModeDescription">
+					In Practice mode, you can freely pick which group of items you want to take.
+				</div>
 			</div>
-		</div>	
+	
+			<div class="classicModeContainer" id="classicModeContainerId">
+				<div class="flexContainer">
+					<div class="flexItem">
+						<h3>Character</h3>
+						<center>
+							<div class="characterIconContainer">
+								?
+							</div>
+							The learner
+						</center>
+						
+					</div>
+					<div class="flexItem">
+						<h3>Ability</h3>
+						<div class="characterAbility">
+							Your own memory and brain
+						</div>
+					</div>
+				</div>
+				
+				<br/>
+	
+				<div class="flexContainer">
+					<div class="flexItem">
+						<div class="">
+							No Music: <input type="checkbox" class="reviGameNoMusic" id="reviGameNoMusicId">
+						</div>
+					</div>
+					<div class="flexItem">
+						<div style="display: inline-flex;">
+							Easy Mode: <input type="checkbox" class="classicEasyMode" id="classicEasyModeId">
+						</div>
+					</div>
+				</div>
+	
+				<div class="classicModeDescription">
+					In classic mode, you must maintain your <b>health</b> and
+					question type may suddenly change which is known as <b>Remix mode!</b>
+				</div>
+	
+				<br/>
+			</div>
+
+			<div class="perfectionModeContainer" id="perfectionModeContainerId">
+				<br/>
+				<div class="flexContainer">
+					Get a Blue Flag on Classic Mode to unlock Perfection Mode
+					<br/>
+					<br/>
+					Although this mode is being worked in progress :)
+				</div>
+				<br/>
+			</div>
+	
+			<div class="flexContainer">
+				<div class="flexItem">
+					<center>
+						<div class="initOptionsHide">Cancel</div>
+					</center>
+				</div>
+				<div class="flexItem">
+					<center>
+						<a href="reviGame.html" class="startReviterm"> Start! </a>
+					</center>
+				</div>
+			</div>	
+		</div>
 	</div>
+
 
 	<br/>
 	<br/>

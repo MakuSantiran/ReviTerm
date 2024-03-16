@@ -3,6 +3,11 @@ import localforage from "./localForage/localforage.js"
 
 var reviewerDatabaseName = "reviewerContent"
 var revieweraddOn = "reviewerContent_"
+var gameOption = {
+    mode: "Practice",
+    music: true,
+    easyMode: false,
+}
 
 // selectedGroupExclusion --> includes the group that would not be taken in the reviterm (This might change especially for the structure of file)
 // reviewerContent_NAME --> contains the items of the reviewer
@@ -26,6 +31,8 @@ var local_atQuestionType = 0
 
 var local_whichGroupsAreHidden = []
 
+// by classes
+
 var html_group = document.querySelector(".itemGroup")
 var html_question = document.querySelector(".itemQuestion")
 var html_answer = document.querySelector(".itemAnswer")
@@ -38,11 +45,19 @@ var html_enumGroup = document.querySelector(".enumItemGroup")
 var html_enumInOrder = document.querySelector(".enumInOrder")
 var html_addEnumButton = document.querySelector(".addEnumItemFunc")
 
+// by Ids
+
 var html_enumInOrderId = document.getElementById("enumInOrderId")
 var html_QAAB = document.getElementById("QAButtonId")
 var html_EnumB = document.getElementById("EnumButtonId")
 var html_qAAContainer = document.getElementById("qAAContainerId")
 var html_enumContainer = document.getElementById("enumContainerId")
+var html_practiceModeContainerId = document.getElementById("practiceModeContainerId")
+var html_classicModeContainerId = document.getElementById("classicModeContainerId")
+var html_perfectionModeContainerId = document.getElementById("perfectionModeContainerId")
+var html_practiceModeButtonId = document.getElementById("practiceModeButtonId")
+var html_classicModeButtonId = document.getElementById("classicModeButtonId")
+var html_perfectionModeButtonId = document.getElementById("perfectionModeButtonId")
 
 var html_overlay = document.getElementById("overlay") 
 var html_editBox = document.getElementById("editorId") 
@@ -267,6 +282,7 @@ function updateBothQEQuestions(){
 // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD 
 // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD 
 
+
 // kunin muna yung "selectedReviewer"
 function initialization(){
 
@@ -279,9 +295,14 @@ function initialization(){
 
             // if empty 
             if (value == null){
+                value = []
+            } else {
+                // do update here?
+                updateContentsOfReviewer("difficultyClassic", 0)
             }
 
-            value = []
+            
+            
             console.log("Content of "+reviewerDatabaseName+" are "+value)
             var reviewerHeaderName = reviewerDatabaseName.replace(revieweraddOn, "");
 
@@ -363,6 +384,8 @@ function addItem(){
     var enumAnswer = local_EnumarationItem
     var enumInOrder = html_enumInOrder.checked
 
+    // the code below code be optimized
+
     // if going to add a questionAndAnswer
     if (local_atQuestionType == 0){
         // if the local_selectedItem is -1, it means just to add a new non existing.. but if its not
@@ -373,6 +396,7 @@ function addItem(){
             var id = local_idCounter
             var enumaration = false
             var difficulty = 0
+            var difficultyClassic = 0
             var disabled = false
 
             // check first if valid text
@@ -386,7 +410,7 @@ function addItem(){
             question = question.trimRight()
             answer = answer.trimRight()
 
-            var item = {id, enumaration, group, question, answer, image, difficulty, disabled}
+            var item = {id, enumaration, group, question, answer, image, difficulty, difficultyClassic, disabled}
             console.log(item)
 
             // add new item
@@ -423,6 +447,7 @@ function addItem(){
             var id = local_selectedItem.id
             var enumaration = false
             var difficulty = local_selectedItem.difficulty
+            var difficultyClassic = local_selectedItem.difficultyClassic
             var disabled = local_selectedItem.disabled
             var changedGroup = false
 
@@ -437,7 +462,7 @@ function addItem(){
             question = question.trimRight()
             answer = answer.trimRight()
 
-            var updatedItem = {id, enumaration, group, question, answer, image, difficulty, disabled}
+            var updatedItem = {id, enumaration, group, question, answer, image, difficulty, difficultyClassic, disabled}
 
             console.log("["+group+"]")
 
@@ -476,6 +501,7 @@ function addItem(){
             var id = local_idCounter
             var enumaration = true
             var difficulty = 0
+            var difficultyClassic = 0
             var disabled = false
 
             // trim left or right and remove ""
@@ -504,7 +530,7 @@ function addItem(){
             // remove the image in enumaration
             image = ""
 
-            var item = {id, enumaration, group, question, answer: enumAnswer, image, difficulty, disabled, enumInOrder}
+            var item = {id, enumaration, group, question, answer: enumAnswer, image, difficulty, difficultyClassic, disabled, enumInOrder}
             console.log(item)
 
             /**/ 
@@ -543,6 +569,7 @@ function addItem(){
             var id = local_selectedItem.id
             var enumaration = true
             var difficulty = local_selectedItem.difficulty
+            var difficultyClassic = local_selectedItem.difficultyClassic
             var disabled = local_selectedItem.disabled
             var changedGroup = false
 
@@ -566,7 +593,7 @@ function addItem(){
             group = group.trimRight()
             question = question.trimRight()
 
-            var updatedItem = {id, enumaration, group, question, answer: enumAnswer, image, difficulty, disabled, enumInOrder}
+            var updatedItem = {id, enumaration, group, question, answer: enumAnswer, image, difficulty, difficultyClassic, disabled, enumInOrder}
             console.log("["+group+"]")
             console.log(updatedItem)
 
@@ -666,6 +693,21 @@ function deleteEnumerationAns(index){
 function addEnumaratorAns(){
     local_EnumarationItem.push("")
     displayEnumarationAns(local_EnumarationItem)
+}
+
+function updateContentsOfReviewer(key, value){
+    localforage.getItem(reviewerDatabaseName, function (err, content) {
+
+        for (var i in content){
+            if (content[i][key] == null){
+                console.log("Added!",key)
+                content[i][key] = value
+            }
+        }
+
+        console.log("updated!")
+        localforage.setItem(reviewerDatabaseName, content)
+    })
 }
 
 // BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS// BUTTONS // BUTTONS
@@ -794,7 +836,11 @@ function showOptionsBeforeReviTerm(){
         html_initOptionsReviewerName.innerHTML = html_reviewerName
         html_initOptionsTotalItems.innerHTML = html_totalItems
 
-
+        gameOption = {
+            mode: "Practice",
+            music: true,
+            easyMode: false,
+        }
 
         // print the html :)
         for (var i in totalGroups){
@@ -862,6 +908,68 @@ function showOrHideGroup(id){
     console.log(buttonContent.innerHTML, local_whichGroupsAreHidden)
 }
 
+function switchGameModeMenu(mode){
+    var COLOR_white = "#ffffff"
+    var COLOR_gray = "#bbbbbb"
+
+    // html_practiceModeContainerId 
+    // html_classicModeContainerId 
+    // html_practiceModeButtonId 
+    // html_classicModeButtonId
+    // html_perfectionModeContainerId
+    // html_perfectionModeButtonId
+
+    if (mode == 0){
+        html_practiceModeContainerId.style.display = "block"
+        html_practiceModeButtonId.style.backgroundColor = COLOR_white
+        html_classicModeContainerId.style.display = "none"
+        html_classicModeButtonId.style.backgroundColor = COLOR_gray
+        html_perfectionModeContainerId.style.display = "none"
+        html_perfectionModeButtonId.style.backgroundColor = COLOR_gray
+
+        gameOption = {
+            mode: "Practice",
+            music: true,
+            easyMode: false,
+        }
+
+        localforage.setItem("reviTermGameOptions", gameOption)
+
+    } else if (mode == 1) {
+        html_classicModeContainerId.style.display = "block"
+        html_classicModeButtonId.style.backgroundColor = COLOR_white    
+        html_practiceModeContainerId.style.display = "none"
+        html_practiceModeButtonId.style.backgroundColor = COLOR_gray
+        html_perfectionModeContainerId.style.display = "none"
+        html_perfectionModeButtonId.style.backgroundColor = COLOR_gray
+    
+        gameOption = {
+            mode: "Classic",
+            music: true,
+            easyMode: false,
+        }
+
+        localforage.setItem("reviTermGameOptions", gameOption)
+    } else if (mode == 2){
+        html_perfectionModeContainerId.style.display = "block"
+        html_perfectionModeButtonId.style.backgroundColor = COLOR_white   
+        html_practiceModeContainerId.style.display = "none"
+        html_practiceModeButtonId.style.backgroundColor = COLOR_gray        
+        html_classicModeContainerId.style.display = "none"
+        html_classicModeButtonId.style.backgroundColor = COLOR_gray
+
+        gameOption = {
+            mode: "Perfection",
+            music: true,
+            easyMode: false,
+        }
+
+        localforage.setItem("reviTermGameOptions", gameOption)
+    }
+
+    console.log(mode)
+}
+
 function getListOfShowOrHide(){
     //var buttonContent = document.getElementById("groupHideButtonId"+id)
     //var groupSection = document.getElementById("groupSectionId"+id)
@@ -882,6 +990,7 @@ function startReviterm(){
 
 initialization()
 
+
 window.removeItem = removeItem
 window.hideEditor = hideEditor
 window.gotoSelectReviewer = gotoSelectReviewer
@@ -895,6 +1004,7 @@ window.deleteEnumerationAns = deleteEnumerationAns
 window.updateBothQEQuestions = updateBothQEQuestions
 window.addItem = addItem
 window.showOrHideGroup = showOrHideGroup
+window.switchGameModeMenu = switchGameModeMenu
 
 
 document.querySelector(".initOptionsHide").addEventListener("click", hideOptionsBeforeReviTerm);

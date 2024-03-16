@@ -49,16 +49,22 @@ h3 {
 
 .QAButton {
     background-color: #ffffff;
-    padding-left: 3vw;
     user-select: none;
     cursor: pointer;
+    padding: 2vw;
+    user-select: none;
+    cursor: pointer;
+    font-size: 4.5vw;
 }
 
 .EnumButton {
     background-color: #bbbbbb;
-    padding-left: 3vw;
     user-select: none;
     cursor: pointer;
+    padding: 2vw;
+    user-select: none;
+    cursor: pointer;
+    font-size: 4.5vw;
 }
 
 .qAAContainer {
@@ -82,9 +88,10 @@ h3 {
 .editorContainer{
     background-color: #ffffff;
     padding: 2vw;
+    /*height: 112vw;*/
 
-    border-bottom-left-radius: 2vw;
-    border-bottom-right-radius: 2vw;
+    border-bottom-left-radius: 3vw;
+    border-bottom-right-radius: 3vw;
 }   
 
 .itemImage {
@@ -428,14 +435,19 @@ h3 {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: #ffffff;
-    padding: 2vw;
-    
+
     display: none;
 
     width: 82%;
 
     font-size: 4vw;   
+}
+
+.initOptionsBg{
+    background: #ffffff;
+    padding: 2vw;
+    border-bottom-left-radius: 2vw;
+    border-bottom-right-radius: 2vw;
 }
 
 .groupListContainer{
@@ -507,4 +519,61 @@ button {
 
 .initOptionsHide:hover{
     cursor: pointer;
+}
+
+.practiceModeButton {
+    background-color: #ffffff;
+    padding: 2vw;
+    user-select: none;
+    cursor: pointer;
+    font-size: 4.5vw;
+}
+
+.classicModeButton {
+    background-color: #bbbbbb;
+    padding: 2vw;
+    user-select: none;
+    cursor: pointer;
+    font-size: 4.5vw;
+}
+
+.perfectionModeButton {
+    background-color: #bbbbbb;
+    padding: 2vw;
+    user-select: none;
+    cursor: pointer;
+    font-size: 4.5vw;
+}
+
+/*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*/
+/*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*/
+/*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*/
+
+
+.classicModeContainer{
+    display: none;
+}
+
+.perfectionModeContainer{
+    display: none;
+}
+
+.characterIconContainer{
+    width: 60%;
+    height: 20vw;
+    border-style: solid;
+    border-color: #000000;
+    position: relative;
+
+    text-align: center; 
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+}
+
+.classicModeDescription{
+    padding: 2vw;
+    text-align: justify;
+    font-weight: 100;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 }
