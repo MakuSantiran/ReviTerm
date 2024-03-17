@@ -1,14 +1,14 @@
 :root {
     --choiceBottomSpace: 6%;
     --startingHealth: 100%;
-    --startingHealthColor: #646464;
+    --startingHealthColor: #2dc9328a;
 
 
     --practiceHealthColor: #646464;
     --highHealthColor: #4388a5;
-    --goodHealthColor:#41ad37;
+    --goodHealthColor:#23de12;
     --halfHealthColor: #f4f12b;
-    --lowHealthColor: #d13434;
+    --lowHealthColor: #ab2929;
 }  
 
 @font-face {
@@ -36,6 +36,16 @@
     z-index: 1;
 
     word-wrap: break-word;       /* Internet Explorer 5.5+ */;
+
+    border-style: solid;
+    border-color: #000;
+    border-width: 1.1vw;
+
+    text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;   
 }
 
 .choice2Container {
@@ -54,6 +64,16 @@
     z-index: 1;
 
     word-wrap: break-word;       /* Internet Explorer 5.5+ */;
+
+    border-style: solid;
+    border-color: #000;
+    border-width: 1.1vw;
+
+    text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;  
 }
 
 .choice3Container {
@@ -72,6 +92,16 @@
     z-index: 1;
 
     word-wrap: break-word;       /* Internet Explorer 5.5+ */;
+
+    border-style: solid;
+    border-color: #000;
+    border-width: 1.1vw;
+
+    text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;  
 }
 
 .choice4Container {
@@ -90,6 +120,16 @@
     z-index: 1;
 
     word-wrap: break-word;       /* Internet Explorer 5.5+ */;
+
+    border-style: solid;
+    border-color: #000;
+    border-width: 1.1vw;
+
+    text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;  
 }
 
 .health1 {
@@ -102,6 +142,9 @@
     left: 0%;
 
     z-index: -3;
+
+    width: "100%";
+
 }
 
 .health2 {
@@ -114,6 +157,8 @@
     left: 0%;
 
     z-index: -3;
+
+    width: "100%";
 }
 
 .health3 {
@@ -126,6 +171,9 @@
     left: 0%;
 
     z-index: -3;
+
+    width: "100%";
+
 }
 
 .health4 {
@@ -138,11 +186,57 @@
     left: 0%;
 
     z-index: -3;
+
+    width: "100%";
 }
 
 /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ 
 /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ 
 /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ 
+
+.enumSubContainer{
+    background-color: #646464;
+    padding: 2vw;
+
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-bottom: var(--choiceBottomSpace);
+
+    position: relative;
+    user-select: none;
+
+    cursor: pointer;
+
+    z-index: 1;
+
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */;
+
+    border-style: solid;
+    border-color: #000;
+    border-width: 1.1vw;
+
+    text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;  
+
+    margin-top: 5vw;
+}
+
+.enumHealth {
+    background-color: var(--startingHealthColor);
+    width: var(--startingHealth);
+    height: 100%;
+    position: absolute;
+
+    top: 0%;
+    left: 0%;
+
+    z-index: -3;
+
+    width: "100%";
+}
 
 .enumAnswer {
     width: 85%;
@@ -155,16 +249,11 @@
 }
 
 .enumSubmit {
-    background-color: var(--practiceHealthColor);
     color: #ffffff;
     font-family: 'HeyComic';
 
     font-size: 5vw;
-    padding: 2vw;
 
-    margin-top: 4vw;
-
-    width: 70%;
     user-select: none;
 
     cursor: pointer;

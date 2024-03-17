@@ -21,15 +21,25 @@ var html_restartContainer = document.getElementById("restartContainerId")
 
 var html_multipleChoiceContainer = document.getElementById("multipleChoiceContainerId")
 var html_enumarationId = document.getElementById("enumarationId")
-var html_enumSubmit = document.getElementById("enumSubmitId")
+var html_enumSubContainerId = document.getElementById("enumSubContainerId")
 var html_enumChoicesId = document.getElementById("enumChoicesId")
+
+var html_health1Id = document.getElementById("health1Id")
+var html_health2Id = document.getElementById("health2Id")
+var html_health3Id = document.getElementById("health3Id")
+var html_health4Id = document.getElementById("health4Id")
+var html_enumHealthId = document.getElementById("enumHealthId")
+
+var html_health1 = document.querySelector("health1")
+var html_health2 = document.querySelector("health2")
+var html_health3 = document.querySelector("health3")
+var html_health4 = document.querySelector("health4")
 
 var html_forgetfulFlag = document.querySelector(".forgetfulFlag_Red")
 var html_forgetfulFlagYellow = document.querySelector(".forgetfulFlag_Yellow")
 var html_quizContainer = document.querySelector(".quizContainer")
 var html_enumFlexContainer = document.querySelector(".enumFlexContainer")
 var html_enumAnswer = document.querySelector(".enumAnswer")
-
 
 // variables
 var reviGame = {
@@ -54,7 +64,17 @@ var reviGame = {
 
     enumHidePercent: 65,
     enumFocusHidePercent: 65,
-    enumFocusIndex: 0
+    enumFocusIndex: 0,
+
+    health: 100,
+    trueHealth: 100,
+
+    offScreen: false,
+    isPaused: false,
+    remainingPauses: 2,
+
+    isFinished: false,
+    gameOver: false
 }
 
 var reviewItems_Groups = []     // the outline of this is {group: #, difficulty: #}
@@ -77,16 +97,52 @@ var redFlagRange = 3
 
 // Remix mode stuff
 var whichDifficultyType = "difficulty"
-var remixModeValue = 2
+var remixModeValue = 0
 var trueOrFalseAnswer = true
 var unscrambledChoices = []
+var blankedQuestion = ""
+var answerForBlank = ""
+
+// damages
+var multipleChoiceDMG = 15
+var enumDMG = 3
 
 // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms 
 // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms 
 // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms 
+
+// the good ol lerp :D
+function lerp(start, end, t) {
+    return start * (1 - t) + end * t;
+}
 
 function randomNumbers(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function generateFillInTheBlank(sentence) {
+    // Split the sentence into an array of words
+    var words = sentence.split(/\s+/);
+    
+    // Filter out single-character words and words containing symbols
+    var filteredWords = words.filter(word => word.length > 1 && !/\W/.test(word));
+    
+    // If there are no eligible words, return the original sentence
+    if (filteredWords.length === 0) {
+        return sentence;
+    }
+    
+    // Generate a random index to choose a word
+    var randomIndex = Math.floor(Math.random() * filteredWords.length);
+    
+    // Save the chosen word in a temporary variable
+    answerForBlank = filteredWords[randomIndex];
+
+    // Replace the chosen word with blank
+    filteredWords[randomIndex] = "___";
+    
+    // Join the words back into a sentence
+    return sentence.replace(answerForBlank, "___");
 }
 
 function shuffleArray(array) {
@@ -109,6 +165,10 @@ function shuffleString(str) {
     
     // Join the shuffled array back into a string
     return charArray.join('');
+}
+
+function removeStringFromArray(arr, toRemove) {
+    return arr.filter(str => str !== toRemove);
 }
 
 // addToGroupList first if it doesn't exists {}
@@ -390,11 +450,11 @@ function flagShakeAnimation() {
 function wrongAnswerAnimation(){
     var properties = {
         left: function() {
-          var leftValue = randomNumbers(-1,1)
+          var leftValue = randomNumbers(-3,3)
           return 50 + leftValue + '%';
         },
         top: function() {
-            var leftValue = randomNumbers(-1,1)
+            var leftValue = randomNumbers(-3,3)
             return 50 + leftValue + '%';
         },
     };
@@ -432,6 +492,27 @@ function updateForgetfulFlag(difficultyType){
     //html_forgetfulFlagYellow
 }
 
+function drainHealthAnimation(){
+
+    var lerpHealth = lerp(reviGame.trueHealth, reviGame.health, 0.05)
+    reviGame.trueHealth = lerpHealth
+
+    if (lerpHealth > 100){
+        lerpHealth = 100
+        reviGame.health = 100
+        reviGame.trueHealth = 100
+    }
+
+    html_health1Id.style.width = lerpHealth+"%"
+    html_health2Id.style.width = lerpHealth+"%"
+    html_health3Id.style.width = lerpHealth+"%"
+    html_health4Id.style.width = lerpHealth+"%"
+    html_enumHealthId.style.width = lerpHealth+"%"
+
+
+
+}
+
 
 // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes 
 // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes // QuestionTypes 
@@ -442,20 +523,20 @@ function multipleChoice(Group){
     var amountOfChoices = 4
 
     // display the other 2
-    document.getElementById("choice1ContainerId3").style.display = "block"
-    document.getElementById("choice1ContainerId4").style.display = "block"
+    document.getElementById("choiceContainerId3").style.display = "block"
+    document.getElementById("choiceContainerId4").style.display = "block"
     
     // dynamic difficult :) [if yellow flag]
     if (reviewItems[reviGame.atNumber][whichDifficultyType] > yellowFlagRange && reviewItems[reviGame.atNumber][whichDifficultyType] < redFlagRange){
         amountOfChoices = 3
-        document.getElementById("choice1ContainerId4").style.display = "none"
+        document.getElementById("choiceContainerId4").style.display = "none"
     }
 
     // if red flag
     if (reviewItems[reviGame.atNumber][whichDifficultyType] >= redFlagRange){
         amountOfChoices = 2
-        document.getElementById("choice1ContainerId3").style.display = "none"
-        document.getElementById("choice1ContainerId4").style.display = "none"
+        document.getElementById("choiceContainerId3").style.display = "none"
+        document.getElementById("choiceContainerId4").style.display = "none"
     }
 
 
@@ -489,20 +570,20 @@ function scrambledMultipleChoice(Group){
     var amountOfChoices = 4
 
     // display the other 2
-    document.getElementById("choice1ContainerId3").style.display = "block"
-    document.getElementById("choice1ContainerId4").style.display = "block"
+    document.getElementById("choiceContainerId3").style.display = "block"
+    document.getElementById("choiceContainerId4").style.display = "block"
     
     // dynamic difficult :) [if yellow flag]
     if (reviewItems[reviGame.atNumber][whichDifficultyType] > yellowFlagRange && reviewItems[reviGame.atNumber][whichDifficultyType] < redFlagRange){
         amountOfChoices = 3
-        document.getElementById("choice1ContainerId4").style.display = "none"
+        document.getElementById("choiceContainerId4").style.display = "none"
     }
 
     // if red flag
     if (reviewItems[reviGame.atNumber][whichDifficultyType] >= redFlagRange){
         amountOfChoices = 2
-        document.getElementById("choice1ContainerId3").style.display = "none"
-        document.getElementById("choice1ContainerId4").style.display = "none"
+        document.getElementById("choiceContainerId3").style.display = "none"
+        document.getElementById("choiceContainerId4").style.display = "none"
     }
 
 
@@ -540,6 +621,57 @@ function scrambledMultipleChoice(Group){
     
 
     console.log("unscrambledChoices", correctIndexOfAnswer, unscrambledChoices)
+}
+
+function pickTheWrong(Group){
+    var theChoices = []
+    var amountOfChoices = 4
+
+    // display the other 2
+    document.getElementById("choiceContainerId3").style.display = "block"
+    document.getElementById("choiceContainerId4").style.display = "block"
+    
+    // dynamic difficult :) [if yellow flag]
+    if (reviewItems[reviGame.atNumber][whichDifficultyType] > yellowFlagRange && reviewItems[reviGame.atNumber][whichDifficultyType] < redFlagRange){
+        amountOfChoices = 3
+        document.getElementById("choiceContainerId4").style.display = "none"
+    }
+
+    // if red flag
+    if (reviewItems[reviGame.atNumber][whichDifficultyType] >= redFlagRange){
+        amountOfChoices = 2
+        document.getElementById("choiceContainerId3").style.display = "none"
+        document.getElementById("choiceContainerId4").style.display = "none"
+    }
+
+
+    for (var i in reviewItems_Choices[Group]) {
+        if (checkIfStringOrArray(reviewItems_Choices[Group][i])){
+            theChoices.push(reviewItems_Choices[Group][i])
+        }
+    }
+
+    console.log("AAAsaadsdsa", reviewItems_Choices[Group])
+
+    // for multiple choice
+    var randomizedChoices = shuffleArray(theChoices)
+    var wrongAnswerIndex = randomNumbers(1,amountOfChoices)
+
+    var temporaryWrongChoice = removeStringFromArray(randomizedChoices, reviewItems[reviGame.atNumber].answer)
+    
+    for (var i = 1; i<=amountOfChoices; i++){
+        var html_choice = document.getElementById("choice"+i+"Id")
+        
+        var randomIndex = randomNumbers(0, randomizedChoices.length-1)
+        var forMultipleChoice = randomizedChoices[randomIndex];
+
+        html_choice.innerHTML = forMultipleChoice
+    }
+
+    var html_incorrectChoice = document.getElementById("choice"+wrongAnswerIndex+"Id")
+    html_incorrectChoice.innerHTML = temporaryWrongChoice[0]
+
+    displayPickTheWrong()
 }
 
 function enumarationShowClues(){
@@ -606,8 +738,8 @@ function trueOrFalse(Group){
 
     trueOrFalseAnswer = false
 
-    document.getElementById("choice1ContainerId3").style.display = "none"
-    document.getElementById("choice1ContainerId4").style.display = "none"
+    document.getElementById("choiceContainerId3").style.display = "none"
+    document.getElementById("choiceContainerId4").style.display = "none"
 
     html_true.innerHTML = "True"
     html_false.innerHTML = "False"
@@ -648,6 +780,7 @@ function showChoices(Group){
 
     // check first if the current item is 
     var currentItem = reviewItems[reviGame.atNumber].answer
+    var currentQuestion = reviewItems[reviGame.atNumber].question
 
     
     // if Q and A
@@ -672,6 +805,95 @@ function showChoices(Group){
             html_enumarationId.style.display = "none"
             scrambledMultipleChoice(Group)
         }
+
+        // PickTheWrong
+        if (remixModeValue == 3){
+            html_multipleChoiceContainer.style.display = "block"
+            html_enumarationId.style.display = "none"
+            pickTheWrong(Group)
+        }
+
+        // identification
+        if (remixModeValue == 4){
+            html_multipleChoiceContainer.style.display = "none"
+            html_enumarationId.style.display = "block"
+
+            local_enumarationItems = []
+            local_enumarationItemsP = []
+            local_enumAlreadyAnswered = []
+            html_enumChoicesId.style.color = "#FFFFFF"
+
+            local_enumInOrder = false
+            local_enumarationItems = [currentItem]
+            reviGame.enumFocusIndex = 0
+
+            // reset value
+            reviGame.enumHidePercent = 70
+            reviGame.enumFocusHidePercent = 70
+
+            // dynamic difficult :) [if yellow flag]
+            if (reviewItems[reviGame.atNumber][whichDifficultyType] > yellowFlagRange && reviewItems[reviGame.atNumber][whichDifficultyType] < redFlagRange){
+                reviGame.enumHidePercent = 50
+                reviGame.enumFocusHidePercent = 50
+            }
+
+            // if red flag
+            if (reviewItems[reviGame.atNumber][whichDifficultyType] >= redFlagRange){
+                reviGame.enumHidePercent = 30
+                reviGame.enumFocusHidePercent = 30
+            }
+
+            // push the hide percentage
+            for (var i in local_enumarationItems){
+                local_enumarationItemsP.push(reviGame.enumHidePercent)
+            }
+
+            reviGame.gotWrong = false
+            enumarationShowClues()
+        }
+
+        // fill in the blanks
+        if (remixModeValue == 5){
+            html_multipleChoiceContainer.style.display = "none"
+            html_enumarationId.style.display = "block"
+
+            blankedQuestion = generateFillInTheBlank(currentQuestion+" ["+currentItem+"]")
+
+            local_enumarationItems = []
+            local_enumarationItemsP = []
+            local_enumAlreadyAnswered = []
+            html_enumChoicesId.style.color = "#FFFFFF"
+
+            local_enumInOrder = false
+            local_enumarationItems = [answerForBlank]
+            reviGame.enumFocusIndex = 0
+
+            // reset value
+            reviGame.enumHidePercent = 70
+            reviGame.enumFocusHidePercent = 70
+
+            // dynamic difficult :) [if yellow flag]
+            if (reviewItems[reviGame.atNumber][whichDifficultyType] > yellowFlagRange && reviewItems[reviGame.atNumber][whichDifficultyType] < redFlagRange){
+                reviGame.enumHidePercent = 50
+                reviGame.enumFocusHidePercent = 50
+            }
+
+            // if red flag
+            if (reviewItems[reviGame.atNumber][whichDifficultyType] >= redFlagRange){
+                reviGame.enumHidePercent = 30
+                reviGame.enumFocusHidePercent = 30
+            }
+
+            // push the hide percentage
+            for (var i in local_enumarationItems){
+                local_enumarationItemsP.push(reviGame.enumHidePercent)
+            }
+
+            reviGame.gotWrong = false
+            customDisplayQuestion(blankedQuestion)
+            enumarationShowClues()
+        }
+        
 
     } else {
         // if enumaration
@@ -722,55 +944,17 @@ function clearFeedback(){
     html_Feedback.innerHTML = ""
 }
 
-function displayQuestion(){
-    html_GroupTitle.innerHTML =  reviewItems[reviGame.atNumber].group
-    html_Question.innerHTML = reviewItems[reviGame.atNumber].question
-    //html_difficultyMeter.innerHTML = "DifficultyMeter: "+reviewItems[reviGame.atNumber][whichDifficultyType]
-}
-
-function displayTrueFalse(toCheck){
-    html_GroupTitle.innerHTML =  reviewItems[reviGame.atNumber].group
-    html_Question.innerHTML = reviewItems[reviGame.atNumber].question+`<br/><br/><div style="display: inline-block; color: #77ccf0;">`+toCheck+`</div> is the answer!`
-}
-
 function reAllowToSubmit(){
-    html_enumSubmit.style.backgroundColor = "#646464"
+    html_enumSubContainerId.style.backgroundColor = "#646464"
     reviGame.preventSubmission = false  
 }
 
 function resetMultipleChoices(){
     for (var i = 1; i<=4; i++){
-        var html_health = document.getElementById("health"+i+"Id")
-        html_health.style.backgroundColor = "#646464"
+        var html_selectedContainer = document.getElementById("choiceContainerId"+i)
+        html_selectedContainer.style.backgroundColor = "#646464"
+        html_selectedContainer.style.borderColor = "#000000"
     }
-}
-
-function displayCongrats(){
-    html_GroupTitle.innerHTML = "Nicely Done!"
-    html_Question.innerHTML =
-    `You completed the review session!<br/><br/>Total Items: `+(reviGame.atNumber)+`<br/>Total Mistakes: `+reviGame.totalMistakes+``
-    html_choicesContainer.style.display = "none"; 
-
-    resetMultipleChoices()
-
-    console.log(local_temporarySaveForExcluded)
-
-    if (reviGame.options.mode == "Practice"){
-        // if there was an exclusion, before saving to database, put back the exclusion
-        if (local_temporarySaveForExcluded.length > 1){
-            console.log("The Old one", reviewItems)
-            reviewItems = [...reviewItems, ...local_temporarySaveForExcluded]
-            console.log("BackOriginal", reviewItems)
-        }
-    }
-
-    localforage.getItem(reviewerDatabase, function (err, value) {
-        console.log(value)
-        localforage.setItem(reviewerDatabase, reviewItems)
-        html_restartContainer.style.display = "block";
-        //html_restartContainer.innerHTML = "Saved!"        
-        //setTimeout(startReviTerm, 3000) 
-    })   
 }
 
 function restartingMessage(){
@@ -784,6 +968,8 @@ function proceedToNextItem(){
     // if not finished
     if (reviewItems.length > reviGame.atNumber){
 
+        remixModeValue = randomNumbers(0,5)
+        console.log("remixMOdeValuE "+remixModeValue)
         
         html_GroupTitle.innerHTML =  reviewItems[reviGame.atNumber].group
         html_Question.innerHTML = reviewItems[reviGame.atNumber].question
@@ -822,6 +1008,7 @@ function getReviewerContent(){
                     console.log("EXTRACTED GAMEMODE: "+gameOptions)
 
                     // then start the reviTerm!
+                    startIntervalLoop()
                     startReviTerm()
                 })
                 
@@ -834,13 +1021,85 @@ function goBackToEditor(){
     window.location.replace("reviEditor.html");
 }
 
+// Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System 
+// Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System 
+// Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System 
+
+function drainHealth(){
+    if (reviGame.isPaused == false && reviGame.isFinished == false){
+        if (reviGame.health > 0){
+            reviGame.health = reviGame.health - 0.005
+            drainHealthAnimation(reviGame.health)    
+            console.log(reviGame.health)        
+        } else {
+            console.log("GAME OVER")
+        }
+
+    }
+}
+
+
+// Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs 
+// Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs 
+// Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs 
+
+function displayQuestion(){
+    html_GroupTitle.innerHTML =  reviewItems[reviGame.atNumber].group
+    html_Question.innerHTML = reviewItems[reviGame.atNumber].question
+    //html_difficultyMeter.innerHTML = "DifficultyMeter: "+reviewItems[reviGame.atNumber][whichDifficultyType]
+}
+
+function displayTrueFalse(toCheck){
+    html_GroupTitle.innerHTML =  reviewItems[reviGame.atNumber].group
+    html_Question.innerHTML = reviewItems[reviGame.atNumber].question+`<br/><br/><div style="display: inline-block; color: #77ccf0;">`+toCheck+`</div> is the answer!`
+}
+
+function displayPickTheWrong(){
+    html_GroupTitle.innerHTML =  reviewItems[reviGame.atNumber].group
+    html_Question.innerHTML = reviewItems[reviGame.atNumber].question+`<br/><br/><div style="display: inline-block; color: #77ccf0;"> Pick the WRONG ANSWER!</div>`
+}
+
+function displayCongrats(){
+    html_GroupTitle.innerHTML = "Nicely Done!"
+    html_Question.innerHTML =
+    `You completed the review session!<br/><br/>Total Items: `+(reviGame.atNumber)+`<br/>Total Mistakes: `+reviGame.totalMistakes+``
+    html_choicesContainer.style.display = "none"; 
+
+    resetMultipleChoices()
+
+    console.log(local_temporarySaveForExcluded)
+
+    reviGame.isFinished = true
+
+    if (reviGame.options.mode == "Practice"){
+        // if there was an exclusion, before saving to database, put back the exclusion
+        if (local_temporarySaveForExcluded.length > 1){
+            console.log("The Old one", reviewItems)
+            reviewItems = [...reviewItems, ...local_temporarySaveForExcluded]
+            console.log("BackOriginal", reviewItems)
+        }
+    }
+
+    localforage.getItem(reviewerDatabase, function (err, value) {
+        console.log(value)
+        localforage.setItem(reviewerDatabase, reviewItems)
+        html_restartContainer.style.display = "block";
+        //html_restartContainer.innerHTML = "Saved!"        
+        //setTimeout(startReviTerm, 3000) 
+    })   
+}
+
+function customDisplayQuestion(Question){
+    html_GroupTitle.innerHTML =  reviewItems[reviGame.atNumber].group
+    html_Question.innerHTML = Question
+}
+
 // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers 
 // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers 
 // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers 
 
 function checkAnswer(userAnswer){
     userAnswer = userAnswer.toLowerCase()
-
     var toCheck = reviewItems[reviGame.atNumber].answer.toLowerCase()
     
     console.log("ToCheck: "+userAnswer)
@@ -904,26 +1163,31 @@ function checkAnswerMultipleChoice(choiceNum){
             reviGame.preventSubmission = true
     
             var html_selectedChoice = document.getElementById("choice"+choiceNum+"Id")
+            var html_selectedContainer = document.getElementById("choiceContainerId"+choiceNum)
             var userAnswer = html_selectedChoice.innerHTML
             var html_health = document.getElementById("health"+choiceNum+"Id")
     
             // check First if user is trying to tap at the already wrong answer
-            if (html_health.style.backgroundColor != "rgb(209, 52, 52)"){
+            if (html_selectedContainer.style.backgroundColor != "rgb(128, 32, 32)"){
                 // if correct
                 if (checkAnswer(userAnswer)){
-                    html_health.style.backgroundColor = "#41ad37"
-    
+                    html_selectedContainer.style.backgroundColor = "#1bbb0c"
+                    html_selectedContainer.style.borderColor = "#1bbb0c"
+                    reviGame.health = reviGame.health + (multipleChoiceDMG*0.5)
+                    
                 }
                 // if wrong
                 else {
                     // this might change
-                    html_health.style.backgroundColor = "#d13434"
+                    html_selectedContainer.style.backgroundColor = "#802020"
+                    html_selectedContainer.style.borderColor = "#802020"
+                    reviGame.health = reviGame.health - multipleChoiceDMG
                 }
             } else {
                 reAllowToSubmit()
             }
     
-            console.log(html_health.style.backgroundColor)
+            console.log(html_selectedContainer.style.backgroundColor)
         }
     }
 
@@ -932,19 +1196,24 @@ function checkAnswerMultipleChoice(choiceNum){
         if (!reviGame.preventSubmission){
             reviGame.preventSubmission = true
             var html_selectedChoice = document.getElementById("choice"+choiceNum+"Id")
-            var html_health = document.getElementById("health"+choiceNum+"Id")        
+            var html_selectedContainer = document.getElementById("choiceContainerId"+choiceNum)
+            var html_health = document.getElementById("health"+choiceNum+"Id")   
 
             // check First if user is trying to tap at the already wrong answer
             if (html_health.style.backgroundColor != "rgb(209, 52, 52)"){
                 // if correct
                 if ((trueOrFalseAnswer && choiceNum == 1) || (trueOrFalseAnswer == false && choiceNum == 2)){
-                    html_health.style.backgroundColor = "#41ad37"
+                    html_selectedContainer.style.backgroundColor = "#1bbb0c"
+                    html_selectedContainer.style.borderColor = "#1bbb0c"
+                    reviGame.health = reviGame.health + (multipleChoiceDMG*0.5)
                     checkAnswer(reviewItems[reviGame.atNumber].answer)
                 }
                 // if wrong
                 else {
                     // this might change
-                    html_health.style.backgroundColor = "#d13434"
+                    html_selectedContainer.style.backgroundColor = "#802020"
+                    html_selectedContainer.style.borderColor = "#802020"
+                    reviGame.health = reviGame.health - multipleChoiceDMG
                     checkAnswer("")
                 }
             } else {
@@ -957,23 +1226,28 @@ function checkAnswerMultipleChoice(choiceNum){
     if (remixModeValue == 2){
         if (!reviGame.preventSubmission){
             reviGame.preventSubmission = true
-    
+            
+            var html_selectedContainer = document.getElementById("choiceContainerId"+choiceNum)
             var html_selectedChoice = document.getElementById("choice"+choiceNum+"Id")
             var userAnswer = unscrambledChoices[choiceNum-1]
             var html_health = document.getElementById("health"+choiceNum+"Id")
-    
+
             // check First if user is trying to tap at the already wrong answer
             if (html_health.style.backgroundColor != "rgb(209, 52, 52)"){
                 // if correct
                 if (checkAnswer(userAnswer)){
-                    html_health.style.backgroundColor = "#41ad37"
+                    html_selectedContainer.style.backgroundColor = "#1bbb0c"
+                    html_selectedContainer.style.borderColor = "#1bbb0c"
+                    reviGame.health = reviGame.health + (multipleChoiceDMG*0.5)
                     html_selectedChoice.innerHTML = userAnswer
                     unscrambledChoices = []
                 }
                 // if wrong
                 else {
                     // this might change
-                    html_health.style.backgroundColor = "#d13434"
+                    html_selectedContainer.style.backgroundColor = "#802020"
+                    html_selectedContainer.style.borderColor = "#802020"
+                    reviGame.health = reviGame.health - multipleChoiceDMG
                     html_selectedChoice.innerHTML = userAnswer
                 }
             } else {
@@ -983,6 +1257,51 @@ function checkAnswerMultipleChoice(choiceNum){
             console.log(html_health.style.backgroundColor)
         }
     }    
+
+    // PickTheWrong
+    if (remixModeValue == 3){
+        if (!reviGame.preventSubmission){
+            reviGame.preventSubmission = true
+            
+            var html_selectedContainer = document.getElementById("choiceContainerId"+choiceNum)
+            var html_selectedChoice = document.getElementById("choice"+choiceNum+"Id")
+            var userAnswer = html_selectedChoice.innerHTML
+            var html_health = document.getElementById("health"+choiceNum+"Id")
+    
+            userAnswer = userAnswer.toLowerCase()
+            var toCheck = reviewItems[reviGame.atNumber].answer.toLowerCase()
+
+            // had to improvise to save space (basically if they chose the correct answer, make it wrong)
+            if (userAnswer == toCheck){
+                userAnswer = userAnswer+"WRONG"
+            } else {
+                userAnswer = toCheck
+            }
+
+            console.log("WAFSASFA", userAnswer)
+
+            // check First if user is trying to tap at the already wrong answer
+            if (html_health.style.backgroundColor != "rgb(209, 52, 52)"){
+                // if correct
+                if (checkAnswer(userAnswer)){
+                    html_selectedContainer.style.backgroundColor = "#1bbb0c"
+                    html_selectedContainer.style.borderColor = "#1bbb0c"
+                    reviGame.health = reviGame.health + (multipleChoiceDMG*0.5)
+                }
+                // if wrong
+                else {
+                    // this might change
+                    html_selectedContainer.style.backgroundColor = "#802020"
+                    html_selectedContainer.style.borderColor = "#802020"
+                    reviGame.health = reviGame.health - multipleChoiceDMG
+                }
+            } else {
+                reAllowToSubmit()
+            }
+    
+            console.log(html_health.style.backgroundColor)
+        }
+    }
 
 }
 
@@ -1047,13 +1366,15 @@ function checkAnswerEnumeration(){
                 document.querySelector(".enumClue"+correctIndex).innerHTML = hideCharacter(local_enumarationItems[correctIndex], local_enumarationItemsP[correctIndex])
                 local_enumAlreadyAnswered.push(userEnumAnswer)
                 
-                html_enumSubmit.style.backgroundColor = "#41ad37"
+                html_enumSubContainerId.style.backgroundColor = "#41ad37"
                 html_enumAnswer.value = ""
+
+                reviGame.health = reviGame.health + (enumDMG*2)
 
                 scanIfAnsweredAllEnum()
                 setTimeout(reAllowToSubmit, 500)
             } else {
-                html_enumSubmit.style.backgroundColor = "#363636"
+                html_enumSubContainerId.style.backgroundColor = "#363636"
                 setTimeout(reAllowToSubmit, 100)
                 console.log("Already Answered!")
             }
@@ -1064,8 +1385,8 @@ function checkAnswerEnumeration(){
             console.log("Wrong!", userEnumAnswer)
             local_enumarationItemsP[reviGame.enumFocusIndex] = local_enumarationItemsP[reviGame.enumFocusIndex] - 10
             document.querySelector(".enumClue"+reviGame.enumFocusIndex).innerHTML = hideCharacter(local_enumarationItems[reviGame.enumFocusIndex], local_enumarationItemsP[reviGame.enumFocusIndex])
-            html_enumSubmit.style.backgroundColor = "#d13434"
-            console.log(html_enumSubmit.style.backgroundColor)
+            html_enumSubContainerId.style.backgroundColor = "#d13434"
+            console.log(html_enumSubContainerId.style.backgroundColor)
 
 
             // add difficulty number
@@ -1073,6 +1394,8 @@ function checkAnswerEnumeration(){
                 reviewItems[reviGame.atNumber][whichDifficultyType] += 1
                 reviGame.gotWrong = true
             }
+
+            reviGame.health = reviGame.health - enumDMG
 
             updateForgetfulFlag(whichDifficultyType)
             wrongAnswerAnimation()
@@ -1087,6 +1410,8 @@ function checkAnswerEnumeration(){
 // start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!// start!
 
 function practiceMode(){
+    remixModeValue = 0
+
     // check for exclusions
     extractExclusionGroup()
 
@@ -1107,6 +1432,11 @@ function practiceMode(){
 
 function classicMode(){
     console.log("HelloThere! Classic!")
+
+    //initiateHealth
+    reviGame.health = 100
+    reviGame.isFinished = false
+
 
     // shuffle first
     reviewItems = shuffleArray(reviewItems)
@@ -1149,6 +1479,18 @@ function startReviTerm(){
         classicMode()
     } else if (reviGame.options.mode == "Perfection"){
         perfectionMode()
+    }
+}
+
+function startIntervalLoop(){
+    if (reviGame.options.mode == "Classic"){
+        setInterval(drainHealth, 3);
+    } else {
+        html_health1Id.style.display = "none"
+        html_health2Id.style.display = "none"
+        html_health3Id.style.display = "none"
+        html_health4Id.style.display = "none"
+        html_enumHealthId.style.display = "none"
     }
 }
 
