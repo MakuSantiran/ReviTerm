@@ -45,8 +45,7 @@ Identification = user must manually type the answer by relying on the clue or th
 Fill in the blank = user must type the blank section in the defintion of the term
 
 <h3> Game Modes </h3>
-Overall there are 3 game modes that are in ReviTerm. Each of them having their own quirks and those are Practice, Classic, and Perfection mode
-
+Overall there are 3 game modes that are in ReviTerm. Each of them having their own quirks and those are Practice, Classic, and Perfection mode<br/>
 
 <b>Practice Mode</b> = Mayonnaise Algorithm works here. It allows the user to select which group to only review, thus making them focus only at a certain group in which they have trouble getting right. Dynamic difficulty system happens here but no remixes of question type
 
