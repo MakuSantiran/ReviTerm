@@ -104,7 +104,7 @@ var blankedQuestion = ""
 var answerForBlank = ""
 
 // damages
-var multipleChoiceDMG = 15
+var multipleChoiceDMG = 18
 var enumDMG = 3
 
 // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms 
@@ -503,6 +503,30 @@ function drainHealthAnimation(){
         reviGame.trueHealth = 100
     }
 
+    if (lerpHealth > 50){
+        html_health1Id.style.backgroundColor = "#2dc9328a"
+        html_health2Id.style.backgroundColor = "#2dc9328a"
+        html_health3Id.style.backgroundColor = "#2dc9328a"
+        html_health4Id.style.backgroundColor = "#2dc9328a"
+        html_enumHealthId.style.backgroundColor = "#2dc9328a"
+    }
+
+    if (lerpHealth <= 50 && lerpHealth > 25){
+        html_health1Id.style.backgroundColor = "#f4f12b8a"
+        html_health2Id.style.backgroundColor = "#f4f12b8a"
+        html_health3Id.style.backgroundColor = "#f4f12b8a"
+        html_health4Id.style.backgroundColor = "#f4f12b8a"
+        html_enumHealthId.style.backgroundColor = "#f4f12b8a"
+    }
+
+    if (lerpHealth <= 25){
+        html_health1Id.style.backgroundColor = "#ff4949" 
+        html_health2Id.style.backgroundColor = "#ff4949" 
+        html_health3Id.style.backgroundColor = "#ff4949" 
+        html_health4Id.style.backgroundColor = "#ff4949" 
+        html_enumHealthId.style.backgroundColor = "#ff4949"      
+    }
+
     html_health1Id.style.width = lerpHealth+"%"
     html_health2Id.style.width = lerpHealth+"%"
     html_health3Id.style.width = lerpHealth+"%"
@@ -857,7 +881,7 @@ function showChoices(Group){
             html_multipleChoiceContainer.style.display = "none"
             html_enumarationId.style.display = "block"
 
-            blankedQuestion = generateFillInTheBlank(currentQuestion+" ["+currentItem+"]")
+            blankedQuestion = generateFillInTheBlank(currentQuestion+" , "+currentItem)
 
             local_enumarationItems = []
             local_enumarationItemsP = []
@@ -945,14 +969,15 @@ function clearFeedback(){
 }
 
 function reAllowToSubmit(){
-    html_enumSubContainerId.style.backgroundColor = "#646464"
+    html_enumSubContainerId.style.backgroundColor = "#444444"
+    html_enumSubContainerId.style.borderColor = "#000000"
     reviGame.preventSubmission = false  
 }
 
 function resetMultipleChoices(){
     for (var i = 1; i<=4; i++){
         var html_selectedContainer = document.getElementById("choiceContainerId"+i)
-        html_selectedContainer.style.backgroundColor = "#646464"
+        html_selectedContainer.style.backgroundColor = "#444444"
         html_selectedContainer.style.borderColor = "#000000"
     }
 }
@@ -968,8 +993,11 @@ function proceedToNextItem(){
     // if not finished
     if (reviewItems.length > reviGame.atNumber){
 
-        remixModeValue = randomNumbers(0,5)
-        console.log("remixMOdeValuE "+remixModeValue)
+
+        if (reviGame.options.mode != "Practice"){
+            remixModeValue = randomNumbers(0,5)
+            console.log("remixMOdeValuE "+remixModeValue)
+        }
         
         html_GroupTitle.innerHTML =  reviewItems[reviGame.atNumber].group
         html_Question.innerHTML = reviewItems[reviGame.atNumber].question
@@ -1367,6 +1395,7 @@ function checkAnswerEnumeration(){
                 local_enumAlreadyAnswered.push(userEnumAnswer)
                 
                 html_enumSubContainerId.style.backgroundColor = "#41ad37"
+                html_enumSubContainerId.style.borderColor = "#41ad37"
                 html_enumAnswer.value = ""
 
                 reviGame.health = reviGame.health + (enumDMG*2)
@@ -1375,6 +1404,7 @@ function checkAnswerEnumeration(){
                 setTimeout(reAllowToSubmit, 500)
             } else {
                 html_enumSubContainerId.style.backgroundColor = "#363636"
+                html_enumSubContainerId.style.borderColor = "#363636"
                 setTimeout(reAllowToSubmit, 100)
                 console.log("Already Answered!")
             }
@@ -1385,10 +1415,12 @@ function checkAnswerEnumeration(){
             console.log("Wrong!", userEnumAnswer)
             local_enumarationItemsP[reviGame.enumFocusIndex] = local_enumarationItemsP[reviGame.enumFocusIndex] - 10
             document.querySelector(".enumClue"+reviGame.enumFocusIndex).innerHTML = hideCharacter(local_enumarationItems[reviGame.enumFocusIndex], local_enumarationItemsP[reviGame.enumFocusIndex])
-            html_enumSubContainerId.style.backgroundColor = "#d13434"
+            
             console.log(html_enumSubContainerId.style.backgroundColor)
 
-
+            html_enumSubContainerId.style.backgroundColor = "#d13434"
+            html_enumSubContainerId.style.borderColor = "#d13434"
+            
             // add difficulty number
             if (reviewItems[reviGame.atNumber][whichDifficultyType] < difficultyRange){
                 reviewItems[reviGame.atNumber][whichDifficultyType] += 1
@@ -1486,11 +1518,11 @@ function startIntervalLoop(){
     if (reviGame.options.mode == "Classic"){
         setInterval(drainHealth, 3);
     } else {
-        html_health1Id.style.display = "none"
-        html_health2Id.style.display = "none"
-        html_health3Id.style.display = "none"
-        html_health4Id.style.display = "none"
-        html_enumHealthId.style.display = "none"
+        html_health1Id.style.backgroundColor = "#64646464"
+        html_health2Id.style.backgroundColor = "#64646464"
+        html_health3Id.style.backgroundColor = "#64646464"
+        html_health4Id.style.backgroundColor = "#64646464"
+        html_enumHealthId.style.backgroundColor = "#64646464"
     }
 }
 

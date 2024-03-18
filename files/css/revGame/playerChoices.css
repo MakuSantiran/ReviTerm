@@ -4,7 +4,7 @@
     --startingHealthColor: #2dc9328a;
 
 
-    --practiceHealthColor: #646464;
+    --practiceHealthColor: #444444;
     --highHealthColor: #4388a5;
     --goodHealthColor:#23de12;
     --halfHealthColor: #f4f12b;
@@ -18,10 +18,11 @@
 
 .choicesContainer{
     position: relative;
+    display: none;
 }
 
 .choice1Container {
-    background-color: #646464;
+    background-color: #444444;
     padding: 2vw;
 
     margin-left: 10%;
@@ -49,7 +50,7 @@
 }
 
 .choice2Container {
-    background-color: #646464;
+    background-color: #444444;
     padding: 2vw;
 
     margin-left: 10%;
@@ -77,7 +78,7 @@
 }
 
 .choice3Container {
-    background-color: #646464;
+    background-color: #444444;
     padding: 2vw;
 
     margin-left: 10%;
@@ -105,7 +106,7 @@
 }
 
 .choice4Container {
-    background-color: #646464;
+    background-color: #444444;
     padding: 2vw;
 
     margin-left: 10%;
@@ -195,7 +196,7 @@
 /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ /* Enumaration */ 
 
 .enumSubContainer{
-    background-color: #646464;
+    background-color: #444444;
     padding: 2vw;
 
     margin-left: 10%;

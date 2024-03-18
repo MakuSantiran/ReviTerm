@@ -280,6 +280,19 @@ h3 {
 }
 
 
+.groupDetailsContainer{
+    background: #353535;
+    border-color: #6e6e6e;
+    border-style: solid;
+    border-width: 1.2px;
+    border-top:#ffffff;
+
+    color: #8d8d8d;
+
+    font-size: 3.5vw;
+
+}
+
 
 .itemBox {
     background: #353535;
@@ -347,7 +360,48 @@ h3 {
 }
 
 .itemDifficulty{
-    display:  inline-block;
+    /* display:  inline-block;*/
+    font-family: Arial, Helvetica, sans-serif
+}
+
+/* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS */
+/* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS */
+/* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS */
+
+.miniFlagContainer {
+    float: right;
+}
+
+.miniFlag {
+    width: 3vw;
+    height: 3vw;
+}
+
+
+.normalSizeFlag {
+    width: 7vw;
+    height: 7vw;
+
+    filter: drop-shadow(1px 1px #000000);
+}
+
+.miniFlagPerItemContainer{
+    position: relative;
+    margin-bottom: -2vw;
+    width: 100%;
+    
+}
+
+.miniFlagFlexCont {
+    display: flex;
+    width: 100%;
+}
+
+.miniFlagFlexItem {
+    flex: 1; /* Each item will grow equally to fill the available space */
+    padding-right: 2vw;
+    width: 100%;
+    opacity: 0.2;
 }
 
 /* TOP SCREEN */ /* TOP SCREEN */ /* TOP SCREEN */ /* TOP SCREEN *//* TOP SCREEN *//* TOP SCREEN *//* TOP SCREEN */
