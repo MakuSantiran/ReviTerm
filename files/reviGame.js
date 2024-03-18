@@ -92,8 +92,8 @@ var local_enumInOrder = false
 var reviewItems = [];
 var reviewerDatabase = ""
 var difficultyRange = 5
-var yellowFlagRange = 1
-var redFlagRange = 3
+var yellowFlagRange = 2
+var redFlagRange = 4
 
 // Remix mode stuff
 var whichDifficultyType = "difficulty"

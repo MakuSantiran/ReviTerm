@@ -368,8 +368,14 @@ h3 {
 /* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS */
 /* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS */
 
+.gamemodeflag{
+    display: inline-block;
+    text-align: right;
+}
+
 .miniFlagContainer {
     float: right;
+    user-select: none;
 }
 
 .miniFlag {
@@ -377,6 +383,13 @@ h3 {
     height: 3vw;
 }
 
+.normalSizeFlagIL {
+    display: inline-block;
+    width: 7vw;
+    height: 7vw;
+
+    filter: drop-shadow(1px 1px #000000);
+}
 
 .normalSizeFlag {
     width: 7vw;
@@ -421,6 +434,15 @@ h3 {
 
 .totalItems{
     display: inline-block;
+    
+}
+
+.flexTopItem {
+    flex: 1; /* Each item will grow equally to fill the available space */
+    padding: 0.3vw;
+    width: 100%;
+
+    user-select: none;
 }
 
 .reviewerNameHeader{
@@ -441,14 +463,19 @@ h3 {
 
 .reviewerDetails{
     position: fixed;
-    background-color: #5b2455;
-    color: white;
+    background: rgb(41, 41, 41);
+    border-color: #6e6e6e;
+    border-top-color: rgb(41, 41, 41);
+    border-width: 0.1vw;
+    border-style: solid;
+
+    color: #8D8D8D8D;
     font-size: 1.5vw;
     padding: 1%;
 
     width: 100%;
 
-    font-size: 4vw;
+    font-size: 3.5vw;
 }
 
 .playButton {

@@ -22,8 +22,9 @@ var local_groupList = []
 var local_selectedItem = []
 var local_selectedGroupExclusion = []
 
-var local_forgetfulFlagScore = {}
-var local_bestFlagGroup = {}
+var local_forgetfulFlagScore = {} // this is per group
+var local_bestFlagGroup = {}    // this is per group
+var local_gameModeFlags = [-99,-99,0]    // contains the flag/rank of gameModes
 
 var local_qType = 0 // 0 Question and Answer | 1 Enumaration
 var local_EnumarationItem = []
@@ -47,6 +48,8 @@ var html_enumQuestion = document.querySelector(".enumItemQuestion")
 var html_enumGroup = document.querySelector(".enumItemGroup")
 var html_enumInOrder = document.querySelector(".enumInOrder")
 var html_addEnumButton = document.querySelector(".addEnumItemFunc")
+
+var html_gameModeFlag = document.querySelector(".gameModeFlag")
 
 // by Ids
 
@@ -136,6 +139,33 @@ function answerTypeIndicator(answer){
     }
 }
 
+function displayGameModeFlag(){
+    
+}
+
+function getFlagDescription(value){
+    if (value <= -4){
+        return "Mastered"
+    }
+
+    if (value >= -3 && value < -2){
+        return "Confident"
+    }
+
+    if (value >= -1 && value <= 1){
+        return "Mediocre"
+    }
+
+    if (value >= 2 && value < 4){
+        return "Hesitant"
+    }
+
+    if (value >= 4){
+        return "Forgetful"
+    }
+
+    return "Mediocre"
+}
 
 function getWhichFlag(value){
     
@@ -184,6 +214,7 @@ function generateForgetfulDetails(item){
 
     var html_forgetfulLabel = document.getElementById("forgetful"+item.group)
     var html_flagRankIndicator = document.getElementById("flagRank"+item.group)
+    var html_gameModeFlagId = document.getElementById("gameModeFlagId")
 
     // update the forgetful things
     if (local_forgetfulFlagScore[item.group] == null){
@@ -199,7 +230,7 @@ function generateForgetfulDetails(item){
         local_forgetfulFlagScore[item.group][1] = local_forgetfulFlagScore[item.group][1] + item.difficultyClassic
     }
 
-    // getTheBestFlag
+    // getTheWorstFlag
     if (item.difficulty > local_bestFlagGroup[item.group][0]){
         local_bestFlagGroup[item.group][0] = item.difficulty
     }
@@ -207,12 +238,26 @@ function generateForgetfulDetails(item){
         local_bestFlagGroup[item.group][1] = item.difficultyClassic
     }
 
+    // getWorstGameModeFlag
+    if (item.difficulty > local_gameModeFlags[0]){
+        local_gameModeFlags[0] = item.difficulty
+    }
+    if (item.difficultyClassic > local_gameModeFlags[1]){
+        local_gameModeFlags[1] = item.difficultyClassic
+    }
+
     var toText = local_forgetfulFlagScore[item.group].join(' ');
 
     html_forgetfulLabel.innerHTML = "Forgetful Score: "+toText
     html_flagRankIndicator.innerHTML = displayFlagRank(local_bestFlagGroup[item.group])
+    html_gameModeFlagId.innerHTML = `Total Flag:
+        <img class="miniFlag" src="`+getWhichFlag(local_gameModeFlags[0])+`">
+        <img class="miniFlag" src="`+getWhichFlag(local_gameModeFlags[1])+`">
+        <img class="miniFlag" src="`+FGrey+`">
+     
+    `
 
-    console.log("ASASA",local_forgetfulFlagScore, local_bestFlagGroup)
+    console.log("ASASA",local_forgetfulFlagScore, local_bestFlagGroup, local_gameModeFlags)
                         
 }
 
@@ -506,6 +551,10 @@ function addItem(){
     var enumAnswer = local_EnumarationItem
     var enumInOrder = html_enumInOrder.checked
 
+    local_forgetfulFlagScore = {} // this is per group
+    local_bestFlagGroup = {}    // this is per group
+    local_gameModeFlags = [-99,-99,0]    // contains the flag/rank of gameModes
+    
     // the code below code be optimized
 
     // if going to add a questionAndAnswer
@@ -782,6 +831,11 @@ function removeItem(){
             local_groupList.splice(indexToRemove, 1);
         }
 
+        local_forgetfulFlagScore = {} // this is per group
+        local_bestFlagGroup = {}    // this is per group
+        local_gameModeFlags = [-99,-99,0]    // contains the flag/rank of gameModes
+        
+
         updateReviewerDetails(local_idCounter, local_amountOfItems, local_groupList)
         hideEditor()
         setTimeout(displayItems, 25);
@@ -851,6 +905,11 @@ function showEditor(index = -1, selectedGroup){
                 html_enumQuestion.value = local_selectedItem.question
                 html_enumInOrder.checked = local_selectedItem.enumInOrder
                 local_EnumarationItem = local_selectedItem.answer
+
+                local_atQuestionType = 1
+                selectQType(1)
+                displayEnumarationAns(local_EnumarationItem)
+
                 html_difficulty.forEach(function(element) {
                     element.innerHTML = `
                     <img class="normalSizeFlag" src="`+getWhichFlag(local_selectedItem.difficulty)+`">
@@ -858,10 +917,6 @@ function showEditor(index = -1, selectedGroup){
                     <img class="normalSizeFlag" src="`+getWhichFlag(0)+`">            
                     `
                 });
-
-                local_atQuestionType = 1
-                selectQType(1)
-                displayEnumarationAns(local_EnumarationItem)
 
                 //update mode
 
@@ -872,8 +927,10 @@ function showEditor(index = -1, selectedGroup){
                 html_group.value = local_selectedItem.group
                 html_question.value = local_selectedItem.question
                 html_answer.value = local_selectedItem.answer
-                html_image.value = local_selectedItem.image
+                html_image.value = local_selectedItem.image                
+                console.log(local_selectedItem)
 
+                updateBothQEQuestions()
                 html_difficulty.forEach(function(element) {
                     element.innerHTML = `
                     <img class="normalSizeFlag" src="`+getWhichFlag(local_selectedItem.difficulty)+`">
@@ -881,10 +938,6 @@ function showEditor(index = -1, selectedGroup){
                     <img class="normalSizeFlag" src="`+getWhichFlag(0)+`">            
                     `
                 });
-                
-                console.log(local_selectedItem)
-
-                updateBothQEQuestions()
             }
 
             html_addEnumButton.value = "Update"
@@ -1050,7 +1103,7 @@ function switchGameModeMenu(mode){
     var COLOR_white = "#ffffff"
     var COLOR_gray = "#bbbbbb"
     var html_initFlagDescription = document.getElementById("initFlagDescription")
-    
+
     // html_practiceModeContainerId 
     // html_classicModeContainerId 
     // html_practiceModeButtonId 
@@ -1059,6 +1112,11 @@ function switchGameModeMenu(mode){
     // html_perfectionModeButtonId
 
     if (mode == 0){
+
+        html_initFlagDescription.innerHTML = `Flag: 
+        <img class="normalSizeFlagIL" src="`+getWhichFlag(local_gameModeFlags[0])+`" /><div style="font-size: 3.3vw; display: inline-block;">`+getFlagDescription(local_gameModeFlags[0])+`</div>
+        `
+
         html_practiceModeContainerId.style.display = "block"
         html_practiceModeButtonId.style.backgroundColor = COLOR_white
         html_classicModeContainerId.style.display = "none"
@@ -1072,9 +1130,17 @@ function switchGameModeMenu(mode){
             easyMode: false,
         }
 
+        
+
+
         localforage.setItem("reviTermGameOptions", gameOption)
 
     } else if (mode == 1) {
+
+        html_initFlagDescription.innerHTML = `Flag: 
+        <img class="normalSizeFlagIL" src="`+getWhichFlag(local_gameModeFlags[1])+`" /><div style="font-size: 3.3vw; display: inline-block;">`+getFlagDescription(local_gameModeFlags[1])+`</div>
+        `
+
         html_classicModeContainerId.style.display = "block"
         html_classicModeButtonId.style.backgroundColor = COLOR_white    
         html_practiceModeContainerId.style.display = "none"
@@ -1090,6 +1156,10 @@ function switchGameModeMenu(mode){
 
         localforage.setItem("reviTermGameOptions", gameOption)
     } else if (mode == 2){
+
+        html_initFlagDescription.innerHTML = `Flag: 
+        <img class="normalSizeFlagIL" src="`+getWhichFlag(local_gameModeFlags[3])+`" /><div style="font-size: 3.3vw; display: inline-block;">`+getFlagDescription(local_gameModeFlags[3])+`</div>
+        `
         html_perfectionModeContainerId.style.display = "block"
         html_perfectionModeButtonId.style.backgroundColor = COLOR_white   
         html_practiceModeContainerId.style.display = "none"
