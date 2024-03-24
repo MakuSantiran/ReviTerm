@@ -1,5 +1,5 @@
 :root {
-    --choiceBottomSpace: 6%;
+    --choiceBottomSpace: 4%;
     --startingHealth: 100%;
     --startingHealthColor: #2dc9328a;
 
@@ -42,6 +42,7 @@
     border-color: #000;
     border-width: 1.1vw;
 
+    font-size: 2vh;
     text-shadow:
     -1px -1px 0 #000,
     1px -1px 0 #000,
@@ -70,6 +71,7 @@
     border-color: #000;
     border-width: 1.1vw;
 
+    font-size: 2vh;
     text-shadow:
     -1px -1px 0 #000,
     1px -1px 0 #000,
@@ -98,6 +100,7 @@
     border-color: #000;
     border-width: 1.1vw;
 
+    font-size: 2vh;
     text-shadow:
     -1px -1px 0 #000,
     1px -1px 0 #000,
@@ -126,6 +129,7 @@
     border-color: #000;
     border-width: 1.1vw;
 
+    font-size: 2vh;
     text-shadow:
     -1px -1px 0 #000,
     1px -1px 0 #000,
@@ -246,14 +250,14 @@
     text-align: center;
 
     padding: 2vw;
-    font-size: 5vw;
+    font-size: 2vh;
 }
 
 .enumSubmit {
     color: #ffffff;
     font-family: 'HeyComic';
 
-    font-size: 5vw;
+    font-size: 2vh;
 
     user-select: none;
 

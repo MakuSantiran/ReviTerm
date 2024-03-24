@@ -2,6 +2,7 @@
 <html>
 <head>
 	<title>Editor</title>
+	<script src="./files/compressorJS/compressor.js"></script>
 	<script type="module" src="./files/reviEditor.js"></script>
 	<link rel="stylesheet" href="./files/css/revEditor.css">
 </head>
@@ -62,19 +63,21 @@
 
 		<div class="editorContainer" id="editorContainerId">
 			<div class="qAAContainer" id="qAAContainerId">
-				Question(Max 255)<br/>
-				<textarea placeholder="Type the question here" class="itemQuestion" name="w3review" rows="4" cols="50" onchange="updateBothQEQuestions()"></textarea>
+				Question(Max 255, w/picture 64)<br/>
+				<textarea placeholder="Type the question here" class="itemQuestion" id="itemQuestionId" name="w3review" rows="4" cols="50" maxlength="255" onchange="updateBothQEQuestions()"></textarea>
 				
 				<div class="flexContainer">
 					<div class="flexItem">
 						<br/>
-						Group<br/>
-						<input placeholder="GroupName" type="text" class="itemGroup" onchange="updateBothQEQuestions()">
+						Group(Max 20)<br/>
+						<input maxlength="20" placeholder="GroupName" type="text" class="itemGroup" onchange="updateBothQEQuestions()">
 				
 						<br/><br/>
-						Answer<br/>
+
+		
+						Answer<br/><div style="font-size: 3.5vw;">Max 64, w/picture 25</div>
 						
-						<input placeholder="AnswerHere" type="text" class="itemAnswer" onchange="updateBothQEQuestions()">
+						<input maxlength="25" placeholder="AnswerHere" type="text" class="itemAnswer" id="itemAnswerId" onchange="updateBothQEQuestions()">
 				
 						<br/><br/>
 						<!--
@@ -89,8 +92,10 @@
 						<br/>
 						Picture<br/>
 
-						<div class="itemImage">
-							Coming Soon!
+						<input type="file" class="itemImageInput" id="itemImageInputId" style="display: none;" name="files" accept=".png, .jpg">
+						<div class="itemImage" onclick="pictureManager()">
+							<img src="" class="itemImageShow"/>
+							Tap here to add picture
 						</div>
 
 					</div>
@@ -248,7 +253,7 @@
 				<div class="flexContainer">
 					<div class="flexItem">
 						<div class="">
-							No Music: <input type="checkbox" class="reviGameNoMusic" id="reviGameNoMusicId">
+							No Drain: <input type="checkbox" class="reviGameNoMusic" id="reviGameNoMusicId">
 						</div>
 					</div>
 					<div class="flexItem">

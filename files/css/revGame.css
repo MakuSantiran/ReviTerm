@@ -13,6 +13,7 @@ body {
     color: #ebebeb;
 
     overflow-x: hidden;
+    overflow-y: hidden;
 }
 
 /* QuizContainers and such *//* QuizContainers and such *//* QuizContainers and such *//* QuizContainers and such *//* QuizContainers and such */
@@ -21,17 +22,18 @@ body {
 
 .quizContainer {
     text-align: center;
-
     position: absolute;
-    top: 50%;
+    top: 45%;
     left: 50%;
+    width: 100%;
     transform: translate(-50%, -50%);
 
-    width: 100%;
 }
 
 .question{ 
-    width: 95%;
+    width: 90%;
+
+    font-size: 5vw;
 
     margin: 0 auto; /* Center the div horizontally */
 
@@ -57,7 +59,7 @@ hr {
 .groupTitleContainer {
     padding: 3vw;
     margin-bottom: 1vh;
-    font-size: 10vw;
+    font-size: 8vw;
 
     text-align: center;
 }
@@ -90,8 +92,24 @@ hr {
 .inline-image {
     position: absolute; /* Position the image absolutely */
     right: 25vw;
-    top: -6vw;
+    top: -10vw;
 }
+
+.questionImageContainer{
+    background-color: #000000;
+    width: 64vw;
+    height: 64vw;
+    
+    margin: 0 auto; 
+    margin-bottom: 5vw;
+}
+
+.questionImage{
+    padding: 2px;
+    width: 98%;
+    height: 98%;
+}
+
 
 
 /* AFTER Session *//* AFTER Session *//* AFTER Session *//* AFTER Session *//* AFTER Session *//* AFTER Session *//* AFTER Session *//* AFTER Session *//* AFTER Session */
@@ -163,3 +181,106 @@ hr {
 }
 
 
+/*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*/
+/*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*/
+/*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*//*SP EFX*/
+
+.lowHealthEffectsContainer{
+    opacity: 1;
+}
+
+.lowHealth{
+	position: fixed;
+	top: 0%;
+	left: 0%;
+	background-image: linear-gradient(
+		to top, 
+		rgba(206, 0, 0,0.5) 0%, 
+		rgba(255, 0, 0, 0.1) 40%, 
+		rgba(255, 0, 0, 0) 50%, 
+		rgba(255, 0, 0, 0) 95%, 
+		rgba(206, 0, 0,0) 100%
+	);
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+	transition: 1s;
+	opacity: 1;
+}
+
+/* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER */
+/* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER */
+/* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER *//* GAME OVER */
+
+.gameOverBlackScreen{
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: #000;
+    width: 100%;
+    height: 100%;
+
+    display: none;
+
+    opacity: 0;
+    
+    z-index: 5;
+}
+
+.gameOverContainer {
+    position: absolute;
+    width: 80%;
+    height: 50%; /* Set height to center vertically */
+    top: 50%; /* Position from top */
+    left: 50%; /* Position from left */
+    transform: translate(-50%, -50%); /* Center horizontally and vertically */
+    text-align: center; /* Center text horizontally */
+
+    display: none;
+}
+
+
+.gameOverGoBackButton{
+    background-color: #c8c8c8;
+    color: #000000;
+
+    padding: 2vw;
+
+    width: 16vw;
+
+    text-decoration: none; 
+    font-size: 4vw;
+
+    user-select: none;
+}
+
+.gameOverButtonContainer{
+    display: none;
+}
+
+.gameOverRestartButton{
+    background-color: #2c6b21;
+    color: #ffffff;
+
+    padding: 2vw;
+
+    width: 16vw;
+
+    text-decoration: none; 
+    font-size: 4vw;
+
+    user-select: none;
+}
+
+
+.gameOverRestartButton:hover{
+    cursor: pointer;
+}
+
+.gameOverGoBackButton:hover{
+    cursor: pointer;
+}
+
+.onlyAnswered{
+    display: inline-block;
+}

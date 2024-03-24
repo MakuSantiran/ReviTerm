@@ -1,6 +1,5 @@
 import localforage from "./localForage/localforage.js" 
 
-
 //just load the script
 //var VelocityJsScript = document.createElement('script');
 //VelocityJsScript.src = './files/VelocityJS/velocity.js';
@@ -8,6 +7,8 @@ import localforage from "./localForage/localforage.js"
 //document.body.appendChild(VelocityJsScript);
 
 // html things
+
+// id
 var html_Question = document.getElementById("question")
 var html_Choice = document.getElementById("choices")
 var html_Answer = document.getElementById("answer")
@@ -19,6 +20,7 @@ var html_forgetfulFlagYellowId = document.getElementById("forgetfulFlag_YellowId
 var html_choicesContainer = document.getElementById("choicesContainerId")
 var html_restartContainer = document.getElementById("restartContainerId")
 
+var html_questionImageContainerId = document.getElementById("questionImageContainerId")
 var html_multipleChoiceContainer = document.getElementById("multipleChoiceContainerId")
 var html_enumarationId = document.getElementById("enumarationId")
 var html_enumSubContainerId = document.getElementById("enumSubContainerId")
@@ -30,6 +32,15 @@ var html_health3Id = document.getElementById("health3Id")
 var html_health4Id = document.getElementById("health4Id")
 var html_enumHealthId = document.getElementById("enumHealthId")
 
+var html_gameOverBlackScreenId = document.getElementById("gameOverBlackScreenId")
+var html_gameOverContainerId = document.getElementById("gameOverContainerId")
+var html_gameOverButtonContainerId = document.getElementById("gameOverButtonContainerId")
+
+var html_lowHealthEffectsContainerId = document.getElementById("lowHealthEffectsContainerId")
+html_lowHealthEffectsContainerId.style.opacity = 0
+
+// classes
+
 var html_health1 = document.querySelector("health1")
 var html_health2 = document.querySelector("health2")
 var html_health3 = document.querySelector("health3")
@@ -40,6 +51,12 @@ var html_forgetfulFlagYellow = document.querySelector(".forgetfulFlag_Yellow")
 var html_quizContainer = document.querySelector(".quizContainer")
 var html_enumFlexContainer = document.querySelector(".enumFlexContainer")
 var html_enumAnswer = document.querySelector(".enumAnswer")
+
+var html_questionImageContainer = document.querySelector(".questionImageContainer")
+
+var html_gameOverBlackScreen = document.querySelector(".gameOverBlackScreen")
+var html_gameOverContainer = document.querySelector(".gameOverContainer")
+var html_gameOverButtonContainer = document.querySelector(".gameOverButtonContainer")
 
 // variables
 var reviGame = {
@@ -94,6 +111,11 @@ var reviewerDatabase = ""
 var difficultyRange = 5
 var yellowFlagRange = 2
 var redFlagRange = 4
+var greyYellowFlagRange = 1
+var middlePointFlagRange = 0
+var greyGreenFlagRange = -1
+var greenFlagRange = -2
+var blueFlagRange = -4
 
 // Remix mode stuff
 var whichDifficultyType = "difficulty"
@@ -103,9 +125,69 @@ var unscrambledChoices = []
 var blankedQuestion = ""
 var answerForBlank = ""
 
+var remixModeValueRange = 5
+var remixModeValueRarity = 5
+
+
 // damages
 var multipleChoiceDMG = 18
-var enumDMG = 3
+var enumDMG = 8
+
+// Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds 
+// Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds 
+// Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds 
+
+
+var crrct_audio = new Audio('./files/sfx/Correct.wav');
+var wrng_audio = new Audio('./files/sfx/Wrong.wav');
+var restart_audio = new Audio('./files/sfx/Start.wav');
+var bgmusic = new Audio('./files/sfx/ReviTermWeCantSlowDown.mp3')
+
+// set things
+restart_audio.volume = 0.3
+
+
+var reviTermSfx_BGLoaded = false
+var reviTermSfx_BGSpeed = 1
+//reviTermSfx_BGSpdLerp = 1
+var reviTermSfx_CurrentBg;
+var reviTermSfx_BGMUSIC1 = "./files/sfx/ReviTermWeCantSlowDown.mp3"
+
+function playBg(fileSource) {
+    // Create a new sound object
+    reviTermSfx_CurrentBg = new Pizzicato.Sound({
+        source: 'file', // Use a sine wave as the sound source
+        options: {
+            path: fileSource,
+            speed: 1,
+            volume: 0.5,
+            loop: true // Loop the sound
+        }
+    }
+    // load the sound first
+    ,function() {
+        // Play the sound
+        reviTermSfx_BGLoaded = true
+        reviTermSfx_CurrentBg.play();
+    });
+}
+
+function speedSmooth(oldSpeed, targetSpeed, value){
+    var reviTermSfx_BGSpdLerp = lerp(reviTermSfx_BGSpeed, targetSpeed, 0.005)
+    reviTermSfx_BGSpeed = reviTermSfx_BGSpdLerp
+
+    return reviTermSfx_BGSpdLerp
+}
+
+function changeBgSpeed(newSpeed, smoothValue) {
+    // Check if the sound object exists
+    if (reviTermSfx_BGLoaded) {
+        var editedSpeed = speedSmooth(reviTermSfx_BGSpeed, newSpeed, smoothValue)
+        // Change the speed of the sound
+        reviTermSfx_CurrentBg.sourceNode.playbackRate.value = editedSpeed;
+        //console.log(editedSpeed)
+    }
+}
 
 // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms 
 // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms 
@@ -433,58 +515,83 @@ function checkIfTheSame(toBeCmp, string){
 // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations 
 
 function flagShakeAnimation() {
-    var properties = {
-        top: ['-10px', '10px'] // Bobbing range
-    };
-
-    var options = {
-        duration: 1000, // Duration of each shake (milliseconds)
-        easing: 'easeInOutQuad', // Linear easing for smooth motion
-        loop: true
-    };
-
-    Velocity(html_forgetfulFlag,properties,options)
-
+    //Velocity(html_forgetfulFlag,properties,options)
+    anime({
+        targets: html_forgetfulFlag,
+        top: ["10px","0px","10px","0px"],
+        duration: 5000,
+        easing: 'easeInOutQuad',
+        loop: true,
+    });
 }
 
 function wrongAnswerAnimation(){
-    var properties = {
-        left: function() {
-          var leftValue = randomNumbers(-3,3)
-          return 50 + leftValue + '%';
-        },
-        top: function() {
-            var leftValue = randomNumbers(-3,3)
-            return 50 + leftValue + '%';
-        },
-    };
+    var randomXValue = randomNumbers(-5,5)
+    var randomYValue = randomNumbers(-1,1)
 
-    var options = {
-        duration: 40, // Duration of each shake (milliseconds)
-        easing: 'linear', // Linear easing for smooth motion
-        loop: 1, // Number of times to repeat the animation
-        complete: function() {
-            // Chain another animation after fading out
-            Velocity(html_quizContainer, {left: "49%", top: "50%" }, { duration: 1 });
-        }
-    };   
 
-    Velocity(html_quizContainer,properties,options)
+    //Velocity(html_quizContainer,properties,options)
+
+    //Velocity(html_quizContainer, {left: "49%", top: "50%" }, { duration: 1 });
+    
+    console.log( 50 + randomXValue + '%')
+
+    if (reviGame.trueHealth > 0){
+        anime({
+            targets: html_quizContainer,
+            left: 50 + randomXValue + '%',
+            top: 40 + randomYValue + '%',
+            duration: 5,
+            easing: 'linear',
+            loop: 1,
+            complete: function(anim) {
+                anime({targets: html_quizContainer, left: "49%", top: "50%"})
+            }
+        });
+    }
 }
 
 function updateForgetfulFlag(difficultyType){
     var forgetfulLevel = reviewItems[reviGame.atNumber][difficultyType]
 
-    if (forgetfulLevel > yellowFlagRange){
-        html_forgetfulFlagId.style.display = "flex";
-    } else {
-        html_forgetfulFlagId.style.display = "none";
+    html_forgetfulFlagId.style.display = "flex";
+
+    remixModeValueRange = 0
+    remixModeValueRarity = 10
+
+    // Yellow Flag
+    if (forgetfulLevel >= yellowFlagRange && forgetfulLevel < redFlagRange){
+        html_forgetfulFlagId.src = './files/img/flags/FYELLOW.png'
+    }
+        
+    // Red Flag
+    if (forgetfulLevel >= redFlagRange){
+        html_forgetfulFlagId.src = './files/img/flags/FRED.png'
     }
 
-    if (forgetfulLevel >= yellowFlagRange && forgetfulLevel < redFlagRange){
-        html_forgetfulFlagId.src = './files/img/SlightlyForgetful.png'
-    } else if (forgetfulLevel >= redFlagRange){
-        html_forgetfulFlagId.src = './files/img/ForgetfulFlag.png'
+    // Grey Flag
+    if (forgetfulLevel == greyYellowFlagRange){
+        html_forgetfulFlagId.src = './files/img/flags/FGORANGE.png'
+    }
+    if (forgetfulLevel == middlePointFlagRange){
+        html_forgetfulFlagId.src = './files/img/flags/FGREY.png'
+    }
+    if (forgetfulLevel == greyGreenFlagRange){
+        html_forgetfulFlagId.src = './files/img/flags/FGGREEN.png'
+    }
+    
+    // Green Flag
+    if (forgetfulLevel <= greenFlagRange){
+        html_forgetfulFlagId.src = './files/img/flags/FGREEN.png'
+        remixModeValueRange = 5
+        remixModeValueRarity = 10
+    }
+
+    // Blue Flag
+    if (forgetfulLevel <= blueFlagRange){
+        html_forgetfulFlagId.src = './files/img/flags/FBLUE.png'
+        remixModeValueRange = 5
+        remixModeValueRarity = 3
     }
 
     console.log(forgetfulLevel, reviGame.flagShakeIntensity)
@@ -496,6 +603,8 @@ function drainHealthAnimation(){
 
     var lerpHealth = lerp(reviGame.trueHealth, reviGame.health, 0.05)
     reviGame.trueHealth = lerpHealth
+
+    var lowHPOpacity = html_lowHealthEffectsContainerId.style.opacity 
 
     if (lerpHealth > 100){
         lerpHealth = 100
@@ -509,6 +618,11 @@ function drainHealthAnimation(){
         html_health3Id.style.backgroundColor = "#2dc9328a"
         html_health4Id.style.backgroundColor = "#2dc9328a"
         html_enumHealthId.style.backgroundColor = "#2dc9328a"
+        changeBgSpeed(1, 0.3)
+
+        if (lowHPOpacity > 0){
+            html_lowHealthEffectsContainerId.style.opacity = parseFloat(lowHPOpacity) - parseFloat(0.005)
+        }
     }
 
     if (lerpHealth <= 50 && lerpHealth > 25){
@@ -517,6 +631,11 @@ function drainHealthAnimation(){
         html_health3Id.style.backgroundColor = "#f4f12b8a"
         html_health4Id.style.backgroundColor = "#f4f12b8a"
         html_enumHealthId.style.backgroundColor = "#f4f12b8a"
+        changeBgSpeed(1, 0.3)
+
+        if (lowHPOpacity < 0){
+            html_lowHealthEffectsContainerId.style.opacity = parseFloat(lowHPOpacity) - parseFloat(0.005)
+        }
     }
 
     if (lerpHealth <= 25){
@@ -524,7 +643,15 @@ function drainHealthAnimation(){
         html_health2Id.style.backgroundColor = "#ff4949" 
         html_health3Id.style.backgroundColor = "#ff4949" 
         html_health4Id.style.backgroundColor = "#ff4949" 
-        html_enumHealthId.style.backgroundColor = "#ff4949"      
+        html_enumHealthId.style.backgroundColor = "#ff4949"   
+        changeBgSpeed(1.1, 0.3)
+        
+        if (lowHPOpacity < 1){
+            //console.log(lowHPOpacity)
+            // JavaScript is weird
+            html_lowHealthEffectsContainerId.style.opacity = parseFloat(lowHPOpacity) + parseFloat(0.005)
+        }
+        
     }
 
     html_health1Id.style.width = lerpHealth+"%"
@@ -533,6 +660,106 @@ function drainHealthAnimation(){
     html_health4Id.style.width = lerpHealth+"%"
     html_enumHealthId.style.width = lerpHealth+"%"
 
+
+
+}
+
+function hideGameOverScrn(){
+    
+}
+
+function animateLowHealth(){
+    var html_lowHealth = document.querySelector(".lowHealth")
+
+    anime({
+        targets: html_lowHealth,
+        display: "block",
+        opacity: [0,2],
+        duration: 2000,
+        easing: 'easeInQuad',
+        loop: true,
+    });
+    
+
+
+    setInterval(function(){
+        if (reviGame.trueHealth < 25){
+            createFireParticle()
+        }
+    }, 50)
+}
+
+function showGameOverScrn(){
+    anime({
+        targets: html_quizContainer,
+        top: ["50%", "200%"],
+        left: ["50%"],
+        duration: 2000,
+        rotate: '50deg',
+        easing: 'easeInQuad',
+        loop: 1,
+        complete: function(anim) {
+            anime({targets: html_quizContainer, 
+                left: "50%", 
+                top: "50%", 
+                rotate: '0deg',
+                translateX: "-50%",
+                translateY: "-50%",})
+        }
+    });
+    
+
+    var html_gameOverBlackScreen = document.querySelector(".gameOverBlackScreen")
+    html_gameOverBlackScreenId.style.display = "block"
+
+    
+    anime({
+        targets: html_gameOverBlackScreen,
+        display: "block",
+        opacity: [0,1],
+        duration: 1000,
+        easing: 'easeInQuad',
+        loop: 1,
+    });
+    
+
+   //Velocity(html_gameOverBlackScreen, properties,options)
+
+    console.log("Happening!, WTFFF")
+    
+    setTimeout(displayGameOverMessage, 1500)
+    //setTimeout(startReviTerm, 1000) 
+}
+
+function createFireParticle() {
+    var fireContainer = document.getElementById('fireContainer');
+    var numberOfChildren = fireContainer.childElementCount;
+
+    if (numberOfChildren < 20){
+        var particle = document.createElement('div');
+        particle.className = 'fireParticle';
+        fireContainer.appendChild(particle);
+        particle.style.left = (Math.random() * 95) + "%";
+    
+        var x = parseFloat(Math.random() * window.innerWidth);
+        var y = window.innerHeight - 10; // Start at the bottom of the screen
+        var speed = Math.random() * 2 + 1; // Random speed between 1 and 3
+        var opacity = Math.random() * 0.5 + 0.5; // Random opacity between 0.5 and 1
+        var size = Math.random() * 20 + 10; // Random size between 10 and 30
+    
+        anime({
+            targets: particle,
+            bottom: ["0%", "50%"],
+            opacity: [opacity, 0],
+            width: [size, 0],
+            height: [size, 0],
+            duration: 700,
+            easing: 'easeOutExpo',
+            complete: function(anim) {
+                fireContainer.removeChild(particle); // Remove the particle after animation
+            }
+        });
+    }
 
 
 }
@@ -811,7 +1038,7 @@ function showChoices(Group){
     if (checkIfStringOrArray(currentItem)) {
 
         // if Multiple Choice
-        if (remixModeValue == 0){
+        if (remixModeValue <= 0){
             html_multipleChoiceContainer.style.display = "block"
             html_enumarationId.style.display = "none"
             multipleChoice(Group)
@@ -986,21 +1213,22 @@ function restartingMessage(){
     html_GroupTitle.innerHTML = "Restarting"
     html_Question.innerHTML = ``
     html_restartContainer.style.display = "none";
+
+    if (whichDifficultyType == "difficultyClassic"){
+        reviTermSfx_CurrentBg.play()
+    }
     setTimeout(startReviTerm, 1000) 
 }
 
 function proceedToNextItem(){
     // if not finished
     if (reviewItems.length > reviGame.atNumber){
-
-
         if (reviGame.options.mode != "Practice"){
-            remixModeValue = randomNumbers(0,5)
+            remixModeValue = randomNumbers(-remixModeValueRarity, remixModeValueRange)
             console.log("remixMOdeValuE "+remixModeValue)
         }
         
-        html_GroupTitle.innerHTML =  reviewItems[reviGame.atNumber].group
-        html_Question.innerHTML = reviewItems[reviGame.atNumber].question
+        displayQuestion()
         //html_difficultyMeter.innerHTML = "DifficultyMeter: "+reviewItems[reviGame.atNumber][whichDifficultyType]
         showChoices(reviewItems[reviGame.atNumber].group)   
         reviGame.preventSubmission = false
@@ -1049,20 +1277,37 @@ function goBackToEditor(){
     window.location.replace("reviEditor.html");
 }
 
+function restartFromGameOver(){
+    html_gameOverContainerId.style.display = "none"
+    html_gameOverButtonContainerId.style.display = "none"
+    html_gameOverBlackScreenId.style.opacity = 0
+    html_gameOverBlackScreenId.style.display = "none"
+    reviTermSfx_BGSpeed = 1
+
+    setTimeout(startReviTerm,100) 
+}
+
 // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System 
 // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System 
 // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System // Health System 
 
 function drainHealth(){
     if (reviGame.isPaused == false && reviGame.isFinished == false){
-        if (reviGame.health > 0){
-            reviGame.health = reviGame.health - 0.005
+        if (reviGame.trueHealth > 0){
+            //reviGame.health = reviGame.health - 0.007
+            reviGame.health = reviGame.health - 0.1
             drainHealthAnimation(reviGame.health)    
-            console.log(reviGame.health)        
+            //console.log(reviGame.health)        
         } else {
-            console.log("GAME OVER")
+            //console.log(reviGame.gameOver)
+            if (reviGame.gameOver == false){
+                console.log("GAME OVER")
+                showGameOverScrn()
+                reviGame.gameOver = true
+            }
+            
+            changeBgSpeed(0, 0.05)
         }
-
     }
 }
 
@@ -1071,23 +1316,55 @@ function drainHealth(){
 // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs 
 // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs // Display question/Stuffs 
 
+function displayImage(){
+    console.log("Content of image", reviewItems[reviGame.atNumber].image)
+    
+    anime({
+        targets: html_quizContainer,
+        top: "50%",
+        left: "50%",
+        translateX: "-50%",
+        translateY: "-50%",
+        rotate: '0deg',
+        loop: 1,
+    });
+
+    if (reviewItems[reviGame.atNumber].image != ""){
+        html_questionImageContainerId.style.display = "block"
+
+        var blobUrl = URL.createObjectURL(reviewItems[reviGame.atNumber].image)
+        document.querySelector(".questionImage").src = blobUrl
+        //console.log(reviewItems[reviGame.atNumber].image)
+    }
+
+    if (reviewItems[reviGame.atNumber].image == ""){
+        html_questionImageContainerId.style.display = "none"
+    }
+    
+}
+
 function displayQuestion(){
     html_GroupTitle.innerHTML =  reviewItems[reviGame.atNumber].group
     html_Question.innerHTML = reviewItems[reviGame.atNumber].question
+    displayImage()
+
     //html_difficultyMeter.innerHTML = "DifficultyMeter: "+reviewItems[reviGame.atNumber][whichDifficultyType]
 }
 
 function displayTrueFalse(toCheck){
     html_GroupTitle.innerHTML =  reviewItems[reviGame.atNumber].group
     html_Question.innerHTML = reviewItems[reviGame.atNumber].question+`<br/><br/><div style="display: inline-block; color: #77ccf0;">`+toCheck+`</div> is the answer!`
+    displayImage()
 }
 
 function displayPickTheWrong(){
     html_GroupTitle.innerHTML =  reviewItems[reviGame.atNumber].group
     html_Question.innerHTML = reviewItems[reviGame.atNumber].question+`<br/><br/><div style="display: inline-block; color: #77ccf0;"> Pick the WRONG ANSWER!</div>`
+    displayImage()
 }
 
 function displayCongrats(){
+    html_questionImageContainerId.style.display = "none"
     html_GroupTitle.innerHTML = "Nicely Done!"
     html_Question.innerHTML =
     `You completed the review session!<br/><br/>Total Items: `+(reviGame.atNumber)+`<br/>Total Mistakes: `+reviGame.totalMistakes+``
@@ -1108,6 +1385,10 @@ function displayCongrats(){
         }
     }
 
+    if (whichDifficultyType == "difficultyClassic"){
+        reviTermSfx_CurrentBg.pause()
+    }
+
     localforage.getItem(reviewerDatabase, function (err, value) {
         console.log(value)
         localforage.setItem(reviewerDatabase, reviewItems)
@@ -1120,6 +1401,26 @@ function displayCongrats(){
 function customDisplayQuestion(Question){
     html_GroupTitle.innerHTML =  reviewItems[reviGame.atNumber].group
     html_Question.innerHTML = Question
+    displayImage()
+}
+
+function displayGameOverMessage(){
+    html_gameOverContainerId.style.display = "block"
+    var html_onlyAnswered = document.querySelector(".onlyAnswered")
+
+
+    html_onlyAnswered.innerHTML = "You only answered "+reviGame.atNumber+"/"+reviewItems.length+" items"
+
+
+    resetMultipleChoices()
+
+    //reviGame.isFinished = true
+
+    localforage.getItem(reviewerDatabase, function (err, value) {
+        console.log(value)
+        localforage.setItem(reviewerDatabase, reviewItems)
+        html_gameOverButtonContainerId.style.display = "block";
+    })  
 }
 
 // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers // CheckAnswers 
@@ -1186,7 +1487,7 @@ function checkAnswer(userAnswer){
 function checkAnswerMultipleChoice(choiceNum){
 
     // multipleChoice
-    if (remixModeValue == 0){
+    if (remixModeValue <= 0){
         if (!reviGame.preventSubmission){
             reviGame.preventSubmission = true
     
@@ -1199,6 +1500,7 @@ function checkAnswerMultipleChoice(choiceNum){
             if (html_selectedContainer.style.backgroundColor != "rgb(128, 32, 32)"){
                 // if correct
                 if (checkAnswer(userAnswer)){
+                    crrct_audio.play()
                     html_selectedContainer.style.backgroundColor = "#1bbb0c"
                     html_selectedContainer.style.borderColor = "#1bbb0c"
                     reviGame.health = reviGame.health + (multipleChoiceDMG*0.5)
@@ -1210,6 +1512,7 @@ function checkAnswerMultipleChoice(choiceNum){
                     html_selectedContainer.style.backgroundColor = "#802020"
                     html_selectedContainer.style.borderColor = "#802020"
                     reviGame.health = reviGame.health - multipleChoiceDMG
+                    wrng_audio.play()
                 }
             } else {
                 reAllowToSubmit()
@@ -1235,6 +1538,7 @@ function checkAnswerMultipleChoice(choiceNum){
                     html_selectedContainer.style.borderColor = "#1bbb0c"
                     reviGame.health = reviGame.health + (multipleChoiceDMG*0.5)
                     checkAnswer(reviewItems[reviGame.atNumber].answer)
+                    crrct_audio.play()
                 }
                 // if wrong
                 else {
@@ -1243,6 +1547,7 @@ function checkAnswerMultipleChoice(choiceNum){
                     html_selectedContainer.style.borderColor = "#802020"
                     reviGame.health = reviGame.health - multipleChoiceDMG
                     checkAnswer("")
+                    wrng_audio.play()
                 }
             } else {
                 reAllowToSubmit()
@@ -1269,6 +1574,7 @@ function checkAnswerMultipleChoice(choiceNum){
                     reviGame.health = reviGame.health + (multipleChoiceDMG*0.5)
                     html_selectedChoice.innerHTML = userAnswer
                     unscrambledChoices = []
+                    crrct_audio.play()
                 }
                 // if wrong
                 else {
@@ -1277,6 +1583,7 @@ function checkAnswerMultipleChoice(choiceNum){
                     html_selectedContainer.style.borderColor = "#802020"
                     reviGame.health = reviGame.health - multipleChoiceDMG
                     html_selectedChoice.innerHTML = userAnswer
+                    wrng_audio.play()
                 }
             } else {
                 reAllowToSubmit()
@@ -1315,6 +1622,7 @@ function checkAnswerMultipleChoice(choiceNum){
                     html_selectedContainer.style.backgroundColor = "#1bbb0c"
                     html_selectedContainer.style.borderColor = "#1bbb0c"
                     reviGame.health = reviGame.health + (multipleChoiceDMG*0.5)
+                    crrct_audio.play()
                 }
                 // if wrong
                 else {
@@ -1322,6 +1630,7 @@ function checkAnswerMultipleChoice(choiceNum){
                     html_selectedContainer.style.backgroundColor = "#802020"
                     html_selectedContainer.style.borderColor = "#802020"
                     reviGame.health = reviGame.health - multipleChoiceDMG
+                    wrng_audio.play()
                 }
             } else {
                 reAllowToSubmit()
@@ -1402,6 +1711,7 @@ function checkAnswerEnumeration(){
 
                 scanIfAnsweredAllEnum()
                 setTimeout(reAllowToSubmit, 500)
+                crrct_audio.play()
             } else {
                 html_enumSubContainerId.style.backgroundColor = "#363636"
                 html_enumSubContainerId.style.borderColor = "#363636"
@@ -1432,7 +1742,7 @@ function checkAnswerEnumeration(){
             updateForgetfulFlag(whichDifficultyType)
             wrongAnswerAnimation()
             setTimeout(reAllowToSubmit, 500) 
-            
+            wrng_audio.play()
         }
     }
 }
@@ -1466,9 +1776,10 @@ function classicMode(){
     console.log("HelloThere! Classic!")
 
     //initiateHealth
-    reviGame.health = 100
+    reviGame.health = 110
+    reviGame.trueHealth = 110
+    reviGame.gameOver = false
     reviGame.isFinished = false
-
 
     // shuffle first
     reviewItems = shuffleArray(reviewItems)
@@ -1506,9 +1817,14 @@ function startReviTerm(){
     if (reviGame.options.mode == "Practice"){
         whichDifficultyType = "difficulty"
         practiceMode()
+        restart_audio.play()
     } else if (reviGame.options.mode == "Classic"){
         whichDifficultyType = "difficultyClassic"
         classicMode()
+        restart_audio.play()
+        if (reviTermSfx_BGLoaded == false){
+            playBg(reviTermSfx_BGMUSIC1)
+        }
     } else if (reviGame.options.mode == "Perfection"){
         perfectionMode()
     }
@@ -1528,10 +1844,24 @@ function startIntervalLoop(){
 
 getReviewerContent()
 flagShakeAnimation()
-
+animateLowHealth()
 
 window.checkAnswerMultipleChoice = checkAnswerMultipleChoice
 window.checkAnswerEnumeration = checkAnswerEnumeration
 
 document.querySelector(".goBackButton").addEventListener("click", goBackToEditor);
 document.querySelector(".restartButton").addEventListener("click", restartingMessage);
+
+document.querySelector(".gameOverGoBackButton").addEventListener("click", goBackToEditor);
+document.querySelector(".gameOverRestartButton").addEventListener("click", restartFromGameOver);
+
+
+// initialize animations
+anime({
+    targets: html_quizContainer,
+    top: "50%",
+    left: "50%",
+    translateX: "-50%",
+    translateY: "-50%",
+    loop: 1,
+});

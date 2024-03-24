@@ -3,11 +3,14 @@
     <head>
         <title>Review Terminologies</title>
         <script src="./files/VelocityJS/velocity.js"></script>
+        <script src="./files/AnimeJs/anime.min.js"></script>
+        <script src="./files/Pizzicato/Pizzicato.js"></script>
         <script type="module" src="./files/reviGame.js"></script>
 
         <!-- styles -->
         <link rel="stylesheet" href="./files/css/revGame.css">
         <link rel="stylesheet" href="./files/css/revGame/playerChoices.css">
+        <link rel="stylesheet" href="./files/css/revGame/particles.css">
     </head>
     <body background="files/img/bg/practiceModeBg.png">
         <div class="quizContainer">
@@ -17,9 +20,13 @@
                 </div>
                 <div class="groupTitle" id="groupTitle">Reviewer Doesn't Contain Anything :(</div>
             </div>
-            
-            <p id="question" class="question"></p>
 
+            <div class="questionImageContainer" id="questionImageContainerId">
+                <img class="questionImage" id="questionImageId" src="" />
+            </div>
+
+            <p id="question" class="question"></p>
+            
             <div class="restartContainer" id="restartContainerId">
                 <div class="flexContainer">
                     <div class="flexItem">
@@ -35,11 +42,11 @@
                 </div>
             </div>
 
-            <br/><br/>
+            <br/>
 
             <div class="choicesContainer" id="choicesContainerId">
+                <!-- Multiple Choices -->
                 <div class="multipleChoiceContainer" id="multipleChoiceContainerId">
-                    <!-- Multiple Choices -->
                     <div class="choice1Container" id="choiceContainerId1" onclick="checkAnswerMultipleChoice(1)">
                         <div class="choice1" id="choice1Id">choice 1</div>
                         <div class="health1" id="health1Id">
@@ -62,8 +69,8 @@
                     </div>
                 </div>
 
+                <!-- Enumaration -->
                 <div class="enumarationId" id="enumarationId">
-
                     <input type="text" class="enumAnswer" id="enumAnswerId" placeholder="Your answer"> 
                     <center>
                         <div class="enumSubContainer" id="enumSubContainerId" onclick="checkAnswerEnumeration()">
@@ -72,10 +79,7 @@
                             </div>
                             <div class="enumHealth" id="enumHealthId"></div>
                         </div>
-
                     </center>
-        
-                    
                     <div class="enumChoices" id="enumChoicesId">
                         <div class="enumFlexContainer">
                         </div>
@@ -83,7 +87,6 @@
                 </div>
 
             </div>
-
 
             <div style="display: none;">
                 <br/><br/>
@@ -93,15 +96,50 @@
                 <!--
                     <button onclick="checkAnswerIdentification()">Submit</button>
                 -->
-                
                 <hr/>
-
                 <br/>
             </div>
-
             <!--
                 <div id="difficultyMeter"> </div>
             -->
+        </div>
+
+        <div class="lowHealthEffectsContainer" id="lowHealthEffectsContainerId">
+            <div id="fireContainer"> </div>
+            <div class="lowHealth"> </div>
+        </div>
+        
+
+        <div class="gameOverBlackScreen" id="gameOverBlackScreenId">
+            <div class="gameOverContainer" id="gameOverContainerId">
+                <h1>ReviFailed!</h1>
+                Game Over!<br/>
+                <div class="onlyAnswered">You only answered #/# questions </div>
+                <br/><br/><br/>
+                -insert pic here-
+                <br/><br/><br/>
+
+                <div class="gameOverButtonContainer" id="gameOverButtonContainerId">
+                    <div class="flexContainer">
+                        <div class="flexItem">
+                            <center>
+                                <div class="gameOverGoBackButton">
+                                    Go back
+                                </div>
+                            </center>
+                        </div>
+                        <div class="flexItem">
+                            <center>
+                                <div class="gameOverRestartButton">
+                                    Retry
+                                </div>
+                            </center>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
         </div>
     </body>
 </html>

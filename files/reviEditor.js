@@ -35,6 +35,11 @@ var local_atQuestionType = 0
 
 var local_whichGroupsAreHidden = []
 
+var forgetfulScoreAdjacent = 5
+
+// as the name suggests
+var local_firstRun = true
+
 // by classes
 
 var html_group = document.querySelector(".itemGroup")
@@ -52,7 +57,8 @@ var html_addEnumButton = document.querySelector(".addEnumItemFunc")
 var html_gameModeFlag = document.querySelector(".gameModeFlag")
 
 // by Ids
-
+var html_itemAnswerId = document.getElementById("itemAnswerId")
+var html_questionId = document.getElementById("itemQuestionId")
 var html_enumInOrderId = document.getElementById("enumInOrderId")
 var html_QAAB = document.getElementById("QAButtonId")
 var html_EnumB = document.getElementById("EnumButtonId")
@@ -123,6 +129,91 @@ function removeHiddenGroup(arr, id) {
     return arr;
 }
 
+function addPicture(event) {
+    var file = event.target.files[0];
+
+    console.log("Running")
+
+    if (!file) {
+        console.log("file not found!")
+        return;
+    }
+    
+    var fileReader = new FileReader();
+    var Compressor = window.Compressor; //load the compressor
+    var maxSize = 3 * 1024 * 1024; // 3MB
+
+    fileReader.onload = function(loadedFile) {
+        var arrayBuffer = loadedFile.target.result;
+
+        if (file.size > maxSize) {
+            alert('Please choose an image that is 3MB or less.');
+            return;
+        }
+
+        // Adjust the options as needed
+        var options = {
+            quality: 0.3, // Change the quality as desired
+            //maxWidth: 800, // Maximum width of the image
+            //maxHeight: 600, // Maximum height of the image
+
+            success(result) {
+                //result, result.name
+                console.log('Upload success', result.name);
+                console.log("blob", result)
+
+                local_selectedItem.image = result
+                console.log(local_selectedItem)
+                
+                var blobUrl = URL.createObjectURL(result);
+                document.querySelector(".itemImageShow").src = blobUrl
+
+                updateBothQEQuestions()
+
+                //alert(fileName)
+            },
+
+            error(err) {
+                console.log(err.message);
+            },
+        };
+
+        // Get the file name
+        var fileName = document.getElementById('itemImageInputId').value
+        var fileExtension = fileName.split('.').pop();
+
+        var imageCompressor = new Compressor(file, options);
+    };
+  
+    fileReader.readAsArrayBuffer(file);
+}
+
+function pictureManager(){
+    console.log(local_selectedItem.image)
+
+    if (local_selectedItem.image == ""){
+        var fileInput = document.getElementById('itemImageInputId');
+        fileInput.value = '';
+        console.log("Picking image")
+        document.getElementById('itemImageInputId').click()
+        //updateBothQEQuestions()
+        return
+    }
+
+    if (local_selectedItem.image != ""){
+        local_selectedItem.image = ""
+        document.querySelector(".itemImageShow").src = ""
+        updateBothQEQuestions()
+        console.log(local_selectedItem)
+        return
+    }
+    
+}
+
+function removePicture(){
+    console.log("A")
+}
+
 // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE 
 // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE 
 // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE 
@@ -139,32 +230,35 @@ function answerTypeIndicator(answer){
     }
 }
 
-function displayGameModeFlag(){
-    
+function checkIfItHasImage(item){
+    if (item.image != ""){
+        return "📷"
+    }
+    return ""
 }
 
 function getFlagDescription(value){
     if (value <= -4){
-        return "Mastered"
+        return "S"
     }
 
     if (value >= -3 && value < -2){
-        return "Confident"
+        return "A"
     }
 
     if (value >= -1 && value <= 1){
-        return "Mediocre"
+        return "B"
     }
 
     if (value >= 2 && value < 4){
-        return "Hesitant"
+        return "C"
     }
 
     if (value >= 4){
-        return "Forgetful"
+        return "F"
     }
 
-    return "Mediocre"
+    return "B"
 }
 
 function getWhichFlag(value){
@@ -173,7 +267,7 @@ function getWhichFlag(value){
         return FBlue
     }
 
-    if (value >= -3 && value < -2){
+    if (value >= -3 && value <= -2){
         return FGreen
     }
 
@@ -210,6 +304,24 @@ function displayFlagRank(group){
 */
 }
 
+function displayForgetfulScore(item){
+    var practiceForgetfulScore = item.difficulty + forgetfulScoreAdjacent
+    var classicForgetfulScore = item.difficultyClassic + forgetfulScoreAdjacent
+
+    if (practiceForgetfulScore == -1){
+        practiceForgetfulScore = 0
+    }
+
+    if (classicForgetfulScore == -1){
+        classicForgetfulScore = 0
+    }
+
+
+    var toText = practiceForgetfulScore+" "+classicForgetfulScore+" 5"
+
+    return toText
+}
+
 function generateForgetfulDetails(item){
 
     var html_forgetfulLabel = document.getElementById("forgetful"+item.group)
@@ -223,12 +335,10 @@ function generateForgetfulDetails(item){
     }
     
     // add difficulty score
-    if (item.difficulty > 0){
-        local_forgetfulFlagScore[item.group][0] = local_forgetfulFlagScore[item.group][0] + item.difficulty
-    }
-    if (item.difficultyClassic > 0){
-        local_forgetfulFlagScore[item.group][1] = local_forgetfulFlagScore[item.group][1] + item.difficultyClassic
-    }
+
+    local_forgetfulFlagScore[item.group][0] = (local_forgetfulFlagScore[item.group][0] + item.difficulty) + forgetfulScoreAdjacent
+    local_forgetfulFlagScore[item.group][1] = (local_forgetfulFlagScore[item.group][1] + item.difficultyClassic) + forgetfulScoreAdjacent
+
 
     // getTheWorstFlag
     if (item.difficulty > local_bestFlagGroup[item.group][0]){
@@ -257,7 +367,7 @@ function generateForgetfulDetails(item){
      
     `
 
-    console.log("ASASA",local_forgetfulFlagScore, local_bestFlagGroup, local_gameModeFlags)
+    //console.log("ASASA",local_forgetfulFlagScore, local_bestFlagGroup, local_gameModeFlags)
                         
 }
 
@@ -323,9 +433,14 @@ function displayItems(){
 
                 var html_groupSection = document.querySelector(".groupSectionClass"+i)
 
-                if ( local_whichGroupsAreHidden.includes(parseInt(i, 10))){
+                if (local_whichGroupsAreHidden.includes(parseInt(i, 10))){
                     removeHiddenGroup(local_whichGroupsAreHidden, parseInt(i, 10))
                     showOrHideGroup(parseInt(i, 10)) // restore the hidden option?
+                }
+
+                // hides the list in the first run
+                if (local_firstRun){
+                    showOrHideGroup(parseInt(i, 10)) 
                 }
 
                 // so for each items (that is related to the group)
@@ -335,7 +450,14 @@ function displayItems(){
                     if (value[j].group == totalGroups[i]) {
 
                         html_groupSection.innerHTML += `
-                            <div class="itemBox" onclick="showEditor(`+value[j].id+`,'`+value[j].group+`')">                                
+                            <div class="miniFlagFlexItem">
+                                <div class="miniFlagContainer"></div>
+                                <div class="miniFlagContainer" style="padding-right: 1vw;">
+                                `+checkIfItHasImage(value[j])+`
+                                </div>
+                            </div>            
+
+                            <div class="itemBox" onclick="showEditor(`+value[j].id+`,'`+value[j].group+`')">                    
                                 <div class="textInItemBox"> 
                                     <pre>`+value[j].question+`</pre>
                                 </div>                                
@@ -343,6 +465,7 @@ function displayItems(){
                                 <div class="miniFlagPerItemContainer">  
                                     <div class="miniFlagFlexCont">
                                         <div class="miniFlagFlexItem">
+                                            <div class="itemForgetfulScore">`+displayForgetfulScore(value[j])+`</div>
                                         </div>
                                         <div class="miniFlagFlexItem">
                                             <div class="miniFlagContainer">
@@ -355,9 +478,8 @@ function displayItems(){
                                 </div>
                             </div>                            
                         `
-
                         generateForgetfulDetails(value[j])
-
+                        console.log(j)
                         // <button onclick="removeItem(`+j+`)">Remove</button>
                     }
                     
@@ -374,7 +496,9 @@ function displayItems(){
                 `
             }
 
+            local_firstRun = false
 
+            console.log("Completed!")
 
         } else {
             // display empty message if empty
@@ -422,8 +546,24 @@ function updateEnumarationAns(index){
 
 function updateBothQEQuestions(){
     console.log("The questionTypeVal", local_atQuestionType)
-
     console.log("S The value is ",local_selectedItem.answer)
+
+    if (local_selectedItem.image == ""){
+        html_itemAnswerId.setAttribute('maxlength', 64)        
+        html_questionId.setAttribute('maxlength', 255);
+        html_question.value = html_question.value.substring(0, 255)
+        html_answer.value = html_answer.value.substring(0, 64)
+        
+        console.log("Changed 255")
+    }
+
+    if (local_selectedItem.image != ""){
+        html_itemAnswerId.setAttribute('maxlength', 25)
+        html_questionId.setAttribute('maxlength', 64);
+        html_question.value = html_question.value.substring(0, 64)
+        html_answer.value = html_answer.value.substring(0, 25)
+        console.log("Changed 64")
+    }
 
     // question Type
     if (local_atQuestionType == 0){
@@ -543,7 +683,7 @@ function addItem(){
     var group = document.querySelector(".itemGroup").value
     var question = document.querySelector(".itemQuestion").value
     var answer = document.querySelector(".itemAnswer").value
-    var image = document.querySelector(".itemImage").value
+    var image = local_selectedItem.image
 
     // remove whiteSpaces
     local_EnumarationItem = trimStringArray(local_EnumarationItem)
@@ -554,7 +694,7 @@ function addItem(){
     local_forgetfulFlagScore = {} // this is per group
     local_bestFlagGroup = {}    // this is per group
     local_gameModeFlags = [-99,-99,0]    // contains the flag/rank of gameModes
-    
+
     // the code below code be optimized
 
     // if going to add a questionAndAnswer
@@ -592,18 +732,21 @@ function addItem(){
                     value = []
                 }
 
+                // for testing purposes
+                //for (var i=0; i<255; i++){
                 var newValue = value
                 newValue.push(item)
 
                 localforage.setItem(reviewerDatabaseName, newValue)
                 console.log(newValue)
 
-
                 // update reviewerDetails
                 local_idCounter += 1
                 local_amountOfItems += 1
                 local_groupList.push(group)
                 updateReviewerDetails(local_idCounter, local_amountOfItems, local_groupList)
+                //}
+
 
                 //document.querySelector(".userValue").value = ""
                 hideEditor()
@@ -918,8 +1061,7 @@ function showEditor(index = -1, selectedGroup){
                     `
                 });
 
-                //update mode
-
+            //update mode
             } else {
             // Q&A mode
                 
@@ -930,7 +1072,13 @@ function showEditor(index = -1, selectedGroup){
                 html_image.value = local_selectedItem.image                
                 console.log(local_selectedItem)
 
+                if (local_selectedItem.image != ""){
+                    var blobUrl = URL.createObjectURL(local_selectedItem.image);
+                    document.querySelector(".itemImageShow").src = blobUrl
+                }
+
                 updateBothQEQuestions()
+                
                 html_difficulty.forEach(function(element) {
                     element.innerHTML = `
                     <img class="normalSizeFlag" src="`+getWhichFlag(local_selectedItem.difficulty)+`">
@@ -994,6 +1142,8 @@ function hideEditor(){
 
     html_editBox.style.display = "none";
     html_overlay.style.display = "none";
+
+    document.querySelector(".itemImageShow").src = ""
     
     local_atQuestionType = 0
     selectQType(0)
@@ -1096,7 +1246,7 @@ function showOrHideGroup(id){
         removeHiddenGroup(local_whichGroupsAreHidden, id)
     }
     
-    console.log(buttonContent.innerHTML, local_whichGroupsAreHidden)
+    console.log("UPDATED SHOW HIDE", buttonContent.innerHTML, local_whichGroupsAreHidden)
 }
 
 function switchGameModeMenu(mode){
@@ -1214,9 +1364,10 @@ window.updateBothQEQuestions = updateBothQEQuestions
 window.addItem = addItem
 window.showOrHideGroup = showOrHideGroup
 window.switchGameModeMenu = switchGameModeMenu
-
+window.pictureManager = pictureManager
 
 document.querySelector(".initOptionsHide").addEventListener("click", hideOptionsBeforeReviTerm);
+document.querySelector('.itemImageInput').addEventListener('change', addPicture);
 //document.querySelector(".addItemFunc").addEventListener("click", addItem);
 
 

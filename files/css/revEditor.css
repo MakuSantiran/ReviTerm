@@ -108,6 +108,8 @@ h3 {
     justify-content: center; 
     align-items: center;
 
+    user-select: none;
+    cursor: pointer;
 }
 
 .itemGroup {
@@ -364,6 +366,19 @@ h3 {
     font-family: Arial, Helvetica, sans-serif
 }
 
+.itemForgetfulScore{
+    font-size: 3vw;
+    font-family: Arial, Helvetica, sans-serif;
+    padding-top: 2vw;
+}
+
+.itemImageShow{
+    width: 40vw;
+    height: 20vh;
+    position: absolute;
+    
+}
+
 /* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS */
 /* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS */
 /* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS *//* FLAGS */
@@ -414,8 +429,10 @@ h3 {
     flex: 1; /* Each item will grow equally to fill the available space */
     padding-right: 2vw;
     width: 100%;
-    opacity: 0.2;
+    opacity: 0.6;
 }
+
+
 
 /* TOP SCREEN */ /* TOP SCREEN */ /* TOP SCREEN */ /* TOP SCREEN *//* TOP SCREEN *//* TOP SCREEN *//* TOP SCREEN */
 /* TOP SCREEN */ /* TOP SCREEN */ /* TOP SCREEN */ /* TOP SCREEN *//* TOP SCREEN *//* TOP SCREEN *//* TOP SCREEN */
