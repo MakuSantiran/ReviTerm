@@ -1295,7 +1295,7 @@ function drainHealth(){
     if (reviGame.isPaused == false && reviGame.isFinished == false){
         if (reviGame.trueHealth > 0){
             //reviGame.health = reviGame.health - 0.007
-            reviGame.health = reviGame.health - 0.1
+            reviGame.health = reviGame.health - 0.007
             drainHealthAnimation(reviGame.health)    
             //console.log(reviGame.health)        
         } else {
@@ -1318,7 +1318,7 @@ function drainHealth(){
 
 function displayImage(){
     console.log("Content of image", reviewItems[reviGame.atNumber].image)
-    
+
     anime({
         targets: html_quizContainer,
         top: "50%",

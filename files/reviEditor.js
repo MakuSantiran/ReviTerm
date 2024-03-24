@@ -607,14 +607,14 @@ function initialization(){
                 // do update here?
                 updateContentsOfReviewer("difficultyClassic", 0)
             }
-
-            
             
             console.log("Content of ",reviewerDatabaseName," are ",value)
             var reviewerHeaderName = reviewerDatabaseName.replace(revieweraddOn, "");
 
             document.querySelector(".reviewerName").innerHTML += reviewerHeaderName
             document.querySelector(".totalItems").innerHTML = value["amountOfItems"]
+
+            replaceContentOfReviewer("image", undefined, "")
         })
         
         //localforage.removeItem(reviewerDatabaseName+"_Details")
@@ -1012,6 +1012,23 @@ function deleteEnumerationAns(index){
 function addEnumaratorAns(){
     local_EnumarationItem.push("")
     displayEnumarationAns(local_EnumarationItem)
+}
+
+function replaceContentOfReviewer(key, toReplace, value){
+    localforage.getItem(reviewerDatabaseName, function (err, content) {
+
+        for (var i in content){
+            if (content[i][key] == toReplace){
+                console.log(content[i][key])
+                content[i][key] = value
+                console.log(content[i][key])
+                console.log("replaced")
+            }
+        }
+        
+        console.log(content)
+        localforage.setItem(reviewerDatabaseName, content)
+    })
 }
 
 function updateContentsOfReviewer(key, value){
