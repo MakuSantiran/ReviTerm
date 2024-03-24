@@ -14,6 +14,7 @@ var selectedIndexToBeDeleted = -1
 
 // for exclusion
 var local_selectedGroupExclusion = []
+var local_withImages = []
 
 
 // html things
@@ -487,10 +488,9 @@ function importReviewer(event) {
             return
         }
 
-
         // Convert the array buffer to a string
-        var textContent = String.fromCharCode.apply(null, new Uint8Array(arrayBuffer));
-        var data = JSON.parse(textContent)
+        var textContent = new TextDecoder().decode(arrayBuffer);
+        var data = JSON.parse(textContent);
 
         // Process the text content here
         console.log("ContentOfFile is", data);
@@ -516,14 +516,22 @@ function importReviewer(event) {
 
         // items to be added (just import stuff)
         for (var i in importedReviewerItems){
+
+            var imageToAdd = importedReviewerItems[i][6]
+
+            if (importedReviewerItems[i][6] != ""){
+                imageToAdd = convertImgToBlob(imageToAdd)
+            }
+
             var item = {
                 answer: importedReviewerItems[i][0],
                 difficulty: importedReviewerItems[i][1],
+                difficultyClassic: 0,
                 disabled: importedReviewerItems[i][2],
                 enumaration: importedReviewerItems[i][3],
                 group: importedReviewerItems[i][4],
                 id: importedReviewerItems[i][5],
-                image: importedReviewerItems[i][6],
+                image: imageToAdd,
                 question: importedReviewerItems[i][7]
             }
 
@@ -537,6 +545,7 @@ function importReviewer(event) {
         }
 
         
+        /**/
         // add to reviewerNames
         localforage.getItem("reviewerNames", function (err, value) {
             if (value.some(item => item["ReviewerName"] === ReviewerName)){
@@ -574,6 +583,71 @@ function importReviewer(event) {
     fileReader.readAsArrayBuffer(file);
 }
 
+function downloadReviewer(name, data){
+    console.log("HEYA", data)
+
+    try {
+        var plugin = cordova.plugins.safMediastore;
+
+        // Prompt the user to select a file location
+        var dateString = getDate();
+        var fileName = name+dateString+".rtr";
+        var fileContent = JSON.stringify(data);
+        var base64Data = btoa(fileContent)
+
+        try {
+            plugin.writeFile({
+                "data": base64Data,
+                "filename": fileName
+            });
+            alert(""+fileName+" saved in your download folder!")
+        }catch(error2){
+            alert(error2)
+        }
+    }catch(error){ 
+
+        var dateString = getDate();
+        var fileName = name+dateString+".rtr";
+        var fileContent = JSON.stringify(data);
+
+        var blob = new Blob([fileContent], { type: 'text/plain' });
+
+        // Create a download link
+        var downloadLink = document.createElement('a');
+        downloadLink.href = window.URL.createObjectURL(blob);
+        downloadLink.download = fileName;
+
+        // Append the link to the document body and trigger the click event
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+
+        // Clean up
+        document.body.removeChild(downloadLink);
+
+        //alert(error)
+    }
+}
+
+function convertImgToBlob(base64String){
+    // Extract the MIME type from the base64 string
+    var mimeType = base64String.match(/^data:(.*?);/)[1];
+
+    // Split the base64 string to get the data part
+    var byteCharacters = atob(base64String.split(',')[1]);
+
+    // Convert the byte characters into a typed array
+    var byteNumbers = new Array(byteCharacters.length);
+    for (var i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    var byteArray = new Uint8Array(byteNumbers);
+
+    // Create a Blob from the typed array
+    var blob = new Blob([byteArray], { type: mimeType }); // Use the extracted MIME type
+
+    return blob
+}
+
 function exportReviewer(index){
     localforage.getItem("reviewerNames", function (err, reviewerNames) {
         var selectedReviewer = reviewerNames[index].ReviewerName
@@ -582,8 +656,55 @@ function exportReviewer(index){
             //console.log(reviewerPath+selectedReviewer)
             //var exportData = [[selectedReviewer+"_Export"]]
             var exportData = [[selectedReviewer]]
+            local_withImages = []
 
             for (var i in content){
+                var savedImage = content[i].image
+
+                // for images
+                if (savedImage != ""){
+                    console.log(savedImage)
+
+                    // Create a new FileReader object
+                    var reader = new FileReader();
+                    
+                    // Define a function to handle the FileReader onload event
+                    reader.onload = function(event) {
+                        // Access the base64-encoded string
+                        var base64String = event.target.result;
+                        
+                        // Use the base64String as needed
+                        var stringified = base64String
+                        savedImage = JSON.stringify(stringified)
+                        //console.log("Base64 string:", base64String);
+                        //console.log(savedImage)
+                        //console.log("PARSED", savedImage)
+
+                        // firstIndexOfWithImages (what the hell javascript)
+                        var fIOWI = parseInt(local_withImages[0])
+                        exportData[fIOWI+1][6] = stringified
+
+                        //console.log(fIOWI+1)
+                        alert(exportData[fIOWI+1])
+                        //convertImgToBlob(stringified)
+
+                        // dequeue
+                        local_withImages.shift();
+
+                        if (local_withImages.length == 0){
+                            console.log(exportData)
+                            console.log("Downloading")
+                            downloadReviewer(selectedReviewer, exportData)
+                        }
+                    };
+                    
+                    local_withImages.push(i)
+                    console.log("Pushed!", i)
+
+                    // Read the Blob object as a data URL (base64-encoded string)
+                    reader.readAsDataURL(savedImage);
+                }
+
                 var toBePushed = [[
                     content[i].answer,
                     0,                  //difficulty
@@ -591,35 +712,21 @@ function exportReviewer(index){
                     content[i].enumaration,
                     content[i].group,
                     content[i].id,
-                    content[i].image,
+                    savedImage,
                     content[i].question
                 ]]
 
-                exportData = [...exportData, ...toBePushed]        
+                exportData = [...exportData, ...toBePushed]     
+                
+                console.log(i)
             }
 
-            try {
-                var plugin = cordova.plugins.safMediastore;
+            console.log(local_withImages)
+            console.log("TheExportedOne", exportData)
 
-                // Prompt the user to select a file location
-                var dateString = getDate();
-                var fileName = selectedReviewer+dateString+".rtr";
-                var fileContent = JSON.stringify(exportData);
-                var base64Data = btoa(fileContent)
-        
-                try {
-                    plugin.writeFile({
-                        "data": base64Data,
-                        "filename": fileName
-                    });
-                    alert(""+fileName+" saved in your download folder!")
-                }catch(error2){
-                    alert(error2)
-                }
-            }catch(error){ 
-                alert(error)
+            if (local_withImages.length == 0){
+                downloadReviewer(selectedReviewer, exportData)
             }
-
         });
     });
 }

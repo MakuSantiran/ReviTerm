@@ -17,6 +17,9 @@ v0.7
 ^> improved damage animation
 ^> added the ability to add images (only in q&a)
 
+[x] fixed the layout on the menu where user chooses a reviewer
+
+[x] ^> fixed a bug when importing a quiz, causes the forgetful score to have NAN
 
 
 
