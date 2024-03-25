@@ -648,6 +648,11 @@ button {
 /*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*//*OPTIONS BEFORE REVITERM_ CLASSIC OPTIONS*/
 
 
+.characterSelectedIcon{
+    width: 100%;
+    height: 100%;
+}
+
 .classicModeContainer{
     display: none;
 }
@@ -661,6 +666,7 @@ button {
     height: 20vw;
     border-style: solid;
     border-color: #000000;
+    background-color: #000000;
     position: relative;
 
     text-align: center; 

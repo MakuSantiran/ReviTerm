@@ -233,12 +233,27 @@ hr {
     height: 50%; /* Set height to center vertically */
     top: 50%; /* Position from top */
     left: 50%; /* Position from left */
-    transform: translate(-50%, -50%); /* Center horizontally and vertically */
+    transform: translate(-50%, -75%); /* Center horizontally and vertically */
     text-align: center; /* Center text horizontally */
 
     display: none;
 }
 
+.gameOverCharacterContainer{
+
+}
+
+.lightSource{
+    background-color: #ffffff;
+    width: 100%;
+    height: 20vw;
+    position: absolute;
+    bottom: -10vw;
+
+    border-radius: 100px;
+    z-index: -1;
+    filter: blur(25px);
+}
 
 .gameOverGoBackButton{
     background-color: #c8c8c8;
@@ -270,6 +285,11 @@ hr {
     font-size: 4vw;
 
     user-select: none;
+}
+
+.gameOverCharacter{
+    width: 100%;
+    height: 100%;
 }
 
 

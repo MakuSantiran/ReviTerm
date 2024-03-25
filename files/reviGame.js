@@ -133,62 +133,6 @@ var remixModeValueRarity = 5
 var multipleChoiceDMG = 18
 var enumDMG = 8
 
-// Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds 
-// Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds 
-// Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds 
-
-
-var crrct_audio = new Audio('./files/sfx/Correct.wav');
-var wrng_audio = new Audio('./files/sfx/Wrong.wav');
-var restart_audio = new Audio('./files/sfx/Start.wav');
-var bgmusic = new Audio('./files/sfx/ReviTermWeCantSlowDown.mp3')
-
-// set things
-restart_audio.volume = 0.3
-
-
-var reviTermSfx_BGLoaded = false
-var reviTermSfx_BGSpeed = 1
-//reviTermSfx_BGSpdLerp = 1
-var reviTermSfx_CurrentBg;
-var reviTermSfx_BGMUSIC1 = "./files/sfx/ReviTermWeCantSlowDown.mp3"
-
-function playBg(fileSource) {
-    // Create a new sound object
-    reviTermSfx_CurrentBg = new Pizzicato.Sound({
-        source: 'file', // Use a sine wave as the sound source
-        options: {
-            path: fileSource,
-            speed: 1,
-            volume: 0.5,
-            loop: true // Loop the sound
-        }
-    }
-    // load the sound first
-    ,function() {
-        // Play the sound
-        reviTermSfx_BGLoaded = true
-        reviTermSfx_CurrentBg.play();
-    });
-}
-
-function speedSmooth(oldSpeed, targetSpeed, value){
-    var reviTermSfx_BGSpdLerp = lerp(reviTermSfx_BGSpeed, targetSpeed, 0.005)
-    reviTermSfx_BGSpeed = reviTermSfx_BGSpdLerp
-
-    return reviTermSfx_BGSpdLerp
-}
-
-function changeBgSpeed(newSpeed, smoothValue) {
-    // Check if the sound object exists
-    if (reviTermSfx_BGLoaded) {
-        var editedSpeed = speedSmooth(reviTermSfx_BGSpeed, newSpeed, smoothValue)
-        // Change the speed of the sound
-        reviTermSfx_CurrentBg.sourceNode.playbackRate.value = editedSpeed;
-        //console.log(editedSpeed)
-    }
-}
-
 // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms 
 // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms 
 // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms // Algorithms 
@@ -509,6 +453,66 @@ function checkIfTheSame(toBeCmp, string){
     }
     return -1
 }
+
+// Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds 
+// Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds 
+// Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds // Sounds 
+
+var crrct_audio = new Audio('./files/sfx/Correct.wav');
+var wrng_audio = new Audio('./files/sfx/Wrong.wav');
+var restart_audio = new Audio('./files/sfx/Start.wav');
+//var bgmusic = new Audio('./files/sfx/ReviTermWeCantSlowDown.mp3')
+
+// set things
+restart_audio.volume = 0.3
+
+var rndmBG = randomNumbers(0,2)
+var reviTermSfx_BGSpeed = 1
+//reviTermSfx_BGSpdLerp = 1
+var reviTermSfx_CurrentBg;
+var reviTermSfx_BGMUSIC1 = "./files/sfx/ReviTermWeCantSlowDown.mp3"
+var reviTermSfx_BGMUSIC2 = "./files/sfx/ReviTermWeMustBattleNow.mp3"
+var reviTermSfx_BGMUSIC3 = "./files/sfx/ReviTermReadyPlayer.mp3"
+var reviTermSfx_BGARRAY = [reviTermSfx_BGMUSIC1, reviTermSfx_BGMUSIC2, reviTermSfx_BGMUSIC3]
+var reviTermSfx_BGLoaded = false
+
+function playBg(fileSource) {
+    // Create a new sound object
+    reviTermSfx_CurrentBg = new Pizzicato.Sound({
+        source: 'file', // Use a sine wave as the sound source
+        options: {
+            path: fileSource,
+            speed: 1,
+            volume: 0.5,
+            loop: true // Loop the sound
+        }
+    }
+    // load the sound first
+    ,function() {
+        // Play the sound
+        reviTermSfx_BGLoaded = true
+        reviTermSfx_CurrentBg.play();
+    });
+}
+
+function speedSmooth(oldSpeed, targetSpeed, value){
+    var reviTermSfx_BGSpdLerp = lerp(reviTermSfx_BGSpeed, targetSpeed, 0.005)
+    reviTermSfx_BGSpeed = reviTermSfx_BGSpdLerp
+
+    return reviTermSfx_BGSpdLerp
+}
+
+function changeBgSpeed(newSpeed, smoothValue) {
+    // Check if the sound object exists
+    if (reviTermSfx_BGLoaded) {
+        var editedSpeed = speedSmooth(reviTermSfx_BGSpeed, newSpeed, smoothValue)
+        // Change the speed of the sound
+        reviTermSfx_CurrentBg.sourceNode.playbackRate.value = editedSpeed;
+        //console.log(editedSpeed)
+    }
+}
+
+
 
 // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations 
 // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations // Game Animations 
@@ -1823,7 +1827,7 @@ function startReviTerm(){
         classicMode()
         restart_audio.play()
         if (reviTermSfx_BGLoaded == false){
-            playBg(reviTermSfx_BGMUSIC1)
+            playBg(reviTermSfx_BGARRAY[rndmBG])
         }
     } else if (reviGame.options.mode == "Perfection"){
         perfectionMode()
