@@ -214,6 +214,28 @@ function removePicture(){
     console.log("A")
 }
 
+function countItemsInGroup(parentClassName) {
+    // Select the parent element
+    var parentElement = document.querySelector("." + parentClassName);
+    
+    // If parent element is found
+    if (parentElement) {
+        // Select all child elements of the parent
+        var childElements = parentElement.children;
+        
+        // Filter out child elements with class "addItem"
+        var filteredChildElements = Array.from(childElements).filter(function(child) {
+            return !child.classList.contains("addItem");
+        });
+        
+        // Return the count of filtered child elements
+        return filteredChildElements.length;
+    } else {
+        // Return 0 if parent element is not found
+        return 0;
+    }
+}
+
 // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE 
 // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE 
 // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE // WEBSITE 
@@ -288,7 +310,7 @@ function getWhichFlag(value){
 
 function displayFlagRank(group){
 
-    console.log("flag level", group)
+    //console.log("flag level", group)
 
     var html_flag = `
         <div class="miniFlagContainer">
@@ -317,7 +339,7 @@ function displayForgetfulScore(item){
     }
 
 
-    var toText = practiceForgetfulScore+" "+classicForgetfulScore+" 5"
+    var toText = practiceForgetfulScore+" "+classicForgetfulScore+" 0"
 
     return toText
 }
@@ -333,9 +355,8 @@ function generateForgetfulDetails(item){
         local_forgetfulFlagScore[item.group] = [0,0,0]
         local_bestFlagGroup[item.group] = [-99,-99,0]
     }
-    
-    // add difficulty score
 
+    // add difficulty score
     local_forgetfulFlagScore[item.group][0] = (local_forgetfulFlagScore[item.group][0] + item.difficulty) + forgetfulScoreAdjacent
     local_forgetfulFlagScore[item.group][1] = (local_forgetfulFlagScore[item.group][1] + item.difficultyClassic) + forgetfulScoreAdjacent
 
@@ -364,153 +385,9 @@ function generateForgetfulDetails(item){
         <img class="miniFlag" src="`+getWhichFlag(local_gameModeFlags[0])+`">
         <img class="miniFlag" src="`+getWhichFlag(local_gameModeFlags[1])+`">
         <img class="miniFlag" src="`+FGrey+`">
-     
     `
 
-    //console.log("ASASA",local_forgetfulFlagScore, local_bestFlagGroup, local_gameModeFlags)
-                        
-}
-
-function displayItems(){
-    // then add
-    localforage.getItem(reviewerDatabaseName, function (err, value) {
-
-        localforage.setItem("selectedGroupExclusion", []);
-
-        if (value != null) {
-            // sort by id first
-            value = value.sort((a, b) => a.group - b.group);
-            console.log(value)
-            //console.log("length of value THing", value.length)
-
-            // clear first
-            var html_listOfItems = document.querySelector(".listOfItems")
-            html_listOfItems.innerHTML = ""   
-            
-            var totalGroups = [...new Set(local_groupList)]; //without the duplicates
-            
-            console.log(totalGroups)
-
-            // display empty message if empty
-            if (totalGroups.length == 0){
-                html_listOfItems.innerHTML += `
-                    <div class="emptyItemMessage">
-                        Woaaah soo empty! (   ŏ⁠﹏⁠ŏ⁠) <br/>
-                        Press the [ Add Item ] to add new Items!
-                    </div>
-                `      
-            }
-
-            // this is unoptimized but gets the job done
-            for (var i in totalGroups){
-                html_listOfItems.innerHTML += `
-                    <div class="groupHeaderFlexContainer">
-                        <div class="groupHeaderHideButton" id="groupHideButtonId`+i+`" onclick="showOrHideGroup(`+i+`)">^</div>
-                        <div class="groupHeaderFlexItemTitle">
-                            <div class="groupHeader">
-                                `+totalGroups[i]+`
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="groupDetailsContainer">
-                        <div class="flexContainer">
-                            <div class="flexItem">
-                                <div id="forgetful`+totalGroups[i]+`">
-                                    Forgetful Score: #
-                                </div>
-                            </div>
-                            <div class="flexItem">
-                                <div id="flagRank`+totalGroups[i]+`">
-                                    Best Flag: 
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                
-                    <div class="groupSectionClass`+i+`" id="groupSectionId`+i+`"></div>
-                `
-
-                var html_groupSection = document.querySelector(".groupSectionClass"+i)
-
-                if (local_whichGroupsAreHidden.includes(parseInt(i, 10))){
-                    removeHiddenGroup(local_whichGroupsAreHidden, parseInt(i, 10))
-                    showOrHideGroup(parseInt(i, 10)) // restore the hidden option?
-                }
-
-                // hides the list in the first run
-                if (local_firstRun){
-                    showOrHideGroup(parseInt(i, 10)) 
-                }
-
-                // so for each items (that is related to the group)
-                for (var j in value){
-
-                    // now display the only related item to the group
-                    if (value[j].group == totalGroups[i]) {
-
-                        html_groupSection.innerHTML += `
-                            <div class="miniFlagFlexItem">
-                                <div class="miniFlagContainer"></div>
-                                <div class="miniFlagContainer" style="padding-right: 1vw;">
-                                `+checkIfItHasImage(value[j])+`
-                                </div>
-                            </div>            
-
-                            <div class="itemBox" onclick="showEditor(`+value[j].id+`,'`+value[j].group+`')">                    
-                                <div class="textInItemBox"> 
-                                    <pre>`+value[j].question+`</pre>
-                                </div>                                
-                                <div class="itemAnswerText">`+answerTypeIndicator(value[j].answer)+`</div>
-                                <div class="miniFlagPerItemContainer">  
-                                    <div class="miniFlagFlexCont">
-                                        <div class="miniFlagFlexItem">
-                                            <div class="itemForgetfulScore">`+displayForgetfulScore(value[j])+`</div>
-                                        </div>
-                                        <div class="miniFlagFlexItem">
-                                            <div class="miniFlagContainer">
-                                                <img class="miniFlag" src="`+getWhichFlag(value[j].difficulty)+`">
-                                                <img class="miniFlag" src="`+getWhichFlag(value[j].difficultyClassic)+`">
-                                                <img class="miniFlag" src="`+FGrey+`">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>                            
-                        `
-                        generateForgetfulDetails(value[j])
-                        console.log(j)
-                        // <button onclick="removeItem(`+j+`)">Remove</button>
-                    }
-                    
-                
-                }
-
-                console.log(local_forgetfulFlagScore)
-                
-
-                html_groupSection.innerHTML += `
-                    <div class="addItem" onclick="showEditor(`+-1+`,'`+totalGroups[i]+`')">
-                        +
-                    </div>
-                `
-            }
-
-            local_firstRun = false
-
-            console.log("Completed!")
-
-        } else {
-            // display empty message if empty
-            var html_listOfItems = document.querySelector(".listOfItems")
-            html_listOfItems.innerHTML += `
-                <div class="emptyItemMessage">
-                    Woaaah soo empty! (   ŏ⁠﹏⁠ŏ⁠) <br/>
-                    Press the [ Add Item ] to add new Items!
-                </div>
-            `               
-        }
-    });
+    //console.log("ASASA",local_forgetfulFlagScore, local_bestFlagGroup, local_gameModeFlags)                    
 }
 
 function displayEnumarationAns(enumarationItems){
@@ -583,6 +460,291 @@ function updateBothQEQuestions(){
     }
 
 
+}
+
+
+// htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes 
+// htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes 
+// htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes 
+
+// Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items 
+// Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items 
+// Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items 
+
+function displayItems(){
+    // then add
+    localforage.getItem(reviewerDatabaseName, function (err, value) {
+        localforage.setItem("selectedGroupExclusion", []);
+
+        if (value != null) {
+            //console.log("Sorted value by group:", value)
+            //console.log("length of value THing", value.length)
+
+            // clear first
+            var html_listOfItems = document.querySelector(".listOfItems")
+            html_listOfItems.innerHTML = ""   
+            
+            var totalGroups = [...new Set(local_groupList)]; //without the duplicates
+            totalGroups = totalGroups.sort()
+            
+            console.log("totalGroups:", totalGroups)
+
+            // display empty message if empty
+            if (totalGroups.length == 0){
+                html_listOfItems.innerHTML += `
+                    <div class="emptyItemMessage" id="emptyItemMessageId">
+                        Woaaah soo empty! (   ŏ⁠﹏⁠ŏ⁠) <br/>
+                        Press the [ Add Item ] to add new Items!
+                    </div>
+                `      
+            }
+
+            // this is unoptimized but gets the job done
+            for (var i in totalGroups){
+                html_listOfItems.innerHTML += `
+                <div class="groupSection`+totalGroups[i]+`">
+                    <div class="groupHeaderFlexContainer">
+                        <div class="groupHeaderHideButton" id="groupHideButtonId`+totalGroups[i]+`" onclick="showOrHideGroup('`+totalGroups[i]+`')">^</div>
+                        <div class="groupHeaderFlexItemTitle">
+                            <div class="groupHeader">
+                                `+totalGroups[i]+`
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="groupDetailsContainer">
+                        <div class="flexContainer">
+                            <div class="flexItem">
+                                <div id="forgetful`+totalGroups[i]+`">
+                                    Forgetful Score: #
+                                </div>
+                            </div>
+                            <div class="flexItem">
+                                <div id="flagRank`+totalGroups[i]+`">
+                                    Best Flag: 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="groupSectionItmShowClass`+totalGroups[i]+`" id="groupSectionItmShowId`+totalGroups[i]+`"></div>
+                </div>
+                `
+
+                var html_groupSectionItmShow = document.querySelector(".groupSectionItmShowClass"+totalGroups[i])
+
+                if (local_whichGroupsAreHidden.includes(totalGroups[i])){
+                    removeHiddenGroup(local_whichGroupsAreHidden, totalGroups[i])
+                    showOrHideGroup(totalGroups[i]) // restore the hidden option?
+                }
+
+                // hides the list in the first run
+                if (local_firstRun){
+                    showOrHideGroup(totalGroups[i]) 
+                }
+
+                // so for each items (that is related to the group)
+                for (var j in value){
+
+                    // now display the only related item to the group
+                    if (value[j].group == totalGroups[i]) {
+
+                        html_groupSectionItmShow.innerHTML += `
+                        <div class="itemNo`+value[j].id+`">
+                            <div class="miniFlagFlexItem">
+                                <div class="miniFlagContainer"></div>
+                                <div class="miniFlagContainer itemImageNo`+value[j].id+`" style="padding-right: 1vw;">
+                                `+checkIfItHasImage(value[j])+`
+                                </div>
+                            </div>            
+
+                            <div class="itemBox" onclick="showEditor(`+value[j].id+`,'`+value[j].group+`')">                    
+                                <div class="textInItemBox"> 
+                                    <pre class="itemQuestionNo`+value[j].id+`">`+value[j].question+`</pre>
+                                </div>                                
+                                <div class="itemAnswerText itemAnswerNo`+value[j].id+`">`+answerTypeIndicator(value[j].answer)+`</div>
+                                <div class="miniFlagPerItemContainer">  
+                                    <div class="miniFlagFlexCont">
+                                        <div class="miniFlagFlexItem">
+                                            <div class="itemForgetfulScore">`+displayForgetfulScore(value[j])+`</div>
+                                        </div>
+                                        <div class="miniFlagFlexItem">
+                                            <div class="miniFlagContainer">
+                                                <img class="miniFlag" src="`+getWhichFlag(value[j].difficulty)+`">
+                                                <img class="miniFlag" src="`+getWhichFlag(value[j].difficultyClassic)+`">
+                                                <img class="miniFlag" src="`+FGrey+`">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> 
+                        </div>                           
+                        `
+                        generateForgetfulDetails(value[j])
+                        //console.log(j)
+                        // <button onclick="removeItem(`+j+`)">Remove</button>
+                    }    
+                }
+
+                console.log("ForgetfulScore", local_forgetfulFlagScore)
+                
+
+                html_groupSectionItmShow.innerHTML += `
+                    <div class="addItem addItem`+totalGroups[i]+`" onclick="showEditor(`+-1+`,'`+totalGroups[i]+`')">
+                        +
+                    </div>
+                `
+            }
+
+            local_firstRun = false
+
+            console.log("Completed!")
+        } else {
+            // display empty message if empty
+            var html_listOfItems = document.querySelector(".listOfItems")
+            html_listOfItems.innerHTML += `
+                <div class="emptyItemMessage" id="emptyItemMessageId">
+                    Woaaah soo empty! (   ŏ⁠﹏⁠ŏ⁠) <br/>
+                    Press the [ Add Item ] to add new Items!
+                </div>
+            `               
+        }
+    });
+}
+
+function displayAddedItem(newItem){
+    var html_groupSectionItmShow = document.querySelector(".groupSectionItmShowClass"+newItem.group)
+    var html_groupSectionAddButton = document.querySelector(".addItem"+newItem.group)
+
+    if (local_groupList.length > 0){
+        if (document.getElementById("emptyItemMessageId") != null){
+            document.getElementById("emptyItemMessageId").style.display = "none"
+        }
+    }
+
+    if (html_groupSectionAddButton != null) {
+        html_groupSectionAddButton.remove()
+    } else {
+        var html_listOfItems = document.querySelector(".listOfItems")
+        html_listOfItems.innerHTML += `
+        <div class="groupSection`+newItem.group+`">
+            <div class="groupHeaderFlexContainer">
+                <div class="groupHeaderHideButton" id="groupHideButtonId`+newItem.group+`" onclick="showOrHideGroup('`+newItem.group+`')">^</div>
+                <div class="groupHeaderFlexItemTitle">
+                    <div class="groupHeader">
+                        `+newItem.group+`
+                    </div>
+                </div>
+            </div>
+
+            <div class="groupDetailsContainer">
+                <div class="flexContainer">
+                    <div class="flexItem">
+                        <div id="forgetful`+newItem.group+`">
+                            Forgetful Score: #
+                        </div>
+                    </div>
+                    <div class="flexItem">
+                        <div id="flagRank`+newItem.group+`">
+                            Best Flag: 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="groupSectionItmShowClass`+newItem.group+`" id="groupSectionItmShowId`+newItem.group+`"></div>
+        </div>
+        `
+        
+        html_groupSectionItmShow = document.querySelector(".groupSectionItmShowClass"+newItem.group)
+        html_groupSectionAddButton = document.querySelector(".addItem"+newItem.group)
+    }
+
+    // now display the only related item to the group
+    html_groupSectionItmShow.innerHTML += `
+    <div class="itemNo`+newItem.id+`">
+        <div class="miniFlagFlexItem">
+            <div class="miniFlagContainer"></div>
+            <div class="miniFlagContainer itemImageNo`+newItem.id+`" style="padding-right: 1vw;">
+            `+checkIfItHasImage(newItem)+`
+            </div>
+        </div>            
+
+        <div class="itemBox" onclick="showEditor(`+newItem.id+`,'`+newItem.group+`')">                    
+            <div class="textInItemBox"> 
+                <pre class="itemQuestionNo`+newItem.id+`">`+newItem.question+`</pre>
+            </div>                                
+            <div class="itemAnswerText itemAnswerNo`+newItem.id+`">`+answerTypeIndicator(newItem.answer)+`</div>
+            <div class="miniFlagPerItemContainer">  
+                <div class="miniFlagFlexCont">
+                    <div class="miniFlagFlexItem">
+                        <div class="itemForgetfulScore">`+displayForgetfulScore(newItem)+`</div>
+                    </div>
+                    <div class="miniFlagFlexItem">
+                        <div class="miniFlagContainer">
+                            <img class="miniFlag" src="`+getWhichFlag(newItem.difficulty)+`">
+                            <img class="miniFlag" src="`+getWhichFlag(newItem.difficultyClassic)+`">
+                            <img class="miniFlag" src="`+FGrey+`">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> 
+    </div>                           
+    `
+
+    html_groupSectionItmShow.innerHTML += `
+    <div class="addItem addItem`+newItem.group+`" onclick="showEditor(`+-1+`,'`+newItem.group+`')">
+        +
+    </div>
+    `
+
+    generateForgetfulDetails(newItem)
+
+    console.log(newItem)
+}
+
+function removeItemFromDisplay(item){
+    console.log("deletus", item.id, item.group, "itemQuestionNo"+item.id)
+    
+    var html_itemNo = document.querySelector(".itemNo"+item.id)
+    html_itemNo.remove()
+
+    var forgetFulScoreGroup = local_forgetfulFlagScore[item.group]
+
+    console.log("aasda",local_forgetfulFlagScore)
+
+    // update forgetfulScore
+    local_forgetfulFlagScore[item.group] = [
+        forgetFulScoreGroup[0] - (item.difficulty +5),
+        forgetFulScoreGroup[1] - (item.difficultyClassic +5),
+        forgetFulScoreGroup[2] - 5
+    ]
+
+    console.log("LOCAL GROUP LIST LEGNT", local_groupList.length, local_groupList)
+    console.log("New forgetful score", local_forgetfulFlagScore)
+}
+
+function displayUpdatedItem(updatedItem, changedGroup){
+    console.log("HEY LISTEN YOU PICE")
+
+    if (changedGroup != false){
+        var html_updatedQuestion = document.querySelector(".itemQuestionNo"+updatedItem.id)
+        var html_updatedAnswer = document.querySelector(".itemAnswerNo"+updatedItem.id)
+        var html_updatedImage = document.querySelector(".itemImageNo"+updatedItem.id)
+    
+        html_updatedImage.innerHTML = checkIfItHasImage(updatedItem)
+        html_updatedQuestion.innerHTML = updatedItem.question
+        html_updatedAnswer.innerHTML = answerTypeIndicator(updatedItem.answer)
+    } else {
+        
+        console.log("GROUP",html_groupSectionItmShow,"Not existing!")
+
+    }
+
+   
+
+    console.log("The id of updated", updatedItem.id)
 }
 
 // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD // CRUD 
@@ -696,11 +858,9 @@ function addItem(){
     local_gameModeFlags = [-99,-99,0]    // contains the flag/rank of gameModes
 
     // the code below code be optimized
-
     // if going to add a questionAndAnswer
     if (local_atQuestionType == 0){
-        // if the local_selectedItem is -1, it means just to add a new non existing.. but if its not
-        // then update
+        // if the local_selectedItem is -1, it means just to add a new non existing..
         if (local_selectedItem.id == -1){
 
             // other things
@@ -746,14 +906,30 @@ function addItem(){
                 local_groupList.push(group)
                 updateReviewerDetails(local_idCounter, local_amountOfItems, local_groupList)
                 //}
-
-
+ 
                 //document.querySelector(".userValue").value = ""
                 hideEditor()
-                setTimeout(displayItems, 25);
+                //setTimeout(displayItems, 25);
+                //displayItems()
+
+                /**/ 
+                displayAddedItem(item)
+
+                local_forgetfulFlagScore = {} // this is per group
+                local_bestFlagGroup = {}    // this is per group
+                local_gameModeFlags = [-99,-99,0]    // contains the flag/rank of gameModes
+
+                // update the forgetful details
+                for (var i in value){  
+                    generateForgetfulDetails(value[i]);
+                    console.log("Added", value[i])
+                }
+                /**/
+
+
             }); 
         } else {
-        // if the local_selectedItem is -1(which means the item is existing)
+        // if the local_selectedItem is not -1(which means the item is existing)
         // this is the update part :)
 
             console.log("I see update :)")
@@ -804,6 +980,7 @@ function addItem(){
 
                 localforage.setItem(reviewerDatabaseName, newValue)
                 hideEditor()
+                //displayUpdatedItem(updatedItem)
                 setTimeout(displayItems, 25);
             }); 
         }
@@ -833,8 +1010,6 @@ function addItem(){
                 alert("Please enter the missing fields")
                 return;
             }  
-
-            
 
             // trim the right/left spaces
             group = group.trimRight()
@@ -871,11 +1046,24 @@ function addItem(){
 
                 //document.querySelector(".userValue").value = ""
                 hideEditor()
-                setTimeout(displayItems, 25);
+                //setTimeout(displayItems, 25);
+                /**/
+                displayAddedItem(item)
+
+                local_forgetfulFlagScore = {} // this is per group
+                local_bestFlagGroup = {}    // this is per group
+                local_gameModeFlags = [-99,-99,0]    // contains the flag/rank of gameModes
+
+                // update the forgetful details
+                for (var i in value){  
+                    generateForgetfulDetails(value[i]);
+                    console.log("Added", value[i])
+                }
+                /**/
             }); 
              /**/
         } else {
-        // if the local_selectedItem is -1(which means the item is existing)
+        // if the local_selectedItem is not -1(which means the item is existing)
         // this is the update part for enumeration :)
 
             console.log("I see update :)")
@@ -936,6 +1124,7 @@ function addItem(){
 
                 localforage.setItem(reviewerDatabaseName, newValue)
                 hideEditor()
+                //displayUpdatedItem(updatedItem, changedGroup)
                 setTimeout(displayItems, 25);
             }); 
             /**/
@@ -961,7 +1150,8 @@ function removeItem(){
         // with the deleted
         var newValue = value
         newValue.splice(selectedITBR_Index, 1);
-
+        
+        // update it to the database
         localforage.setItem(reviewerDatabaseName, newValue)
         console.log(newValue)
 
@@ -970,18 +1160,44 @@ function removeItem(){
         
         // this could've been simplier aarghhh (update group list)
         var indexToRemove = local_groupList.indexOf(groupToBeRemoved);
-        if (indexToRemove !== -1) {
+        if (indexToRemove != -1) {
             local_groupList.splice(indexToRemove, 1);
         }
+
+        // remove first from item
+        removeItemFromDisplay(local_selectedItem)
 
         local_forgetfulFlagScore = {} // this is per group
         local_bestFlagGroup = {}    // this is per group
         local_gameModeFlags = [-99,-99,0]    // contains the flag/rank of gameModes
         
-
         updateReviewerDetails(local_idCounter, local_amountOfItems, local_groupList)
+
+        // uhh, add each item forgetful details
+        for (var i in value){  
+            generateForgetfulDetails(value[i]);
+            console.log("DEletefusfdfdhsv", value[i])
+        }
+
+        //and remove another display if the group is empty
+        var indexToRemove = local_groupList.indexOf(groupToBeRemoved);
+        if (indexToRemove == -1) {
+            console.log("AHAHAHAHAHAHHAHAHAHAAHAH -cough-")
+            document.querySelector(".groupSection"+groupToBeRemoved).remove()
+        }
+
+        // display empty message if empty
+        if (local_groupList.length == 0){
+            var html_listOfItems = document.querySelector(".listOfItems")
+            
+            html_listOfItems.innerHTML = `
+                <div class="emptyItemMessage" id="emptyItemMessageId">
+                    Woaaah soo empty! (   ŏ⁠﹏⁠ŏ⁠) <br/>
+                    Press the [ Add Item ] to add new Items!
+                </div>
+            `      
+        }
         hideEditor()
-        setTimeout(displayItems, 25);
     }); 
 }
 
@@ -1250,16 +1466,18 @@ function selectQType(type){
 
 function showOrHideGroup(id){
     var buttonContent = document.getElementById("groupHideButtonId"+id)
-    var groupSection = document.getElementById("groupSectionId"+id)
+    var groupSectionItmShow = document.getElementById("groupSectionItmShowId"+id)
+
+    console.log(id)
 
     if (buttonContent.innerHTML == "^"){
         buttonContent.innerHTML = "v"
-        groupSection.style.display = "none"
+        groupSectionItmShow.style.display = "none"
         local_whichGroupsAreHidden.push(id)
 
     } else if (buttonContent.innerHTML == "v"){
         buttonContent.innerHTML = "^"
-        groupSection.style.display = "block"
+        groupSectionItmShow.style.display = "block"
         removeHiddenGroup(local_whichGroupsAreHidden, id)
     }
     
@@ -1348,7 +1566,7 @@ function switchGameModeMenu(mode){
 
 function getListOfShowOrHide(){
     //var buttonContent = document.getElementById("groupHideButtonId"+id)
-    //var groupSection = document.getElementById("groupSectionId"+id)
+    //var groupSectionItem = document.getElementById("groupSectionItemId"+id)
 }
 
 // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK // LINK 

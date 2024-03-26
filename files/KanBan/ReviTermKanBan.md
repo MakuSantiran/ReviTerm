@@ -17,27 +17,35 @@ v0.7
 ^> improved damage animation
 ^> added the ability to add images (only in q&a)
 
-[x] fixed the layout on the menu where user chooses a reviewer
-
-[x] ^> fixed a bug when importing a quiz, causes the forgetful score to have NAN
-
-
-
+^> fixed the layout on the menu where user chooses a reviewer
+^> fixed a bug where exporting/importing quizzes result in images being lost
+^> fixed a bug when importing a quiz, causes the forgetful score to have NAN
 
 v0.7x
+
+^> fixed a bug when deleting items, the groups can get shuffled
+
+^> improve the performance/algorithm when displaying/manipulating items
+    ^> improved the speed of deletion
+    ^> improved the speed of adding items
+        ^> add a function that also detects if theres no group existing yet
+    [?] improved the speed of updating items
+~ Needs more testing tho to check its reliability
+
+[x] bug on "pick the wrong" if the group only contained 1 items
+[x] bug on "fill in the blank" when each word only contain 1 letter from the question
+[x] fix a bug where user can drag a link, revealing its an html app
+
 [x] create a ReviTerm main menu
 [x] create the credit menu
 [x] create the character placeholder shop
-[x] improve the editor bg effec
-[x] create bg effect on the main menu
-[x] Add a dramatic opening in the classic mode
+[x] add editor bg effect
+[x] add bg effect on the main menu
 
-[x] improve the performance/algorithm when displaying items
+
+[x] Add a dramatic opening in the classic mode
 [x] slow performance when loading the enumarated question due to the flags?
-[x] bug on "pick the wrong" if the group only contained 1 items
-[x] bug on "fill in the blank" when each word only contain 1 letter from the question
 [x] bug on "fill in the blank" when there's a symbol next to a word and it doesn't blank it
-[x] fix a bug where user can drag a link, revealing its an html app
 
 v0.8
 

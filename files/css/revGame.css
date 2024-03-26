@@ -248,7 +248,7 @@ hr {
     width: 100%;
     height: 20vw;
     position: absolute;
-    bottom: -10vw;
+    bottom: 0vw;
 
     border-radius: 100px;
     z-index: -1;
