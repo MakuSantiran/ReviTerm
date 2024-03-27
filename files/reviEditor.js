@@ -21,6 +21,7 @@ var local_amountOfItems = 0
 var local_groupList = []
 var local_selectedItem = []
 var local_selectedGroupExclusion = []
+var local_contentOfReviewer = []
 
 var local_forgetfulFlagScore = {} // this is per group
 var local_bestFlagGroup = {}    // this is per group
@@ -463,9 +464,150 @@ function updateBothQEQuestions(){
 }
 
 
-// htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes 
-// htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes 
-// htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes // htmlCodes 
+// Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation 
+// Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation 
+// Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation // Animation 
+
+function randomNumbers(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function floatText(){
+    var textContainer = document.getElementById('floatingTextContainerId');
+    var numberOfChildren = textContainer.childElementCount;
+
+    if (numberOfChildren < 20){
+        var lengthOfLocalReviewer = local_contentOfReviewer.length
+
+        var randomNumber = randomNumbers(-30,90)
+        var randomSpeed = randomNumbers(0,10)
+
+        var particle = document.createElement('div');
+        particle.className = 'floatingText';
+
+        particle.style.width = "100%"
+        particle.style.fontSize = 5+randomSpeed+"vw"
+        particle.style.position = "absolute"
+        particle.style.bottom = 0
+        particle.style.left = randomNumber+"%"
+        particle.style.whiteSpace = "nowrap"
+        particle.style.color = "#6e6e6e"
+        particle.style.filter = "blur(2px)";
+        particle.style.userSelect = "none"
+        
+        if (lengthOfLocalReviewer != 0){
+            var randomIndex = randomNumbers(0,lengthOfLocalReviewer-1)
+            particle.innerHTML = local_contentOfReviewer[randomIndex]["answer"]    
+        } else {
+            particle.innerHTML = "ReviTerm"
+        }
+
+        anime({
+            targets: particle,
+            opacity: [0, 1],
+            duration: 3000,
+            easing: 'easeOutExpo'
+        })
+
+        anime({
+            targets: particle,
+            bottom: ["0%", "110%"],
+            duration: 10000 + (1000*randomSpeed),
+            easing: 'linear',
+            complete: function(anim) {
+                textContainer.removeChild(particle); // Remove the particle after animation
+            }
+        });
+
+        /*
+        particle.style.left = (Math.random() * 95) + "%";
+        var x = parseFloat(Math.random() * window.innerWidth);
+        var y = window.innerHeight - 10; // Start at the bottom of the screen
+        var speed = Math.random() * 2 + 1; // Random speed between 1 and 3
+        var opacity = Math.random() * 0.5 + 0.5; // Random opacity between 0.5 and 1
+        var size = Math.random() * 20 + 10; // Random size between 10 and 30
+        */
+
+        // add to text
+        textContainer.appendChild(particle);
+    }    
+}
+
+
+function slideText(){
+    var textContainer = document.getElementById('floatingTextContainerId');
+    var numberOfChildren = textContainer.childElementCount;
+
+    if (numberOfChildren < 20){
+        var lengthOfLocalReviewer = local_contentOfReviewer.length
+
+        var randomNumber = randomNumbers(-30,90)
+        var randomSpeed = randomNumbers(0,10)
+
+        var direction = [
+            ["-30%", "110%"],
+            ["110%", "-30%"]
+        ]
+
+        var particle = document.createElement('div');
+        particle.className = 'floatingText';
+
+        particle.style.width = "100%"
+        particle.style.fontSize = 5+randomSpeed+"vw"
+        particle.style.position = "absolute"
+        particle.style.top = randomNumber+"%"
+        particle.style.whiteSpace = "nowrap"
+        particle.style.color = "#6e6e6e"
+        particle.style.filter = "blur(2px)";
+        particle.style.userSelect = "none"
+        
+        if (lengthOfLocalReviewer != 0){
+            var randomIndex = randomNumbers(0,lengthOfLocalReviewer-1)
+            particle.innerHTML = local_contentOfReviewer[randomIndex]["answer"]    
+        } else {
+            particle.innerHTML = "ReviTerm"
+        }
+
+        anime({
+            targets: particle,
+            opacity: [0, 1],
+            duration: 3000,
+            easing: 'easeOutExpo'
+        })
+
+        anime({
+            targets: particle,
+            left: direction[randomNumbers(0,1)],
+            duration: 10000 + (1000*randomSpeed),
+            easing: 'linear',
+            complete: function(anim) {
+                anime({
+                    targets: particle,
+                    opacity: [1, 0],
+                    duration: 1000,
+                    easing: 'easeOutExpo',
+                    complete: function(anim){
+                        textContainer.removeChild(particle); // Remove the particle after animation
+                    }
+                })
+                
+            }
+        });
+
+        /*
+        particle.style.left = (Math.random() * 95) + "%";
+        var x = parseFloat(Math.random() * window.innerWidth);
+        var y = window.innerHeight - 10; // Start at the bottom of the screen
+        var speed = Math.random() * 2 + 1; // Random speed between 1 and 3
+        var opacity = Math.random() * 0.5 + 0.5; // Random opacity between 0.5 and 1
+        var size = Math.random() * 20 + 10; // Random size between 10 and 30
+        */
+
+        // add to text
+        textContainer.appendChild(particle);
+    }    
+}
+setInterval(slideText, 700)
 
 // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items 
 // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items // Display Items 
@@ -772,6 +914,7 @@ function initialization(){
             
             console.log("Content of ",reviewerDatabaseName," are ",value)
             var reviewerHeaderName = reviewerDatabaseName.replace(revieweraddOn, "");
+            local_contentOfReviewer = value
 
             document.querySelector(".reviewerName").innerHTML += reviewerHeaderName
             document.querySelector(".totalItems").innerHTML = value["amountOfItems"]
@@ -924,6 +1067,8 @@ function addItem(){
                     generateForgetfulDetails(value[i]);
                     console.log("Added", value[i])
                 }
+
+                local_contentOfReviewer = value
                 /**/
 
 
@@ -982,6 +1127,8 @@ function addItem(){
                 hideEditor()
                 //displayUpdatedItem(updatedItem)
                 setTimeout(displayItems, 25);
+
+                local_contentOfReviewer = value
             }); 
         }
     } else {
@@ -1059,6 +1206,8 @@ function addItem(){
                     generateForgetfulDetails(value[i]);
                     console.log("Added", value[i])
                 }
+
+                local_contentOfReviewer = value
                 /**/
             }); 
              /**/
@@ -1126,6 +1275,8 @@ function addItem(){
                 hideEditor()
                 //displayUpdatedItem(updatedItem, changedGroup)
                 setTimeout(displayItems, 25);
+
+                local_contentOfReviewer = value
             }); 
             /**/
         }
@@ -1197,6 +1348,8 @@ function removeItem(){
                 </div>
             `      
         }
+
+        local_contentOfReviewer = value
         hideEditor()
     }); 
 }

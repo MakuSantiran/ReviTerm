@@ -29,17 +29,22 @@ v0.7x
     ^> improved the speed of deletion
     ^> improved the speed of adding items
         ^> add a function that also detects if theres no group existing yet
-    [?] improved the speed of updating items
+    [pass] improved the speed of updating items
 ~ Needs more testing tho to check its reliability
 
-[x] bug on "pick the wrong" if the group only contained 1 items
-[x] bug on "fill in the blank" when each word only contain 1 letter from the question
-[x] fix a bug where user can drag a link, revealing its an html app
 
+^> improved the "pick the wrong" choices
+^> updated "the learner" icon
+^> bug on "fill in the blank" when each word only contain 1 letter from the question
+^> add editor bg effect and recolored
+
+
+
+
+[x] fix a bug where user can drag a link, revealing its an html app
 [x] create a ReviTerm main menu
 [x] create the credit menu
 [x] create the character placeholder shop
-[x] add editor bg effect
 [x] add bg effect on the main menu
 
 

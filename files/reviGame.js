@@ -152,7 +152,14 @@ function generateFillInTheBlank(sentence) {
     
     // Filter out single-character words and words containing symbols
     var filteredWords = words.filter(word => word.length > 1 && !/\W/.test(word));
-    
+
+    console.log("filtered words", filteredWords)
+    if (filteredWords.length == 0){
+        filteredWords = words.filter(word => word.length == 1 && !/\W/.test(word));
+        console.log("Aha!!!", filteredWords)
+    }
+
+
     // If there are no eligible words, return the original sentence
     if (filteredWords.length === 0) {
         return sentence;
@@ -764,8 +771,6 @@ function createFireParticle() {
             }
         });
     }
-
-
 }
 
 
@@ -881,6 +886,7 @@ function scrambledMultipleChoice(Group){
 function pickTheWrong(Group){
     var theChoices = []
     var amountOfChoices = 4
+    var choiceIndex = [1,2,3,4]
 
     // display the other 2
     document.getElementById("choiceContainerId3").style.display = "block"
@@ -889,12 +895,14 @@ function pickTheWrong(Group){
     // dynamic difficult :) [if yellow flag]
     if (reviewItems[reviGame.atNumber][whichDifficultyType] > yellowFlagRange && reviewItems[reviGame.atNumber][whichDifficultyType] < redFlagRange){
         amountOfChoices = 3
+        choiceIndex = [1,2,3]
         document.getElementById("choiceContainerId4").style.display = "none"
     }
 
     // if red flag
     if (reviewItems[reviGame.atNumber][whichDifficultyType] >= redFlagRange){
         amountOfChoices = 2
+        choiceIndex = [1,2]
         document.getElementById("choiceContainerId3").style.display = "none"
         document.getElementById("choiceContainerId4").style.display = "none"
     }
@@ -909,11 +917,20 @@ function pickTheWrong(Group){
     console.log("AAAsaadsdsa", reviewItems_Choices[Group])
 
     // for multiple choice
+    var randomizedChoiceBank = shuffleArray(choiceIndex)
     var randomizedChoices = shuffleArray(theChoices)
     var wrongAnswerIndex = randomNumbers(1,amountOfChoices)
 
+    console.log("randomizedChoiceBank: ",randomizedChoiceBank)
+
+    // remove which wrong
+    randomizedChoiceBank = removeStringFromArray(randomizedChoiceBank, wrongAnswerIndex)
+    
+    console.log("randomizedChoiceBank: ",randomizedChoiceBank)
+
     var temporaryWrongChoice = removeStringFromArray(randomizedChoices, reviewItems[reviGame.atNumber].answer)
     
+    // put the choices
     for (var i = 1; i<=amountOfChoices; i++){
         var html_choice = document.getElementById("choice"+i+"Id")
         
@@ -925,6 +942,11 @@ function pickTheWrong(Group){
 
     var html_incorrectChoice = document.getElementById("choice"+wrongAnswerIndex+"Id")
     html_incorrectChoice.innerHTML = temporaryWrongChoice[0]
+
+    var html_correctChoice = document.getElementById("choice"+randomizedChoiceBank[0]+"Id")
+    html_correctChoice.innerHTML = reviewItems[reviGame.atNumber].answer
+
+    console.log("CorrectAnswer",randomizedChoiceBank[0])
 
     displayPickTheWrong()
 }
@@ -1036,8 +1058,16 @@ function showChoices(Group){
     // check first if the current item is 
     var currentItem = reviewItems[reviGame.atNumber].answer
     var currentQuestion = reviewItems[reviGame.atNumber].question
+    var amountOfChoices = reviewItems_Choices[Group]
 
-    
+    console.log("Amount Of CHoices", amountOfChoices, amountOfChoices.length)
+
+    // prevent remix 3 if the choices are less than 2
+    if (amountOfChoices.length < 2){
+        console.log("HEY DISABLE THE REMIX")
+        remixModeValue = 0
+    }
+
     // if Q and A
     if (checkIfStringOrArray(currentItem)) {
 
@@ -1227,9 +1257,12 @@ function restartingMessage(){
 function proceedToNextItem(){
     // if not finished
     if (reviewItems.length > reviGame.atNumber){
+
+        
         if (reviGame.options.mode != "Practice"){
             remixModeValue = randomNumbers(-remixModeValueRarity, remixModeValueRange)
-            console.log("remixMOdeValuE "+remixModeValue)
+            //remixModeValue = 5
+            //console.log("remixMOdeValuE "+remixModeValue)
         }
         
         displayQuestion()

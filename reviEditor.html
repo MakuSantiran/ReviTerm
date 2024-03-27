@@ -2,9 +2,11 @@
 <html>
 <head>
 	<title>Editor</title>
+	<script src="./files/AnimeJs/anime.min.js"></script>
 	<script src="./files/compressorJS/compressor.js"></script>
 	<script type="module" src="./files/reviEditor.js"></script>
 	<link rel="stylesheet" href="./files/css/revEditor.css">
+	<link rel="stylesheet" href="./files/css/revEditor/editorParticles.css">
 </head>
 <body>
 	
@@ -12,10 +14,9 @@
 		<button onclick="gotoSelectQuiz()"> Go Back </button>
 	-->
 
+	<div class="floatingTextContainer" id="floatingTextContainerId"></div>
+
 	<div style="margin-bottom: 22vw;"></div>
-
-
-
 
 	<div class="addItemWithoutGroup" onclick="showEditor(-1,'')">
 		Add Item
@@ -296,7 +297,6 @@
 			</div>	
 		</div>
 	</div>
-
 
 	<br/>
 	<br/>
