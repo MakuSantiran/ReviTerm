@@ -2,6 +2,8 @@
 <html>
 <head>
 	<title>Editor</title>
+	<script src="cordova.js"></script>
+	<script src="./js/index.js"></script>
 	<script src="./files/AnimeJs/anime.min.js"></script>
 	<script src="./files/compressorJS/compressor.js"></script>
 	<script type="module" src="./files/reviEditor.js"></script>
@@ -95,8 +97,10 @@
 
 						<input type="file" class="itemImageInput" id="itemImageInputId" style="display: none;" name="files" accept=".png, .jpg">
 						<div class="itemImage" onclick="pictureManager()">
+							<div class="itemImageMessage">
+								Tap here to <br/>add picture
+							</div>
 							<img src="" class="itemImageShow"/>
-							Tap here to add picture
 						</div>
 
 					</div>

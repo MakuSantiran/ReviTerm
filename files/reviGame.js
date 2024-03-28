@@ -1058,19 +1058,19 @@ function showChoices(Group){
     // check first if the current item is 
     var currentItem = reviewItems[reviGame.atNumber].answer
     var currentQuestion = reviewItems[reviGame.atNumber].question
-    var amountOfChoices = reviewItems_Choices[Group]
-
-    console.log("Amount Of CHoices", amountOfChoices, amountOfChoices.length)
-
-    // prevent remix 3 if the choices are less than 2
-    if (amountOfChoices.length < 2){
-        console.log("HEY DISABLE THE REMIX")
-        remixModeValue = 0
-    }
 
     // if Q and A
     if (checkIfStringOrArray(currentItem)) {
 
+        var amountOfChoices = reviewItems_Choices[Group]
+        console.log("Amount Of CHoices", amountOfChoices, amountOfChoices.length)
+    
+        // prevent remix 3 if the choices are less than 2
+        if (amountOfChoices.length < 2){
+            console.log("HEY DISABLE THE REMIX")
+            remixModeValue = 0
+        }
+    
         // if Multiple Choice
         if (remixModeValue <= 0){
             html_multipleChoiceContainer.style.display = "block"

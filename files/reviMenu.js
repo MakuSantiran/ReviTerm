@@ -591,9 +591,9 @@ function downloadReviewer(name, data){
 
         // Prompt the user to select a file location
         var dateString = getDate();
-        var fileName = name+dateString+".rtr";
+        var fileName = name+"_"+dateString+".rtr";
         var fileContent = JSON.stringify(data);
-        var base64Data = btoa(fileContent)
+        var base64Data = Base64.encode(fileContent)
 
         try {
             plugin.writeFile({
@@ -605,9 +605,10 @@ function downloadReviewer(name, data){
             alert(error2)
         }
     }catch(error){ 
+        alert(error)
 
         var dateString = getDate();
-        var fileName = name+dateString+".rtr";
+        var fileName = name+"_"+dateString+".rtr";
         var fileContent = JSON.stringify(data);
 
         var blob = new Blob([fileContent], { type: 'text/plain' });
@@ -648,61 +649,29 @@ function convertImgToBlob(base64String){
     return blob
 }
 
+
+
 function exportReviewer(index){
     localforage.getItem("reviewerNames", function (err, reviewerNames) {
         var selectedReviewer = reviewerNames[index].ReviewerName
 
         localforage.getItem(reviewerPath+selectedReviewer, function (err, content){
             //console.log(reviewerPath+selectedReviewer)
+
+            console.log("The contetnt is",content)
             //var exportData = [[selectedReviewer+"_Export"]]
             var exportData = [[selectedReviewer]]
             local_withImages = []
 
+            console.log("export datta is",exportData)
+
             for (var i in content){
                 var savedImage = content[i].image
+                console.log("The item is",content[i])
 
                 // for images
                 if (savedImage != ""){
-                    console.log(savedImage)
-
-                    // Create a new FileReader object
-                    var reader = new FileReader();
-                    
-                    // Define a function to handle the FileReader onload event
-                    reader.onload = function(event) {
-                        // Access the base64-encoded string
-                        var base64String = event.target.result;
-                        
-                        // Use the base64String as needed
-                        var stringified = base64String
-                        savedImage = JSON.stringify(stringified)
-                        //console.log("Base64 string:", base64String);
-                        //console.log(savedImage)
-                        //console.log("PARSED", savedImage)
-
-                        // firstIndexOfWithImages (what the hell javascript)
-                        var fIOWI = parseInt(local_withImages[0])
-                        exportData[fIOWI+1][6] = stringified
-
-                        //console.log(fIOWI+1)
-                        alert(exportData[fIOWI+1])
-                        //convertImgToBlob(stringified)
-
-                        // dequeue
-                        local_withImages.shift();
-
-                        if (local_withImages.length == 0){
-                            console.log(exportData)
-                            console.log("Downloading")
-                            downloadReviewer(selectedReviewer, exportData)
-                        }
-                    };
-                    
                     local_withImages.push(i)
-                    console.log("Pushed!", i)
-
-                    // Read the Blob object as a data URL (base64-encoded string)
-                    reader.readAsDataURL(savedImage);
                 }
 
                 var toBePushed = [[
@@ -712,17 +681,63 @@ function exportReviewer(index){
                     content[i].enumaration,
                     content[i].group,
                     content[i].id,
-                    savedImage,
+                    content[i].image,
                     content[i].question
                 ]]
 
+                console.log("savedImage is", i ,content[i]["answer"], savedImage)
+
                 exportData = [...exportData, ...toBePushed]     
                 
-                console.log(i)
+                //console.log(i)
             }
 
-            console.log(local_withImages)
-            console.log("TheExportedOne", exportData)
+            console.log("WHAWHGEUIHGSO",exportData)
+            
+            // for the damn images
+            for (var i in local_withImages){
+
+                // Create a new FileReader object
+                var reader = new FileReader();
+
+                // what the hell javascript
+                var adjustedIndex = parseInt(local_withImages[i])+1
+
+                // Define a function to handle the FileReader onload event
+                // used some "illegal" techiniques
+                reader.onload = (function(index, item) {
+                    return function(event) {
+
+                        console.log("IndexIS", index, item)
+
+                        // Access the base64-encoded string
+                        var base64String = event.target.result;
+                        
+                        // Use the base64String as needed
+                        var stringified = base64String;
+                        savedImage = JSON.stringify(stringified);
+
+                        // save to the exportData
+                        exportData[index + 1][6] = stringified;
+                        console.log(exportData[index + 1][6]);
+
+                        // remove the list of items with images
+                        local_withImages.shift(); 
+
+                        if (local_withImages.length == 0) {
+                            console.log("To be downloaded", exportData);
+                            console.log("Downloading");
+                            downloadReviewer(selectedReviewer, exportData)
+                        }
+                    };
+                })(parseInt(i), exportData[adjustedIndex]); // <-- "illegal" file parameters
+
+                // read the image and save
+                reader.readAsDataURL(exportData[adjustedIndex][6]);
+            }
+
+            //console.log(local_withImages)
+            //console.log("TheExportedOne", exportData)
 
             if (local_withImages.length == 0){
                 downloadReviewer(selectedReviewer, exportData)

@@ -97,17 +97,22 @@ hr {
 
 .questionImageContainer{
     background-color: #000000;
-    width: 64vw;
-    height: 64vw;
+    width: 100%;
+    
     
     margin: 0 auto; 
     margin-bottom: 5vw;
+
+    padding: 1vw;
 }
 
 .questionImage{
-    padding: 2px;
-    width: 98%;
-    height: 98%;
+    display: inline-block; /* Ensure the image behaves as an inline block */
+    max-width: 100%; /* Ensure the image takes up the available width */
+    max-height: 60vw; /* Ensure the image takes up the available height */
+    vertical-align: middle; /* Vertically align the image within the container */
+
+    top: 1vw;
 }
 
 

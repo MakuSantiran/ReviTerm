@@ -347,27 +347,29 @@ function displayForgetfulScore(item){
 
 function generateForgetfulDetails(item){
 
-    var html_forgetfulLabel = document.getElementById("forgetful"+item.group)
-    var html_flagRankIndicator = document.getElementById("flagRank"+item.group)
+    var finalizedGroup = item.group.replace(/ /g, "_");
+
+    var html_forgetfulLabel = document.getElementById("forgetful"+finalizedGroup)
+    var html_flagRankIndicator = document.getElementById("flagRank"+finalizedGroup)
     var html_gameModeFlagId = document.getElementById("gameModeFlagId")
 
     // update the forgetful things
-    if (local_forgetfulFlagScore[item.group] == null){
-        local_forgetfulFlagScore[item.group] = [0,0,0]
-        local_bestFlagGroup[item.group] = [-99,-99,0]
+    if (local_forgetfulFlagScore[finalizedGroup] == null){
+        local_forgetfulFlagScore[finalizedGroup] = [0,0,0]
+        local_bestFlagGroup[finalizedGroup] = [-99,-99,0]
     }
 
     // add difficulty score
-    local_forgetfulFlagScore[item.group][0] = (local_forgetfulFlagScore[item.group][0] + item.difficulty) + forgetfulScoreAdjacent
-    local_forgetfulFlagScore[item.group][1] = (local_forgetfulFlagScore[item.group][1] + item.difficultyClassic) + forgetfulScoreAdjacent
+    local_forgetfulFlagScore[finalizedGroup][0] = (local_forgetfulFlagScore[finalizedGroup][0] + item.difficulty) + forgetfulScoreAdjacent
+    local_forgetfulFlagScore[finalizedGroup][1] = (local_forgetfulFlagScore[finalizedGroup][1] + item.difficultyClassic) + forgetfulScoreAdjacent
 
 
     // getTheWorstFlag
-    if (item.difficulty > local_bestFlagGroup[item.group][0]){
-        local_bestFlagGroup[item.group][0] = item.difficulty
+    if (item.difficulty > local_bestFlagGroup[finalizedGroup][0]){
+        local_bestFlagGroup[finalizedGroup][0] = item.difficulty
     }
-    if (item.difficultyClassic > local_bestFlagGroup[item.group][1]){
-        local_bestFlagGroup[item.group][1] = item.difficultyClassic
+    if (item.difficultyClassic > local_bestFlagGroup[finalizedGroup][1]){
+        local_bestFlagGroup[finalizedGroup][1] = item.difficultyClassic
     }
 
     // getWorstGameModeFlag
@@ -378,10 +380,10 @@ function generateForgetfulDetails(item){
         local_gameModeFlags[1] = item.difficultyClassic
     }
 
-    var toText = local_forgetfulFlagScore[item.group].join(' ');
+    var toText = local_forgetfulFlagScore[finalizedGroup].join(' ');
 
     html_forgetfulLabel.innerHTML = "Forgetful Score: "+toText
-    html_flagRankIndicator.innerHTML = displayFlagRank(local_bestFlagGroup[item.group])
+    html_flagRankIndicator.innerHTML = displayFlagRank(local_bestFlagGroup[finalizedGroup])
     html_gameModeFlagId.innerHTML = `Total Flag:
         <img class="miniFlag" src="`+getWhichFlag(local_gameModeFlags[0])+`">
         <img class="miniFlag" src="`+getWhichFlag(local_gameModeFlags[1])+`">
@@ -578,7 +580,7 @@ function slideText(){
         anime({
             targets: particle,
             left: direction[randomNumbers(0,1)],
-            duration: 10000 + (1000*randomSpeed),
+            duration: 7000 + (1000*randomSpeed),
             easing: 'linear',
             complete: function(anim) {
                 anime({
@@ -643,10 +645,12 @@ function displayItems(){
 
             // this is unoptimized but gets the job done
             for (var i in totalGroups){
+                var replacedSpacedWith_ = totalGroups[i].replace(/ /g, "_");
+
                 html_listOfItems.innerHTML += `
-                <div class="groupSection`+totalGroups[i]+`">
+                <div class="groupSection`+replacedSpacedWith_+`">
                     <div class="groupHeaderFlexContainer">
-                        <div class="groupHeaderHideButton" id="groupHideButtonId`+totalGroups[i]+`" onclick="showOrHideGroup('`+totalGroups[i]+`')">^</div>
+                        <div class="groupHeaderHideButton" id="groupHideButtonId`+replacedSpacedWith_+`" onclick="showOrHideGroup('`+replacedSpacedWith_+`')">^</div>
                         <div class="groupHeaderFlexItemTitle">
                             <div class="groupHeader">
                                 `+totalGroups[i]+`
@@ -657,32 +661,32 @@ function displayItems(){
                     <div class="groupDetailsContainer">
                         <div class="flexContainer">
                             <div class="flexItem">
-                                <div id="forgetful`+totalGroups[i]+`">
+                                <div id="forgetful`+replacedSpacedWith_+`">
                                     Forgetful Score: #
                                 </div>
                             </div>
                             <div class="flexItem">
-                                <div id="flagRank`+totalGroups[i]+`">
+                                <div id="flagRank`+replacedSpacedWith_+`">
                                     Best Flag: 
                                 </div>
                             </div>
                         </div>
                     </div>
                 
-                    <div class="groupSectionItmShowClass`+totalGroups[i]+`" id="groupSectionItmShowId`+totalGroups[i]+`"></div>
+                    <div class="groupSectionItmShowClass`+replacedSpacedWith_+`" id="groupSectionItmShowId`+replacedSpacedWith_+`"></div>
                 </div>
                 `
 
-                var html_groupSectionItmShow = document.querySelector(".groupSectionItmShowClass"+totalGroups[i])
+                var html_groupSectionItmShow = document.querySelector(".groupSectionItmShowClass"+replacedSpacedWith_)
 
-                if (local_whichGroupsAreHidden.includes(totalGroups[i])){
-                    removeHiddenGroup(local_whichGroupsAreHidden, totalGroups[i])
-                    showOrHideGroup(totalGroups[i]) // restore the hidden option?
+                if (local_whichGroupsAreHidden.includes(replacedSpacedWith_)){
+                    removeHiddenGroup(local_whichGroupsAreHidden, replacedSpacedWith_)
+                    showOrHideGroup(replacedSpacedWith_) // restore the hidden option?
                 }
 
                 // hides the list in the first run
                 if (local_firstRun){
-                    showOrHideGroup(totalGroups[i]) 
+                    showOrHideGroup(replacedSpacedWith_) 
                 }
 
                 // so for each items (that is related to the group)
@@ -732,7 +736,7 @@ function displayItems(){
                 
 
                 html_groupSectionItmShow.innerHTML += `
-                    <div class="addItem addItem`+totalGroups[i]+`" onclick="showEditor(`+-1+`,'`+totalGroups[i]+`')">
+                    <div class="addItem addItem`+replacedSpacedWith_+`" onclick="showEditor(`+-1+`,'`+totalGroups[i]+`')">
                         +
                     </div>
                 `
@@ -755,8 +759,11 @@ function displayItems(){
 }
 
 function displayAddedItem(newItem){
-    var html_groupSectionItmShow = document.querySelector(".groupSectionItmShowClass"+newItem.group)
-    var html_groupSectionAddButton = document.querySelector(".addItem"+newItem.group)
+
+    var finalizedGroup = newItem.group.replace(/ /g, "_");
+
+    var html_groupSectionItmShow = document.querySelector(".groupSectionItmShowClass"+finalizedGroup)
+    var html_groupSectionAddButton = document.querySelector(".addItem"+finalizedGroup)
 
     if (local_groupList.length > 0){
         if (document.getElementById("emptyItemMessageId") != null){
@@ -769,9 +776,9 @@ function displayAddedItem(newItem){
     } else {
         var html_listOfItems = document.querySelector(".listOfItems")
         html_listOfItems.innerHTML += `
-        <div class="groupSection`+newItem.group+`">
+        <div class="groupSection`+finalizedGroup+`">
             <div class="groupHeaderFlexContainer">
-                <div class="groupHeaderHideButton" id="groupHideButtonId`+newItem.group+`" onclick="showOrHideGroup('`+newItem.group+`')">^</div>
+                <div class="groupHeaderHideButton" id="groupHideButtonId`+finalizedGroup+`" onclick="showOrHideGroup('`+finalizedGroup+`')">^</div>
                 <div class="groupHeaderFlexItemTitle">
                     <div class="groupHeader">
                         `+newItem.group+`
@@ -782,24 +789,24 @@ function displayAddedItem(newItem){
             <div class="groupDetailsContainer">
                 <div class="flexContainer">
                     <div class="flexItem">
-                        <div id="forgetful`+newItem.group+`">
+                        <div id="forgetful`+finalizedGroup+`">
                             Forgetful Score: #
                         </div>
                     </div>
                     <div class="flexItem">
-                        <div id="flagRank`+newItem.group+`">
+                        <div id="flagRank`+finalizedGroup+`">
                             Best Flag: 
                         </div>
                     </div>
                 </div>
             </div>
         
-            <div class="groupSectionItmShowClass`+newItem.group+`" id="groupSectionItmShowId`+newItem.group+`"></div>
+            <div class="groupSectionItmShowClass`+finalizedGroup+`" id="groupSectionItmShowId`+finalizedGroup+`"></div>
         </div>
         `
         
-        html_groupSectionItmShow = document.querySelector(".groupSectionItmShowClass"+newItem.group)
-        html_groupSectionAddButton = document.querySelector(".addItem"+newItem.group)
+        html_groupSectionItmShow = document.querySelector(".groupSectionItmShowClass"+finalizedGroup)
+        html_groupSectionAddButton = document.querySelector(".addItem"+finalizedGroup)
     }
 
     // now display the only related item to the group
@@ -836,7 +843,7 @@ function displayAddedItem(newItem){
     `
 
     html_groupSectionItmShow.innerHTML += `
-    <div class="addItem addItem`+newItem.group+`" onclick="showEditor(`+-1+`,'`+newItem.group+`')">
+    <div class="addItem addItem`+finalizedGroup+`" onclick="showEditor(`+-1+`,'`+newItem.group+`')">
         +
     </div>
     `
@@ -852,7 +859,8 @@ function removeItemFromDisplay(item){
     var html_itemNo = document.querySelector(".itemNo"+item.id)
     html_itemNo.remove()
 
-    var forgetFulScoreGroup = local_forgetfulFlagScore[item.group]
+    var finalizedGroupId = item.group.replace(/ /g, "_");
+    var forgetFulScoreGroup = local_forgetfulFlagScore[finalizedGroupId]
 
     console.log("aasda",local_forgetfulFlagScore)
 
@@ -1297,6 +1305,7 @@ function removeItem(){
         
         // get the group first
         var groupToBeRemoved = value[selectedITBR_Index]["group"]
+        var groupWith_ForHtml = value[selectedITBR_Index]["group"].replace(/ /g, "_");
 
         // with the deleted
         var newValue = value
@@ -1334,7 +1343,7 @@ function removeItem(){
         var indexToRemove = local_groupList.indexOf(groupToBeRemoved);
         if (indexToRemove == -1) {
             console.log("AHAHAHAHAHAHHAHAHAHAAHAH -cough-")
-            document.querySelector(".groupSection"+groupToBeRemoved).remove()
+            document.querySelector(".groupSection"+groupWith_ForHtml).remove()
         }
 
         // display empty message if empty
@@ -1569,12 +1578,14 @@ function showOptionsBeforeReviTerm(){
 
         // print the html :)
         for (var i in totalGroups){
+            var replacedSpacedWith_ = totalGroups[i].replace(/ /g, "_");
+
             html_groupListContainer.innerHTML += `
 				<div class="groupListItem">				
 					<div class="groupListItemCheckBox">
-						<input type="checkbox" class="itemDisabled" onclick='excludeGroup("`+totalGroups[i]+`")' checked>
+						<input type="checkbox" class="itemDisabled" onclick='excludeGroup("`+replacedSpacedWith_+`")' checked>
 					</div>
-					`+totalGroups[i]+`
+					`+replacedSpacedWith_+`
 				</div>
             `
         }
